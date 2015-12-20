@@ -1,0 +1,11 @@
+[
+	{
+		"SCREEN_WIDTH" : 1280,
+		"SCREEN_HEIGHT" : 720,
+		"TITLE" : "Hello World",
+		"SAMPLE_FREQUENCY" : 44100,
+		"NO_CHANNELS": 2,
+		"SAMPLE_SIZE": 2048
+
+	}
+]

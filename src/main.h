@@ -7,6 +7,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <fcntl.h>
+#include <unistd.h>
 
 //----------------------------------- PROGRAM CONSTANTS --------------------------------------
 #define SIZE_OF_MODIFIERS 6
@@ -20,6 +22,8 @@ const static int MODIFIERPOSITION_STUCK = 4;
 const static int MODIFIERPOSITION_IMPETOUOUS = 5;
 const static char FALSE = 0;
 const static char TRUE = 1;
+const static char FAIL = 0;
+const static char SUCCESS = 1;
 const static int SIDE_ONE = 0;
 const static int SIDE_TWO = 1;
 const static int TERRAIN_COAST = 0;
@@ -214,7 +218,7 @@ typedef struct
 */
 typedef struct
 {
-	int SCREEN_WIDTH, SCREEN_HEIGHT;
+	int SCREEN_WIDTH, SCREEN_HEIGHT, SAMPLE_FREQUENCY, NO_CHANNELS, SAMPLE_SIZE;
 	char *windowTitle;
 
 
@@ -232,8 +236,8 @@ typedef struct
 //-----------INITIALISATION-----------
 //loading libraries and the files themselves
 char *loadTextFile(const char *filename, int *success);
-int getFileSize(FILE *sizeToGet);
-optionsData *initOptions(char *fileContents, int *success);
+int getFileSize(FILE *sizeToGet, int *success);
+optionsData initOptions(char *fileContents, int *success);
 SDL_Window *initSDL(optionsData *opt, int *success);
 SDL_Renderer *createRenderer(SDL_Window *screen, int *success);
 Mix_Music *loadMusic(const char *filename, int *success);
