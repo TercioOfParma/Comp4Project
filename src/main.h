@@ -52,8 +52,8 @@ const static int UNITTYPE_AA = 6;
 const static int UNITTYPE_ARTILLERY = 7;
 const static char *OPTIONS_FILE = "options.json";
 const static char *LEVELS_FILE = "levels.json";
-
- 
+const static int MAX_TEXT_OUTPUT = 200;
+const static SDL_Color DEFAULT_TEXT = {255,255,255,0}; 
 
 //----------------------------------- STRUTURE DEFINITIONS -----------------------------------
 
@@ -222,12 +222,13 @@ typedef struct
 }activityData;
 /*
 	optionsData: holds information on options
-
+	NOTE: The names are in the snake case of the constants because they are intended to be program constants, but the nature of Structures means that
+	const makes them read only members which I cannot load into 
 */
 typedef struct
 {
-	int SCREEN_WIDTH, SCREEN_HEIGHT, SAMPLE_FREQUENCY, NO_CHANNELS, SAMPLE_SIZE;
-	char *windowTitle;
+	int SCREEN_WIDTH, SCREEN_HEIGHT, SAMPLE_FREQUENCY, NO_CHANNELS, SAMPLE_SIZE, FONT_SIZE;
+	char *WINDOW_TITLE, *DEFAULT_FONT;
 
 
 }optionsData;
@@ -250,12 +251,12 @@ SDL_Window *initSDL(optionsData *opt, int *success);// DONE
 SDL_Renderer *createRenderer(SDL_Window *screen, int *success);// DONE
 Mix_Music *loadMusic(const char *filename, int *success);// DONE
 Mix_Chunk *loadEffect(const char *filename, int *success);// DONE
-TTF_Font *loadFont(const char *filename, int size,  int *success);// DONE
+TTF_Font *loadFont(optionsData *opt, int *success);// DONE
 SDL_Texture *loadImage(const char *filename, SDL_Renderer *render, SDL_Rect *dimen, int *success);// DONE
 //runtime objects
 buttonData *loadButton(SDL_Texture *display, SDL_Rect *posAndSize, int type, int *success);// DONE
-textData *createTextData(TTF_Font *font, SDL_Renderer *render, SDL_Rect *posAndSize, const char *initialData);
-buttonDataText *loadButtonText(SDL_Texture *display, SDL_Rect *posAndSize, SDL_Renderer *render, const char *initialData, int type, int *success);
+//there was createTextData here, but i felt it unneccessary, Can always roll back changes need be
+buttonDataText *loadButtonText(SDL_Texture *display, SDL_Rect *posAndSize, SDL_Renderer *render, const char *initialData, TTF_Font *font, int type, int *success);
 levelData *loadLevelData(char *levelFileData, int *success);
 char *mapLevelIDToMapPath(levelData *levelDataToChoose, char *mappingFile, char id, int *success);//used to find the mapData file + directory
 char *miscIDToFilePath(mapData *map, char *mappingFile, char ID, int *success);//this will be used to map tilesets and unitSide files together
@@ -284,8 +285,8 @@ void drawTerrain(tileData **toDraw, int size, SDL_Renderer *render);
 void drawUnits(unitData *toDraw, int size,  SDL_Renderer *render);
 void drawMenuElements(buttonData **buttons,int size, SDL_Renderer *render);// DONE
 void drawMenuElementsText(buttonDataText **buttons, int size, SDL_Renderer *render);
-textData *renderText(TTF_Font *font, SDL_Renderer *render, const char *stringToTexture);
-void drawText(textData *toDraw, int size,  SDL_Renderer *render);
+textData *renderText(TTF_Font *font, SDL_Renderer *render, const char *stringToTexture,int *success);// DONE
+void drawText(textData *toDraw,SDL_Renderer *render);// DONE
 void drawQuote(quoteData **quotes, int quoteNo, SDL_Renderer *render);
 void drawQuestion(questionData **questions, int quoteNo, SDL_Renderer *render);
 

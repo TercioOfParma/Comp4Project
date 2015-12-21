@@ -2,10 +2,11 @@
 	{
 		"SCREEN_WIDTH" : 1280,
 		"SCREEN_HEIGHT" : 720,
-		"TITLE" : "Hello World",
+		"WINDOW_TITLE" : "Cold War Conflicts",
 		"SAMPLE_FREQUENCY" : 44100,
 		"NO_CHANNELS": 2,
-		"SAMPLE_SIZE": 2048
-
+		"SAMPLE_SIZE": 2048,
+		"DEFAULT_FONT" : "defaultFont.ttf",
+		"FONT_SIZE" : 12
 	}
 ]

@@ -30,17 +30,26 @@ int main(int argc, char *argv[])
 	//SDL2 + EXTENSION LIBRARIES AND JANSSON STRUCTURES
 	SDL_Window *wind;
 	SDL_Renderer *render;
-	
+	TTF_Font *font;
+	SDL_Texture *testTex;
+	SDL_Rect testRect;
+	buttonDataText *test;
 	//------------------------------------------------ INITIALISATION -------------------------------------------
+	
 	optionsFile = loadTextFile(OPTIONS_FILE, &success);
 	options = initOptions(optionsFile,&success);
 	wind = initSDL(&options, &success);
 	render = createRenderer(wind, &success);
-	
+	font = loadFont(&options, &success);
+	//use below here for testing
+	testRect.x = 100;
+	testRect.y = 100;
+	testTex = loadImage("gfx/blank_button.png", render,&testRect, &success);
+	test = loadButtonText(testTex, &testRect, render, "MEMES GUISE", font, 2, &success);
 	//------------------------------------------------ MAIN LOOP ------------------------------------------------
-	
-	
-	
+	drawMenuElementsText(&test, 1, render);
+	SDL_RenderPresent(render);
+	getch();
 	//------------------------------------------------ DEINITIALISATION -----------------------------------------
 	
 	

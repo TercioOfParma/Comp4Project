@@ -37,8 +37,8 @@ char *loadTextFile(const char *filename, int *success)
 	}
 	
 	FILE *jsonFile = fdopen(fileDescriptor, "rb");
-	int fileSize, result, looper;
-	char *fileContents, *truncatedContents;
+	int fileSize;
+	char *fileContents;
 	if(!jsonFile)
 	{
 		fprintf(stderr, "fopen has failed : %s \n", strerror(errno));
@@ -62,6 +62,13 @@ char *loadTextFile(const char *filename, int *success)
 	fread(fileContents,1,fileSize, jsonFile);
 	fileContents[fileSize] = '\0';
 	fclose(jsonFile);
+	if(strstr(fileContents, "%x") != NULL)
+	{
+		fprintf(stderr, "stack change formatter detected in file provided, nice try\n");
+		*success = FAIL;
+		return NULL;
+	
+	}
 	return fileContents;
 
 
@@ -122,11 +129,12 @@ optionsData initOptions(char *fileContents, int *success)
 
 	tempOpt.SCREEN_WIDTH = json_integer_value(json_object_get(optionsData,"SCREEN_WIDTH"));
 	tempOpt.SCREEN_HEIGHT = json_integer_value(json_object_get(optionsData,"SCREEN_HEIGHT"));
-	tempOpt.windowTitle = json_string_value(json_object_get(optionsData, "TITLE"));
+	tempOpt.WINDOW_TITLE = json_string_value(json_object_get(optionsData, "WINDOW_TITLE"));
 	tempOpt.SAMPLE_SIZE = json_integer_value(json_object_get(optionsData,"SAMPLE_SIZE"));
 	tempOpt.SAMPLE_FREQUENCY = json_integer_value(json_object_get(optionsData,"SAMPLE_FREQUENCY"));
 	tempOpt.NO_CHANNELS = json_integer_value(json_object_get(optionsData,"NO_CHANNELS"));
-
+	tempOpt.FONT_SIZE = json_integer_value(json_object_get(optionsData,"FONT_SIZE"));
+	tempOpt.DEFAULT_FONT = json_string_value(json_object_get(optionsData, "DEFAULT_FONT"));
 	return tempOpt;
 }
 
@@ -173,10 +181,10 @@ SDL_Window *initSDL(optionsData *opt, int *success)
 	
 	}
 	//initialise window
-	temp = SDL_CreateWindow(opt->windowTitle, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, opt->SCREEN_WIDTH, opt->SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+	temp = SDL_CreateWindow(opt->WINDOW_TITLE, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, opt->SCREEN_WIDTH, opt->SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
 	if(!temp)
 	{
-		fprintf(stderr, "SDL_CreateWindow has failed : %s \n");
+		fprintf(stderr, "SDL_CreateWindow has failed : %s \n", SDL_GetError());
 		*success = FAIL;
 		return NULL;
 	
@@ -243,13 +251,14 @@ Mix_Chunk *loadEffect(const char *filename, int *success)
 	return temp;
 }
 /*
-	TTF_Font *loadFont(const char *filename, int size,  int *success):
+	TTF_Font *loadFont(options *opt, int *success):
 	load a font structure
 
 */
-TTF_Font *loadFont(const char *filename, int size,  int *success)
+TTF_Font *loadFont(optionsData *opt, int *success)
 {
-	TTF_Font *temp = TTF_OpenFont(filename, size);
+	
+	TTF_Font *temp = TTF_OpenFont(opt->DEFAULT_FONT, opt->FONT_SIZE);
 	if(!temp)
 	{
 		fprintf(stderr, "TTF_OpenFont has failed : %s \n", TTF_GetError());
@@ -313,5 +322,38 @@ buttonData *loadButton(SDL_Texture *display, SDL_Rect *posAndSize, int type, int
 	temp->dimensions = *posAndSize;
 	temp->type = type;
 
+	return temp;
+}
+/*
+	buttonData *loadButton(SDL_Texture *display, SDL_Rect *posAndSize, int type, int *success):
+	Loads a button with text
+
+*/
+buttonDataText *loadButtonText(SDL_Texture *display, SDL_Rect *posAndSize, SDL_Renderer *render, const char *initialData, TTF_Font *font, int type, int *success)
+{
+	buttonDataText *temp = malloc(sizeof(buttonDataText));
+	if(!temp)
+	{
+		fprintf(stderr, "malloc has failed on buttonData : %s", SDL_GetError());
+		*success = FAIL;
+		return NULL;
+	
+	
+	}
+	temp->details = malloc(sizeof(textData));
+	if(!temp->details)
+	{
+		fprintf(stderr, "malloc has failed on buttonData : %s", SDL_GetError());
+		*success = FAIL;
+		return NULL;
+	
+	
+	}
+	temp->display = display;
+	temp->dimensions = *posAndSize;
+	temp->type = type;
+	temp->details = renderText(font, render, initialData, success);
+	temp->details->dimensions.x = posAndSize->x + (posAndSize->w / 5);
+	temp->details->dimensions.y = posAndSize->y + (posAndSize->h / 5);
 	return temp;
 }
