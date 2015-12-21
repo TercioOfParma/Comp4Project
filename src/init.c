@@ -1,3 +1,11 @@
+/*
+	FILE : INIT.C
+	PURPOSE : Hold initialisation functions for libraries, multimedia and runtime structures
+	VERSION : 0.001
+	NOTES: Big File, may have some unnoticed minor bugs
+*/
+
+
 //---------------------------------- C PREPROCESSOR --------------------------
 
 
@@ -197,4 +205,113 @@ SDL_Renderer *createRenderer(SDL_Window *screen, int *success)
 
 	return temp;
 
+}
+/*
+	Mix_Music *loadMusic(const char *filename, int *success):
+	load music 
+
+*/
+
+Mix_Music *loadMusic(const char *filename, int *success)
+{
+	Mix_Music *temp = Mix_LoadMUS(filename);
+	if(!temp)
+	{
+		fprintf(stderr, "Mix_LoadMUS has failed : %s \n", Mix_GetError());
+		*success = FAIL;
+		return NULL;
+	}
+
+	return temp;
+
+}
+/*
+	Mix_Chunk *loadEffect(const char *filename, int *success):
+	load sound effects
+
+*/
+Mix_Chunk *loadEffect(const char *filename, int *success)
+{
+	Mix_Chunk *temp = Mix_LoadWAV(filename);
+	if(!temp)
+	{
+		fprintf(stderr, "Mix_LoadWAV has failed : %s \n", Mix_GetError());
+		*success = FAIL;
+		return NULL;
+	}
+
+	return temp;
+}
+/*
+	TTF_Font *loadFont(const char *filename, int size,  int *success):
+	load a font structure
+
+*/
+TTF_Font *loadFont(const char *filename, int size,  int *success)
+{
+	TTF_Font *temp = TTF_OpenFont(filename, size);
+	if(!temp)
+	{
+		fprintf(stderr, "TTF_OpenFont has failed : %s \n", TTF_GetError());
+		*success = FAIL;
+		return NULL;
+	}
+
+	return temp;
+
+}
+/*
+	SDL_Texture *loadImage(const char *filename, SDL_Renderer *render, SDL_Rect *dimen, int *success):
+	load an image, translates it to a hardware renderable texture and returns the original image's dimensions
+
+*/
+SDL_Texture *loadImage(const char *filename, SDL_Renderer *render, SDL_Rect *dimen, int *success)
+{
+	SDL_Surface *temp;
+	SDL_Texture *tempTex;
+	temp = IMG_Load(filename);
+	if(!temp)
+	{
+		fprintf(stderr, "IMG_LoadBMP has failed: %s \n", IMG_GetError());
+		*success = FAIL;
+		return NULL;
+	
+	}
+	SDL_SetColorKey(temp, SDL_TRUE, SDL_MapRGB(temp->format, 255,0,255));
+	tempTex = SDL_CreateTextureFromSurface(render, temp);
+	if(!tempTex)
+	{
+		fprintf(stderr, "SDL_CreateTextureFromSurface has failed : %s \n", SDL_GetError());
+		*success = FAIL;
+		return NULL;
+	}
+	dimen->w = temp->w;
+	dimen->h = temp->h;
+	
+	SDL_FreeSurface(temp);
+	return tempTex;
+
+
+}
+/*
+	buttonData *loadButton(SDL_Texture *display, SDL_Rect *posAndSize, int type, int *success):
+	Loads a regular button
+
+*/
+buttonData *loadButton(SDL_Texture *display, SDL_Rect *posAndSize, int type, int *success)
+{
+	buttonData *temp = malloc(sizeof(buttonData));
+	if(!temp)
+	{
+		fprintf(stderr, "malloc has failed on buttonData : %s", SDL_GetError());
+		*success = FAIL;
+		return NULL;
+	
+	
+	}
+	temp->display = display; //will copy the address of the button texture to the object
+	temp->dimensions = *posAndSize;
+	temp->type = type;
+
+	return temp;
 }

@@ -1,3 +1,11 @@
+/*
+	FILE : MAIN.H
+	PURPOSE : Holds all constants, Data structure definitions and function prototypes in a manner accessible to all of the C files
+	VERSION : 0.001
+	NOTES: This could be broken down, but it is more convenient to access just one file across all
+*/
+
+
 //----------------------------------- HEADER FILES AND C PREPROCESSOR (MINUS #define)------------------------
 #include <SDL.h>
 #include <SDL_image.h>
@@ -235,17 +243,17 @@ typedef struct
 //----------------------------------- FUNCTION PROTOTYPES ------------------------------------
 //-----------INITIALISATION-----------
 //loading libraries and the files themselves
-char *loadTextFile(const char *filename, int *success);
-int getFileSize(FILE *sizeToGet, int *success);
-optionsData initOptions(char *fileContents, int *success);
-SDL_Window *initSDL(optionsData *opt, int *success);
-SDL_Renderer *createRenderer(SDL_Window *screen, int *success);
-Mix_Music *loadMusic(const char *filename, int *success);
-Mix_Chunk *loadEffect(const char *filename, int *success);
-TTF_Font *loadFont(const char *filename, int *success);
-SDL_Texture *loadImage(const char *filename, int *success);
+char *loadTextFile(const char *filename, int *success);// DONE
+int getFileSize(FILE *sizeToGet, int *success);// DONE
+optionsData initOptions(char *fileContents, int *success);// DONE
+SDL_Window *initSDL(optionsData *opt, int *success);// DONE
+SDL_Renderer *createRenderer(SDL_Window *screen, int *success);// DONE
+Mix_Music *loadMusic(const char *filename, int *success);// DONE
+Mix_Chunk *loadEffect(const char *filename, int *success);// DONE
+TTF_Font *loadFont(const char *filename, int size,  int *success);// DONE
+SDL_Texture *loadImage(const char *filename, SDL_Renderer *render, SDL_Rect *dimen, int *success);// DONE
 //runtime objects
-buttonData *loadButton(SDL_Texture *display, SDL_Rect *posAndSize, int type, int *success);
+buttonData *loadButton(SDL_Texture *display, SDL_Rect *posAndSize, int type, int *success);// DONE
 textData *createTextData(TTF_Font *font, SDL_Renderer *render, SDL_Rect *posAndSize, const char *initialData);
 buttonDataText *loadButtonText(SDL_Texture *display, SDL_Rect *posAndSize, SDL_Renderer *render, const char *initialData, int type, int *success);
 levelData *loadLevelData(char *levelFileData, int *success);
@@ -272,12 +280,12 @@ void endQuestions(questionData **questions);
 void endLevels(levelData *levels);
 
 //----------DRAWING AND GRAPHICAL-----
-void drawTerrain(tileData **toDraw, SDL_Renderer *render);
-void drawUnits(unitData *toDraw, SDL_Renderer *render);
-void drawMenuElements(buttonData **buttons, SDL_Renderer *render);
-void drawMenuElementsText(buttonDataText **buttons, SDL_Renderer *render);
+void drawTerrain(tileData **toDraw, int size, SDL_Renderer *render);
+void drawUnits(unitData *toDraw, int size,  SDL_Renderer *render);
+void drawMenuElements(buttonData **buttons,int size, SDL_Renderer *render);// DONE
+void drawMenuElementsText(buttonDataText **buttons, int size, SDL_Renderer *render);
 textData *renderText(TTF_Font *font, SDL_Renderer *render, const char *stringToTexture);
-void drawText(textData *toDraw, SDL_Renderer *render);
+void drawText(textData *toDraw, int size,  SDL_Renderer *render);
 void drawQuote(quoteData **quotes, int quoteNo, SDL_Renderer *render);
 void drawQuestion(questionData **questions, int quoteNo, SDL_Renderer *render);
 
