@@ -32,6 +32,11 @@ int main(int argc, char *argv[])
 	SDL_Renderer *render;
 	TTF_Font *font;
 	questionData **questions;
+	textData *test;
+	quoteData **quotes;
+	buttonDataText *testButton;
+	SDL_Texture *testTex;
+	SDL_Rect buttonPos;
 	//------------------------------------------------ INITIALISATION -------------------------------------------
 	
 	optionsFile = loadTextFile(OPTIONS_FILE, &success);
@@ -40,7 +45,26 @@ int main(int argc, char *argv[])
 	render = createRenderer(wind, &success);
 	font = loadFont(&options, &success);
 	//use below here for testing
+	buttonPos.x = 500;
+	buttonPos.y = 500;
+	fprintf(stderr, "works\n");
+	testTex = loadImage("gfx/blank_button.png",render, &buttonPos, &success);
+	fprintf(stderr, "works\n");
+	questions = loadQuestions("data/Hill 875/questions.json", &success);
+	fprintf(stderr, "works\n");
+	quotes = loadQuotes("data/Hill 875/quotes.json", &success);
+	fprintf(stderr, "works\n");
+	test = renderText(font, render, "Allah Ackbar Testa", &success);
+	test->dimensions.x = 600;
+	test->dimensions.y = 600;
+	fprintf(stderr, "works\n");
+	testButton = loadButtonText(testTex, &buttonPos, render, "Faggot Button", font, 1 , &success);
 	//------------------------------------------------ MAIN LOOP ------------------------------------------------
+	fprintf(stderr, "works\n");
+	drawMenuElementsText(&testButton, 1, render);
+	drawText(test, render);
+	drawQuote(quotes, 1, render, font);
+	drawQuestion(questions,1, render, font);
 	SDL_RenderPresent(render);
 	getch();
 	//------------------------------------------------ DEINITIALISATION -----------------------------------------

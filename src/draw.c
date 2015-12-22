@@ -106,7 +106,7 @@ void drawQuote(quoteData **quotes, int quoteNo, SDL_Renderer *render, TTF_Font *
 	quote->dimensions.x = QUOTATION_XPOS;
 	quote->dimensions.y = QUOTATION_YPOS;
 	analysis->dimensions.x = QUOTATION_XPOS;
-	analysis->dimensions.y = QUOTATION_YPOS + 200;
+	analysis->dimensions.y = QUOTATION_YPOS + 100;
 	drawText(quote, render);
 	drawText(analysis, render);
 	SDL_DestroyTexture(quote->display);

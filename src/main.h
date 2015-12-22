@@ -54,7 +54,7 @@ const static char *OPTIONS_FILE = "options.json";
 const static char *LEVELS_FILE = "levels.json";
 const static int MAX_TEXT_OUTPUT = 200;
 const static SDL_Color DEFAULT_TEXT = {255,255,255,0}; 
-const static int QUOTATION_XPOS = 300;
+const static int QUOTATION_XPOS = 400;
 const static int QUOTATION_YPOS = 300;
 const static int QUESTION_XPOS = 250;
 const static int QUESTION_YPOS = 200;
@@ -264,7 +264,7 @@ buttonData *loadButton(SDL_Texture *display, SDL_Rect *posAndSize, int type, int
 buttonDataText *loadButtonText(SDL_Texture *display, SDL_Rect *posAndSize, SDL_Renderer *render, const char *initialData, TTF_Font *font, int type, int *success);//DONE
 levelData *loadLevelData(char *levelFileData, int *success);
 char *mapLevelIDToMapPath(levelData *levelDataToChoose, char *mappingFile, char id, int *success);//used to find the mapData file + directory
-char *miscIDToFilePath(int ID, char *path);//this will be used to map tilesets and unitSide files together
+char *miscIDToFilePath(int ID, char *path);//this will be used to map tilesets and unitSide files together DONE
 mapData *loadMapData(char *filename);
 sideData *loadSideData(char *filename, int *success);
 unitData **loadUnitData(char *sideFile, int *success);//likely a very big function
