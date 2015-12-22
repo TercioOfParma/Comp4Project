@@ -357,3 +357,49 @@ buttonDataText *loadButtonText(SDL_Texture *display, SDL_Rect *posAndSize, SDL_R
 	temp->details->dimensions.y = posAndSize->y + (posAndSize->h / 5);
 	return temp;
 }
+quoteData **loadQuotes(char *filename, int *success)
+{
+	char *quoteDataFILE = loadTextFile(filename, success);
+	quoteData **temp;
+	json_t *tempJsonHandle, *quoteDataJSON;
+	json_error_t errorHandle;
+	int numberOfQuotes, i;
+	
+	tempJsonHandle = json_loads(quoteDataFILE,0, &errorHandle);
+	if(!tempJsonHandle)
+	{
+		fprintf(stderr, "json_loads has failed : %s \n", errorHandle.text);
+		*success = FAIL;
+		return temp;
+	
+	}
+	
+	quoteDataJSON = json_array_get(tempJsonHandle, 0);
+	if(!json_is_object(quoteDataJSON))
+	{
+		fprintf(stderr,"json_object_get failed, didn't get an object\n");
+		*success = FAIL;
+		json_decref(tempJsonHandle);
+		return temp;
+	
+	}
+	numberOfQuotes = json_integer_value(json_object_get(quoteDataJSON,"NO_QUOTES"));
+	temp = malloc(sizeof(quoteData *) * numberOfQuotes);
+	for(i = 0; i < numberOfQuotes; i++)
+	{
+		temp[i] = malloc(sizeof(quoteData));
+		quoteDataJSON = json_array_get(tempJsonHandle, i);
+		if(!json_is_object(quoteDataJSON))
+		{
+			fprintf(stderr,"json_object_get failed, didn't get an object\n");
+			*success = FAIL;
+			json_decref(tempJsonHandle);
+			return temp;
+	
+		}
+		temp[i]->quote = json_string_value(json_object_get(quoteDataJSON, "QUOTE"));
+		temp[i]->analysis = json_string_value(json_object_get(quoteDataJSON, "ANALYSIS"));
+		fprintf(stderr, "%d %s %s\n",i, temp[i]->quote, temp[i]->analysis);
+	}
+	return temp;
+}

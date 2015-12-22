@@ -54,6 +54,8 @@ const static char *OPTIONS_FILE = "options.json";
 const static char *LEVELS_FILE = "levels.json";
 const static int MAX_TEXT_OUTPUT = 200;
 const static SDL_Color DEFAULT_TEXT = {255,255,255,0}; 
+const static int QUOTATION_XPOS = 300;
+const static int QUOTATION_YPOS = 300;
 
 //----------------------------------- STRUTURE DEFINITIONS -----------------------------------
 
@@ -256,7 +258,7 @@ SDL_Texture *loadImage(const char *filename, SDL_Renderer *render, SDL_Rect *dim
 //runtime objects
 buttonData *loadButton(SDL_Texture *display, SDL_Rect *posAndSize, int type, int *success);// DONE
 //there was createTextData here, but i felt it unneccessary, Can always roll back changes need be
-buttonDataText *loadButtonText(SDL_Texture *display, SDL_Rect *posAndSize, SDL_Renderer *render, const char *initialData, TTF_Font *font, int type, int *success);
+buttonDataText *loadButtonText(SDL_Texture *display, SDL_Rect *posAndSize, SDL_Renderer *render, const char *initialData, TTF_Font *font, int type, int *success);//DONE
 levelData *loadLevelData(char *levelFileData, int *success);
 char *mapLevelIDToMapPath(levelData *levelDataToChoose, char *mappingFile, char id, int *success);//used to find the mapData file + directory
 char *miscIDToFilePath(mapData *map, char *mappingFile, char ID, int *success);//this will be used to map tilesets and unitSide files together
@@ -265,7 +267,7 @@ sideData *loadSideData(char *filename, int *success);
 unitData **loadUnitData(char *sideFile, int *success);//likely a very big function
 tileData **loadTileData(char *tileFile, int *success);
 quoteListData *loadQuoteListData(char *filename, int *success);
-quoteData **loadQuotes(char *filename, int *success);
+quoteData **loadQuotes(char *filename, int *success);//DONE
 activityData *loadActivity(char *filename, int *success);
 questionData **loadQuestions(char *filename, int *success);
 
@@ -284,10 +286,10 @@ void endLevels(levelData *levels);
 void drawTerrain(tileData **toDraw, int size, SDL_Renderer *render);
 void drawUnits(unitData *toDraw, int size,  SDL_Renderer *render);
 void drawMenuElements(buttonData **buttons,int size, SDL_Renderer *render);// DONE
-void drawMenuElementsText(buttonDataText **buttons, int size, SDL_Renderer *render);
+void drawMenuElementsText(buttonDataText **buttons, int size, SDL_Renderer *render);//DONE
 textData *renderText(TTF_Font *font, SDL_Renderer *render, const char *stringToTexture,int *success);// DONE
 void drawText(textData *toDraw,SDL_Renderer *render);// DONE
-void drawQuote(quoteData **quotes, int quoteNo, SDL_Renderer *render);
+void drawQuote(quoteData **quotes, int quoteNo, SDL_Renderer *render, TTF_Font *font);//DONE
 void drawQuestion(questionData **questions, int quoteNo, SDL_Renderer *render);
 
 

@@ -40,6 +40,7 @@ int main(int argc, char *argv[])
 	font = loadFont(&options, &success);
 	//use below here for testing
 	//------------------------------------------------ MAIN LOOP ------------------------------------------------
+
 	SDL_RenderPresent(render);
 	getch();
 	//------------------------------------------------ DEINITIALISATION -----------------------------------------

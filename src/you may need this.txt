@@ -1,0 +1,8 @@
+fprintf(stderr, "works\n");
+
+
+
+game : cold war conflicts
+dev : anon
+tools : Notepad++, SDL2, C
+progress: Added <stuff>

@@ -86,3 +86,25 @@ void drawMenuElementsText(buttonDataText **buttons, int size, SDL_Renderer *rend
 
 	}
 }
+/*
+	void drawQuote(quoteData **quotes, int quoteNo, SDL_Renderer *render, TTF_Font *font):
+	Draws a quote an its analysis in a set place, will be done at the end of a turn
+
+*/
+void drawQuote(quoteData **quotes, int quoteNo, SDL_Renderer *render, TTF_Font *font)
+{
+	textData *quote, *analysis;
+	int wasSuccess = SUCCESS;
+	quote = renderText(font, render, (quotes[quoteNo]->quote), &wasSuccess);
+	analysis = renderText(font, render, (quotes[quoteNo]->analysis), &wasSuccess);
+	quote->dimensions.x = QUOTATION_XPOS;
+	quote->dimensions.y = QUOTATION_YPOS;
+	analysis->dimensions.x = QUOTATION_XPOS + 200;
+	analysis->dimensions.y = QUOTATION_YPOS;
+	drawText(quote, render);
+	drawText(analysis, render);
+	SDL_DestroyTexture(quote->display);
+	SDL_DestroyTexture(analysis->display);
+	free(quote);
+	free(analysis);
+}
