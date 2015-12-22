@@ -97,14 +97,45 @@ void drawQuote(quoteData **quotes, int quoteNo, SDL_Renderer *render, TTF_Font *
 	int wasSuccess = SUCCESS;
 	quote = renderText(font, render, (quotes[quoteNo]->quote), &wasSuccess);
 	analysis = renderText(font, render, (quotes[quoteNo]->analysis), &wasSuccess);
+	if(wasSuccess == FAIL)
+	{
+		fprintf(stderr, "One of the quote components has failed, please check the file and your computer\n");//NON CRITICAL FAILURE
+		return;
+	
+	}
 	quote->dimensions.x = QUOTATION_XPOS;
 	quote->dimensions.y = QUOTATION_YPOS;
-	analysis->dimensions.x = QUOTATION_XPOS + 200;
-	analysis->dimensions.y = QUOTATION_YPOS;
+	analysis->dimensions.x = QUOTATION_XPOS;
+	analysis->dimensions.y = QUOTATION_YPOS + 200;
 	drawText(quote, render);
 	drawText(analysis, render);
 	SDL_DestroyTexture(quote->display);
 	SDL_DestroyTexture(analysis->display);
 	free(quote);
 	free(analysis);
+}
+/*
+	void drawQuestion(questionData **questions, int quoteNo, SDL_Renderer *render):
+	Draws a quote an its analysis in a set place, will be done at the end of a turn
+
+*/
+void drawQuestion(questionData **questions, int quoteNo, SDL_Renderer *render, TTF_Font *font)
+{
+	textData *question, *answer;
+	int wasSuccess = SUCCESS;
+	int i;
+	question = renderText(font, render, questions[quoteNo]->question, &wasSuccess);
+	question->dimensions.x = QUESTION_XPOS;
+	question->dimensions.y = QUESTION_YPOS;
+	drawText(question, render);
+	SDL_DestroyTexture(question->display);
+	free(question);
+	for(i = 0; i < NO_ANSWERS; i++)
+	{
+		answer = renderText(font, render, questions[quoteNo]->answers[i], &wasSuccess);
+		answer->dimensions.x = QUESTION_XPOS;
+		answer->dimensions.y = QUESTION_YPOS + (50 * (i + 1));
+		drawText(answer, render);
+	}
+
 }

@@ -31,6 +31,7 @@ int main(int argc, char *argv[])
 	SDL_Window *wind;
 	SDL_Renderer *render;
 	TTF_Font *font;
+	questionData **questions;
 	//------------------------------------------------ INITIALISATION -------------------------------------------
 	
 	optionsFile = loadTextFile(OPTIONS_FILE, &success);
@@ -40,7 +41,6 @@ int main(int argc, char *argv[])
 	font = loadFont(&options, &success);
 	//use below here for testing
 	//------------------------------------------------ MAIN LOOP ------------------------------------------------
-
 	SDL_RenderPresent(render);
 	getch();
 	//------------------------------------------------ DEINITIALISATION -----------------------------------------

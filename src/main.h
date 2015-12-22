@@ -56,6 +56,8 @@ const static int MAX_TEXT_OUTPUT = 200;
 const static SDL_Color DEFAULT_TEXT = {255,255,255,0}; 
 const static int QUOTATION_XPOS = 300;
 const static int QUOTATION_YPOS = 300;
+const static int QUESTION_XPOS = 250;
+const static int QUESTION_YPOS = 200;
 
 //----------------------------------- STRUTURE DEFINITIONS -----------------------------------
 
@@ -269,7 +271,7 @@ tileData **loadTileData(char *tileFile, int *success);
 quoteListData *loadQuoteListData(char *filename, int *success);
 quoteData **loadQuotes(char *filename, int *success);//DONE
 activityData *loadActivity(char *filename, int *success);
-questionData **loadQuestions(char *filename, int *success);
+questionData **loadQuestions(char *filename, int *success);//DONE
 
 //----------DEINITIALISATION-----------
 void endSDL(SDL_Renderer *render, SDL_Window *screen, TTF_Font *font);
@@ -290,7 +292,7 @@ void drawMenuElementsText(buttonDataText **buttons, int size, SDL_Renderer *rend
 textData *renderText(TTF_Font *font, SDL_Renderer *render, const char *stringToTexture,int *success);// DONE
 void drawText(textData *toDraw,SDL_Renderer *render);// DONE
 void drawQuote(quoteData **quotes, int quoteNo, SDL_Renderer *render, TTF_Font *font);//DONE
-void drawQuestion(questionData **questions, int quoteNo, SDL_Renderer *render);
+void drawQuestion(questionData **questions, int quoteNo, SDL_Renderer *render, TTF_Font *font);//DONE
 
 
 //----------INPUT---------------------

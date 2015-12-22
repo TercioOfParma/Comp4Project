@@ -357,6 +357,11 @@ buttonDataText *loadButtonText(SDL_Texture *display, SDL_Rect *posAndSize, SDL_R
 	temp->details->dimensions.y = posAndSize->y + (posAndSize->h / 5);
 	return temp;
 }
+/*
+	quoteData **loadQuotes(char *filename, int *success):
+	Loads the quotes from a specified data file
+
+*/
 quoteData **loadQuotes(char *filename, int *success)
 {
 	char *quoteDataFILE = loadTextFile(filename, success);
@@ -402,4 +407,60 @@ quoteData **loadQuotes(char *filename, int *success)
 		fprintf(stderr, "%d %s %s\n",i, temp[i]->quote, temp[i]->analysis);
 	}
 	return temp;
+}
+/*
+	quoteData **loadQuotes(char *filename, int *success):
+	Loads the questions from a specified data file
+
+*/
+questionData **loadQuestions(char *filename, int *success)
+{
+	char *questionDataFILE = loadTextFile(filename, success);
+	questionData **temp;
+	json_t *tempJsonHandle, *questionDataJSON;
+	json_error_t errorHandle;
+	int numberOfQuestions, i;
+	
+	tempJsonHandle = json_loads(questionDataFILE,0, &errorHandle);
+	if(!tempJsonHandle)
+	{
+		fprintf(stderr, "json_loads has failed : %s \n", errorHandle.text);
+		*success = FAIL;
+		return temp;
+	
+	}
+	
+	questionDataJSON = json_array_get(tempJsonHandle, 0);
+	if(!json_is_object(questionDataJSON))
+	{
+		fprintf(stderr,"json_object_get failed, didn't get an object\n");
+		*success = FAIL;
+		json_decref(tempJsonHandle);
+		return temp;
+	
+	}
+	numberOfQuestions = json_integer_value(json_object_get(questionDataJSON,"NO_QUESTIONS"));
+	temp = malloc(sizeof(questionData *) * numberOfQuestions);
+	for(i = 0; i < numberOfQuestions; i++)
+	{
+		temp[i] = malloc(sizeof(questionData));
+		questionDataJSON = json_array_get(tempJsonHandle, i);
+		if(!json_is_object(questionDataJSON))
+		{
+			fprintf(stderr,"json_object_get failed, didn't get an object\n");
+			*success = FAIL;
+			json_decref(tempJsonHandle);
+			return temp;
+	
+		}
+		temp[i]->question = json_string_value(json_object_get(questionDataJSON, "QUESTION"));
+		temp[i]->answers[0] = json_string_value(json_object_get(questionDataJSON, "ANSWERONE"));
+		temp[i]->answers[1] = json_string_value(json_object_get(questionDataJSON, "ANSWERTWO"));
+		temp[i]->answers[2] = json_string_value(json_object_get(questionDataJSON, "ANSWERTHREE"));
+		fprintf(stderr, "%d %s %s %s %s\n",i, temp[i]->question, temp[i]->answers[0], temp[i]->answers[1], temp[i]->answers[2]);
+	}
+	return temp;
+
+
+
 }
