@@ -457,10 +457,51 @@ questionData **loadQuestions(char *filename, int *success)
 		temp[i]->answers[0] = json_string_value(json_object_get(questionDataJSON, "ANSWERONE"));
 		temp[i]->answers[1] = json_string_value(json_object_get(questionDataJSON, "ANSWERTWO"));
 		temp[i]->answers[2] = json_string_value(json_object_get(questionDataJSON, "ANSWERTHREE"));
+		temp[i]->answerNo = json_integer_value(json_object_get(questionDataJSON, "CORRECT"));
 		fprintf(stderr, "%d %s %s %s %s\n",i, temp[i]->question, temp[i]->answers[0], temp[i]->answers[1], temp[i]->answers[2]);
 	}
 	return temp;
 
 
 
+}
+/*
+	char *miscIDToFilePath(int ID, char *path):
+	Used to map the IDs in non Level Data files to correct file paths
+
+*/
+char *miscIDToFilePath(int ID, char *path)
+{
+	char filePath [MAX_TEXT_OUTPUT];
+	char *mappingFileContents,*mappedPath, *stringPath;
+	json_t *tempJsonHandle, *mappingDataJSON;
+	json_error_t errorHandle;
+	int wasSuccess = SUCCESS;
+	snprintf(filePath, MAX_TEXT_OUTPUT,  "%s%s", path, MAPPING_FILE_MISC);
+	mappingFileContents = loadTextFile(filePath, &wasSuccess);
+	tempJsonHandle = json_loads(mappingFileContents,0, &errorHandle);
+	if(!tempJsonHandle)
+	{
+		fprintf(stderr, "json_loads has failed : %s \n", errorHandle.text);
+		return NULL;
+	
+	}
+	
+	mappingDataJSON = json_array_get(tempJsonHandle, 0);
+	if(!json_is_object(mappingDataJSON))
+	{
+		fprintf(stderr,"json_object_get failed, didn't get an object\n");
+		json_decref(tempJsonHandle);
+		return NULL;
+	
+	}
+	itoa(ID, stringPath, 10);
+	mappedPath = json_string_value(json_object_get(mappingDataJSON, stringPath));
+	if(!mappedPath)
+	{
+		fprintf(stderr, "The ID you have requested doesn't exist\n");
+		return NULL;
+	
+	}
+	return mappedPath;
 }

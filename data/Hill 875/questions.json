@@ -6,14 +6,15 @@
 		"QUESTION" : "What Does Marcellus Wallace Look Like?",
 		"ANSWERONE" : "1 He's Black",
 		"ANSWERTWO" : "2 He's Bald",
-		"ANSWERTHREE" : "3 He's a Bitch"
+		"ANSWERTHREE" : "3 He's a Bitch",
+		"CORRECT" : 3
 	},
 	{
 		"QUESTION" : "What is love?",
 		"ANSWERONE" : "1 Baby don't hurt me",
 		"ANSWERTWO" : "2 Don't hurt me",
 		"ANSWERTHREE" : "3 no more"
-	
+		"CORRECT" : 2
 	}
 
 

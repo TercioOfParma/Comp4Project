@@ -58,6 +58,7 @@ const static int QUOTATION_XPOS = 300;
 const static int QUOTATION_YPOS = 300;
 const static int QUESTION_XPOS = 250;
 const static int QUESTION_YPOS = 200;
+const static char *MAPPING_FILE_MISC = "FileIDMapping.json";
 
 //----------------------------------- STRUTURE DEFINITIONS -----------------------------------
 
@@ -263,7 +264,7 @@ buttonData *loadButton(SDL_Texture *display, SDL_Rect *posAndSize, int type, int
 buttonDataText *loadButtonText(SDL_Texture *display, SDL_Rect *posAndSize, SDL_Renderer *render, const char *initialData, TTF_Font *font, int type, int *success);//DONE
 levelData *loadLevelData(char *levelFileData, int *success);
 char *mapLevelIDToMapPath(levelData *levelDataToChoose, char *mappingFile, char id, int *success);//used to find the mapData file + directory
-char *miscIDToFilePath(mapData *map, char *mappingFile, char ID, int *success);//this will be used to map tilesets and unitSide files together
+char *miscIDToFilePath(int ID, char *path);//this will be used to map tilesets and unitSide files together
 mapData *loadMapData(char *filename);
 sideData *loadSideData(char *filename, int *success);
 unitData **loadUnitData(char *sideFile, int *success);//likely a very big function
