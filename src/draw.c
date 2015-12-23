@@ -93,49 +93,42 @@ void drawMenuElementsText(buttonDataText **buttons, int size, SDL_Renderer *rend
 */
 void drawQuote(quoteData **quotes, int quoteNo, SDL_Renderer *render, TTF_Font *font)
 {
-	textData *quote, *analysis;
 	int wasSuccess = SUCCESS;
-	quote = renderText(font, render, (quotes[quoteNo]->quote), &wasSuccess);
-	analysis = renderText(font, render, (quotes[quoteNo]->analysis), &wasSuccess);
+	quotes[quoteNo]->display[QUOTE_POS] = renderText(font, render, (quotes[quoteNo]->quote), &wasSuccess);
+	quotes[quoteNo]->display[ANALYSIS_POS] = renderText(font, render, (quotes[quoteNo]->analysis), &wasSuccess);
 	if(wasSuccess == FAIL)
 	{
 		fprintf(stderr, "One of the quote components has failed, please check the file and your computer\n");//NON CRITICAL FAILURE
 		return;
 	
 	}
-	quote->dimensions.x = QUOTATION_XPOS;
-	quote->dimensions.y = QUOTATION_YPOS;
-	analysis->dimensions.x = QUOTATION_XPOS;
-	analysis->dimensions.y = QUOTATION_YPOS + 100;
-	drawText(quote, render);
-	drawText(analysis, render);
-	SDL_DestroyTexture(quote->display);
-	SDL_DestroyTexture(analysis->display);
-	free(quote);
-	free(analysis);
+	quotes[quoteNo]->display[QUOTE_POS]->dimensions.x = QUOTATION_XPOS;
+	quotes[quoteNo]->display[QUOTE_POS]->dimensions.y = QUOTATION_YPOS;
+	quotes[quoteNo]->display[ANALYSIS_POS]->dimensions.x = QUOTATION_XPOS;
+	quotes[quoteNo]->display[ANALYSIS_POS]->dimensions.y = QUOTATION_YPOS + 100;
+	drawText(quotes[quoteNo]->display[QUOTE_POS], render);
+	drawText(quotes[quoteNo]->display[ANALYSIS_POS], render);
 }
 /*
 	void drawQuestion(questionData **questions, int quoteNo, SDL_Renderer *render):
 	Draws a quote an its analysis in a set place, will be done at the end of a turn
 
 */
-void drawQuestion(questionData **questions, int quoteNo, SDL_Renderer *render, TTF_Font *font)
+void drawQuestion(questionData **questions, int questionNo, SDL_Renderer *render, TTF_Font *font)
 {
-	textData *question, *answer;
+	
 	int wasSuccess = SUCCESS;
 	int i;
-	question = renderText(font, render, questions[quoteNo]->question, &wasSuccess);
-	question->dimensions.x = QUESTION_XPOS;
-	question->dimensions.y = QUESTION_YPOS;
-	drawText(question, render);
-	SDL_DestroyTexture(question->display);
-	free(question);
+	questions[questionNo]->display[QUESTION_POS] = renderText(font, render, questions[questionNo]->question, &wasSuccess);
+	questions[questionNo]->display[QUESTION_POS]->dimensions.x = QUESTION_XPOS;
+	questions[questionNo]->display[QUESTION_POS]->dimensions.y = QUESTION_YPOS;
+	drawText(questions[questionNo]->display[QUESTION_POS], render);
 	for(i = 0; i < NO_ANSWERS; i++)
 	{
-		answer = renderText(font, render, questions[quoteNo]->answers[i], &wasSuccess);
-		answer->dimensions.x = QUESTION_XPOS;
-		answer->dimensions.y = QUESTION_YPOS + (50 * (i + 1));
-		drawText(answer, render);
+		questions[questionNo]->display[i + 1]= renderText(font, render, questions[questionNo]->answers[i], &wasSuccess);
+		questions[questionNo]->display[i + 1]->dimensions.x = QUESTION_XPOS;
+		questions[questionNo]->display[i + 1]->dimensions.y = QUESTION_YPOS + (50 * (i + 1));
+		drawText(questions[questionNo]->display[i + 1], render);
 	}
 
 }

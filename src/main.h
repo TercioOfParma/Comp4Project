@@ -22,6 +22,8 @@
 #define SIZE_OF_MODIFIERS 6
 #define NO_SIDES 2
 #define NO_ANSWERS 3
+#define TEXT_DATA_QUESTION 4
+#define TEXT_DATA_QUOTE 2
 const static int MODIFIERPOSITION_ROUT = 0;
 const static int MODIFIERPOSITION_PANICKED = 1;
 const static int MODIFIERPOSITION_STUNNED = 2;
@@ -59,6 +61,12 @@ const static int QUOTATION_YPOS = 300;
 const static int QUESTION_XPOS = 250;
 const static int QUESTION_YPOS = 200;
 const static char *MAPPING_FILE_MISC = "FileIDMapping.json";
+const static int QUOTE_POS = 0;
+const static int ANALYSIS_POS = 1;
+const static int QUESTION_POS = 0;
+const static int ANSWERONE_POS = 1;
+const static int ANSWERTWO_POS = 2;
+const static int ANSWERTHREE_POS = 3;
 
 //----------------------------------- STRUTURE DEFINITIONS -----------------------------------
 
@@ -168,6 +176,7 @@ typedef struct
 {
 	char *quote;
 	char *analysis;
+	textData *display [TEXT_DATA_QUOTE];
 
 }quoteData;
 /*
@@ -210,7 +219,7 @@ typedef struct
 	char *question;
 	char *answers[NO_ANSWERS];
 	int answerNo;
-
+	textData *display [TEXT_DATA_QUESTION];
 
 }questionData;
 /*
@@ -293,7 +302,7 @@ void drawMenuElementsText(buttonDataText **buttons, int size, SDL_Renderer *rend
 textData *renderText(TTF_Font *font, SDL_Renderer *render, const char *stringToTexture,int *success);// DONE
 void drawText(textData *toDraw,SDL_Renderer *render);// DONE
 void drawQuote(quoteData **quotes, int quoteNo, SDL_Renderer *render, TTF_Font *font);//DONE
-void drawQuestion(questionData **questions, int quoteNo, SDL_Renderer *render, TTF_Font *font);//DONE
+void drawQuestion(questionData **questions, int questionNo, SDL_Renderer *render, TTF_Font *font);//DONE
 
 
 //----------INPUT---------------------
