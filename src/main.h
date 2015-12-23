@@ -289,18 +289,18 @@ unitData **loadUnitData(char *sideFile, int *success);//likely a very big functi
 tileData **loadTileData(char *tileFile, int *success);
 quoteListData *loadQuoteListData(char *filename, int *success);
 quoteData **loadQuotes(char *filename, int *success);//DONE
-activityData *loadActivity(char *filename, int *success);
+activityData *loadActivity(char *filename, int *success);//DONE
 questionData **loadQuestions(char *filename, int *success);//DONE
 
 //----------DEINITIALISATION-----------
-void endSDL(SDL_Renderer *render, SDL_Window *screen, TTF_Font *font);
+void endSDL(SDL_Renderer *render, SDL_Window *screen, TTF_Font *font);//DONE
 void endUnitDataArray(unitData **units);
 void endSideData(sideData *side);
 void endTileData(tileData **tiles);
 void endQuoteListData(quoteListData *quotes);
 void endQuotes(quoteData **quotes);
-void endActivity(activityData *activity);
-void endQuestions(questionData **questions);
+void endActivity(activityData *activity);//DONE
+void endQuestions(questionData **questions, int size);//DONE
 void endLevels(levelData *levels);
 
 //----------DRAWING AND GRAPHICAL-----
@@ -333,7 +333,7 @@ void calculateMoraleModifier(unitData **losingSideUnits, int losingSideNo, int r
 void displaySimulationResults(sideData *sideOne, sideData *sideTwo, tileData *map);
 
 //---------ACTIVITY------------------
-void startQuiz(activityData *quiz);
-int askQuestion(questionData **questions, int questionNo);
+int startQuiz(activityData *quiz, SDL_Renderer *render, TTF_Font *font, int *success);//DONE
+//there was askQuestion here but it seemed unneccessary, so Its been folded into startQuiz
 char computeGrade(activityData *quiz, int noCorrect);//DONE
-void displayActivityResults(activityData *quiz, char grade);
+void displayActivityResults(activityData *quiz, char *resultsToDisplay, SDL_Renderer *render, TTF_Font *font);//DONE

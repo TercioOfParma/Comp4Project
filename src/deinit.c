@@ -11,3 +11,46 @@
 #include "main.h"
 #endif
 //------------------------------ FUNCTIONS -----------------------------------
+
+/*
+	void endQuestions(questionData **questions, int size):
+	To deinit questions
+
+*/
+void endQuestions(questionData **questions, int size)
+{
+	int i;
+	for(i = 0; i < size; i++)
+	{
+		free(questions[i]);
+	
+	}
+	free(questions);
+}
+/*
+	void endActivity(activityData *activity):
+	To deinit an activity
+
+*/
+void endActivity(activityData *activity)
+{
+	endQuestions(activity->questions, activity->maximumMark);
+	free(activity);
+
+}
+/*
+	void endSDL(SDL_Renderer *render, SDL_Window *screen, TTF_Font *font):
+	To deinit SDL and associated libraries
+
+*/
+void endSDL(SDL_Renderer *render, SDL_Window *screen, TTF_Font *font)
+{
+	SDL_DestroyRenderer(render);
+	SDL_DestroyWindow(screen);
+	TTF_CloseFont(font);
+	IMG_Quit();
+	Mix_Quit();
+	TTF_Quit();
+	SDL_Quit();
+
+}

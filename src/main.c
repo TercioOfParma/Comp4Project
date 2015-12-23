@@ -25,6 +25,7 @@ int main(int argc, char *argv[])
 	//PRIMITIVE DATA TYPES
 	char *optionsFile;
 	int success = SUCCESS;
+	int quizTerminated = 1;
 	//CUSTOM RUNTIME STRUCTURES
 	optionsData options;
 	activityData *activity;
@@ -41,9 +42,7 @@ int main(int argc, char *argv[])
 	render = createRenderer(wind, &success);
 	font = loadFont(&options, &success);
 	//use below here for testing
-	fprintf(stderr, "works\n");
 	activity = loadActivity("data/Hill 875/", &success);
-	fprintf(stderr, "works\n");
 
 	//------------------------------------------------ MAIN LOOP ------------------------------------------------
 	while(success != FAIL)
@@ -51,21 +50,22 @@ int main(int argc, char *argv[])
 	
 		while(SDL_PollEvent(&eventHandle))
 		{
-			if(eventHandle.type == SDL_QUIT)
-			{
-				success = FAIL;
 			
-			}
 		
 		
 		}
 
 
-		drawQuestion(activity->questions, 1, render, font);
+		quizTerminated = startQuiz(activity, render, font, &success);
 		SDL_RenderPresent(render);
+		if(eventHandle.type == SDL_QUIT || quizTerminated == 0)
+		{
+				success = FAIL;
+			
+		}
 	}
 	//------------------------------------------------ DEINITIALISATION -----------------------------------------
-	
-	
+	endActivity(activity);
+	endSDL(render, wind,font);
 	return 0;
 }

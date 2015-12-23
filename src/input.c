@@ -22,19 +22,31 @@ int checkButtonClicked(SDL_Rect *mouseDimensions, buttonData *button)
 {
 	if(SDL_HasIntersection(&(mouseDimensions), &(button->dimensions)) == SDL_TRUE)
 	{	
-		
 		return SUCCESS;
-	
+	}
+	else
+	{
+		return FAIL;
+	}
+
+}
+/*
+	int checkButtonTextClicked(SDL_Rect *mouseDimensions, buttonDataText *button):
+	Checks if a mouse clicked a button
+
+
+*/
+int checkButtonTextClicked(SDL_Rect *mouseDimensions, buttonDataText *button)
+{
+	if(SDL_HasIntersection(&(mouseDimensions), &(button->dimensions)) == SDL_TRUE)
+	{	
+		return SUCCESS;
 	}
 
 	else
 	{
-	
 		return FAIL;
 	}
-
-
-
 
 }
 /*
@@ -46,20 +58,12 @@ int checkButtonClicked(SDL_Rect *mouseDimensions, buttonData *button)
 
 int checkQuestionClicked(SDL_Rect *mouseDimensions, questionData *question, int answerNo)
 {
-	if(SDL_HasIntersection(&(mouseDimensions), &(question->display[answerNo]->dimensions)) == SDL_TRUE)
+	if(SDL_HasIntersection(mouseDimensions, &(question->display[answerNo]->dimensions)) == SDL_TRUE)
 	{	
-		
 		return SUCCESS;
-	
 	}
-
 	else
 	{
-	
 		return FAIL;
 	}
-
-
-
-
 }

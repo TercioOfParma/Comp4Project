@@ -458,7 +458,6 @@ questionData **loadQuestions(char *filename, int *success)
 		temp[i]->answers[1] = json_string_value(json_object_get(questionDataJSON, "ANSWERTWO"));
 		temp[i]->answers[2] = json_string_value(json_object_get(questionDataJSON, "ANSWERTHREE"));
 		temp[i]->answerNo = json_integer_value(json_object_get(questionDataJSON, "CORRECT"));
-		fprintf(stderr, "%d %s %s %s %s\n",i, temp[i]->question, temp[i]->answers[0], temp[i]->answers[1], temp[i]->answers[2]);
 	}
 	return temp;
 
@@ -573,3 +572,4 @@ activityData *loadActivity(char *filename, int *success)
 	return temp;
 
 }
+
