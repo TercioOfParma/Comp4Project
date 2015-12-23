@@ -67,6 +67,15 @@ const static int QUESTION_POS = 0;
 const static int ANSWERONE_POS = 1;
 const static int ANSWERTWO_POS = 2;
 const static int ANSWERTHREE_POS = 3;
+const static int A_GRADE = 80;
+const static int B_GRADE = 70;
+const static int C_GRADE = 60;
+const static int D_GRADE = 50;
+const static int E_GRADE = 40;
+const static int F_GRADE = 30;
+const static int G_GRADE = 20;
+const static int N_GRADE = 10;
+const static char *ACTIVITY_FILE = "activity.json";
 
 //----------------------------------- STRUTURE DEFINITIONS -----------------------------------
 
@@ -306,14 +315,14 @@ void drawQuestion(questionData **questions, int questionNo, SDL_Renderer *render
 
 
 //----------INPUT---------------------
-int checkButtonClicked(SDL_Rect *mouseDimensions, buttonData *button);
+int checkButtonClicked(SDL_Rect *mouseDimensions, buttonData *button);//DONE
 int checkButtonTextClicked(SDL_Rect *mouseDimensions, buttonDataText *button);
 int handleMouseButtonMainMenu(SDL_Rect mouseDimensions, buttonData **buttons, buttonDataText **buttonsText);
 int handleMouseButtonSelectionMenu(SDL_Rect mouseDimensions, buttonData **buttons, buttonDataText **buttonsText);
 int handleKeyboardSimulation(SDL_Event *keyboardInput, unitData **units);
 int handleMapClicked(unitData **applicableUnits, tileData **tiles,  buttonData **buttons, buttonDataText **textButtons);
 int handleActivityClicked(questionData **questions, buttonData **buttons, buttonDataText **textButtons);
-
+int checkQuestionClicked(SDL_Rect *mouseDimensions, questionData *question, int answerNo);//DONE
 //---------SIMULATION----------------
 int aStarWithTerrain(unitData **applicableUnits, int unitNo, tileData **tiles, int xPos, int yPos);
 void movementMorale(unitData **applicableUnits);
@@ -326,5 +335,5 @@ void displaySimulationResults(sideData *sideOne, sideData *sideTwo, tileData *ma
 //---------ACTIVITY------------------
 void startQuiz(activityData *quiz);
 int askQuestion(questionData **questions, int questionNo);
-char computeGrade(activityData *quiz, int noCorrect);
+char computeGrade(activityData *quiz, int noCorrect);//DONE
 void displayActivityResults(activityData *quiz, char grade);

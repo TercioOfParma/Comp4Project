@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
 	int success = SUCCESS;
 	//CUSTOM RUNTIME STRUCTURES
 	optionsData options;
-	questionData **questions;
+	activityData *activity;
 	//SDL2 + EXTENSION LIBRARIES AND JANSSON STRUCTURES
 	SDL_Window *wind;
 	SDL_Renderer *render;
@@ -41,10 +41,14 @@ int main(int argc, char *argv[])
 	render = createRenderer(wind, &success);
 	font = loadFont(&options, &success);
 	//use below here for testing
-	questions = loadQuestions("data/Hill 875/questions.json", &success);
+	fprintf(stderr, "works\n");
+	activity = loadActivity("data/Hill 875/", &success);
+	fprintf(stderr, "works\n");
+
 	//------------------------------------------------ MAIN LOOP ------------------------------------------------
 	while(success != FAIL)
 	{
+	
 		while(SDL_PollEvent(&eventHandle))
 		{
 			if(eventHandle.type == SDL_QUIT)
@@ -55,7 +59,9 @@ int main(int argc, char *argv[])
 		
 		
 		}
-		drawQuestion(questions, 1, render, font);
+
+
+		drawQuestion(activity->questions, 1, render, font);
 		SDL_RenderPresent(render);
 	}
 	//------------------------------------------------ DEINITIALISATION -----------------------------------------

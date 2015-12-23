@@ -31,7 +31,7 @@ char *loadTextFile(const char *filename, int *success)
 	fileDescriptor = open(filename, O_RDONLY, 0600);//avoids the race condition issues
 	if(fileDescriptor == -1)
 	{
-		fprintf(stderr, "open has failed : %s \n", strerror(errno));
+		fprintf(stderr, "open has failed on %s: %s \n", filename, strerror(errno));
 		*success = FAIL;
 		return NULL;
 	}
@@ -312,7 +312,7 @@ buttonData *loadButton(SDL_Texture *display, SDL_Rect *posAndSize, int type, int
 	buttonData *temp = malloc(sizeof(buttonData));
 	if(!temp)
 	{
-		fprintf(stderr, "malloc has failed on buttonData : %s", SDL_GetError());
+		fprintf(stderr, "malloc has failed on buttonData : %s", strerror(errno));
 		*success = FAIL;
 		return NULL;
 	
@@ -334,7 +334,7 @@ buttonDataText *loadButtonText(SDL_Texture *display, SDL_Rect *posAndSize, SDL_R
 	buttonDataText *temp = malloc(sizeof(buttonDataText));
 	if(!temp)
 	{
-		fprintf(stderr, "malloc has failed on buttonData : %s", SDL_GetError());
+		fprintf(stderr, "malloc has failed on buttonData : %s", strerror(errno));
 		*success = FAIL;
 		return NULL;
 	
@@ -373,7 +373,7 @@ quoteData **loadQuotes(char *filename, int *success)
 	tempJsonHandle = json_loads(quoteDataFILE,0, &errorHandle);
 	if(!tempJsonHandle)
 	{
-		fprintf(stderr, "json_loads has failed : %s \n", errorHandle.text);
+		fprintf(stderr, "json_loads has failed on %s: %s \n", filename, errorHandle.text);
 		*success = FAIL;
 		return temp;
 	
@@ -424,7 +424,7 @@ questionData **loadQuestions(char *filename, int *success)
 	tempJsonHandle = json_loads(questionDataFILE,0, &errorHandle);
 	if(!tempJsonHandle)
 	{
-		fprintf(stderr, "json_loads has failed : %s \n", errorHandle.text);
+		fprintf(stderr, "json_loads has failed on %s: %s \n", filename, errorHandle.text);
 		*success = FAIL;
 		return temp;
 	
@@ -473,16 +473,19 @@ questionData **loadQuestions(char *filename, int *success)
 char *miscIDToFilePath(int ID, char *path)
 {
 	char filePath [MAX_TEXT_OUTPUT];
-	char *mappingFileContents,*mappedPath, *stringPath;
+	char *mappingFileContents,*mappedPath, stringPath[MAX_TEXT_OUTPUT];
 	json_t *tempJsonHandle, *mappingDataJSON;
 	json_error_t errorHandle;
 	int wasSuccess = SUCCESS;
+	
 	snprintf(filePath, MAX_TEXT_OUTPUT,  "%s%s", path, MAPPING_FILE_MISC);
 	mappingFileContents = loadTextFile(filePath, &wasSuccess);
+	
 	tempJsonHandle = json_loads(mappingFileContents,0, &errorHandle);
 	if(!tempJsonHandle)
 	{
-		fprintf(stderr, "json_loads has failed : %s \n", errorHandle.text);
+		fprintf(stderr, "%s", mappingFileContents);
+		fprintf(stderr, "json_loads has failed on %s: %s \n", filePath, errorHandle.text);
 		return NULL;
 	
 	}
@@ -495,6 +498,7 @@ char *miscIDToFilePath(int ID, char *path)
 		return NULL;
 	
 	}
+	
 	itoa(ID, stringPath, 10);
 	mappedPath = json_string_value(json_object_get(mappingDataJSON, stringPath));
 	if(!mappedPath)
@@ -503,5 +507,69 @@ char *miscIDToFilePath(int ID, char *path)
 		return NULL;
 	
 	}
+	
 	return mappedPath;
+}
+/*
+	activityData *loadActivity(char *filename, int *success):
+	Used to load ActivityData structures
+
+*/
+activityData *loadActivity(char *filename, int *success)
+{
+	char *activityDataFile, pathToLoad[MAX_TEXT_OUTPUT], *questionFILE;
+	int wasSuccess = SUCCESS;
+	json_t *tempJsonHandle, *activityDataJSON;
+	json_error_t errorHandle;
+	activityData *temp = malloc(sizeof(activityData));
+	if(!temp)
+	{
+		fprintf(stderr, "malloc has failed on activityData : %s", strerror(errno));
+		*success = FAIL;
+		return NULL;
+	
+	
+	}
+	snprintf(pathToLoad, MAX_TEXT_OUTPUT, "%s%s", filename, ACTIVITY_FILE);
+	activityDataFile = loadTextFile(pathToLoad, &wasSuccess);
+	tempJsonHandle = json_loads(activityDataFile,0, &errorHandle);
+	
+	if(!tempJsonHandle)
+	{
+		fprintf(stderr, "json_loads has failed : %s \n", errorHandle.text);
+		return NULL;
+	
+	}
+	activityDataJSON = json_array_get(tempJsonHandle, 0);
+	if(!json_is_object(activityDataJSON))
+	{
+		fprintf(stderr,"json_object_get failed, didn't get an object\n");
+		json_decref(tempJsonHandle);
+		return NULL;
+	
+	}
+	
+	temp->activityID = json_integer_value(json_object_get(activityDataJSON, "ACTIVITY_ID"));
+	questionFILE = miscIDToFilePath(temp->activityID, filename);
+	
+	if(!questionFILE)
+	{
+		fprintf(stderr, "loadActivity has failed : %s", strerror(errno));
+		*success = FAIL;
+		return NULL;
+	
+	}
+	temp->questions = loadQuestions(questionFILE, &wasSuccess);
+	temp->maximumMark = json_integer_value(json_object_get(activityDataJSON, "MAXIMUM_MARK"));
+	temp->title = json_string_value(json_object_get(activityDataJSON, "TITLE"));
+	if(wasSuccess == FAIL)
+	{
+		fprintf(stderr, "loadActivity has failed : %s", strerror(errno));
+		*success = FAIL;
+		return NULL;
+	
+	}
+	
+	return temp;
+
 }
