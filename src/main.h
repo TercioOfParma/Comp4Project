@@ -290,7 +290,7 @@ char *miscIDToFilePath(int ID, char *path);//this will be used to map tilesets a
 mapData *loadMapData(char *filename);
 sideData *loadSideData(char *filename, int *success);
 unitData **loadUnitData(char *sideFile, int *success);//likely a very big function
-tileData **loadTileData(char *tileFile, int size, int *success);
+tileData **loadTileData(char *tileFile, int *success);//DONE
 quoteListData *loadQuoteListData(char *filename, int *success);//DONE
 quoteData **loadQuotes(char *filename, int *success);//DONE
 activityData *loadActivity(char *filename, int *success);//DONE
