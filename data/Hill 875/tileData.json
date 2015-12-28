@@ -1,0 +1,582 @@
+[
+	{
+		"NO_TILES" : 48
+	
+	},
+	{
+		"RELATIVE_XPOS" : 1,
+		"RELATIVE_YPOS" : 1,
+		"SPRITE_XPOS" : 3,
+		"SPRITE_YPOS" : 3,
+		"TERRAIN_TYPE" : 2,
+		"CIVILIAN_POPULATION" : 10,
+		"ANGLE" : 0.0,
+		"TILE_ID" : 1
+	
+	
+	},
+	{
+		"RELATIVE_XPOS" : 2,
+		"RELATIVE_YPOS" : 1,
+		"SPRITE_XPOS" : 3,
+		"SPRITE_YPOS" : 3,
+		"TERRAIN_TYPE" : 2,
+		"CIVILIAN_POPULATION" : 10,
+		"ANGLE" : 0.0,
+		"TILE_ID" : 2
+	
+	
+	},
+	{
+		"RELATIVE_XPOS" : 3,
+		"RELATIVE_YPOS" : 1,
+		"SPRITE_XPOS" : 3,
+		"SPRITE_YPOS" : 3,
+		"TERRAIN_TYPE" : 2,
+		"CIVILIAN_POPULATION" : 50,
+		"ANGLE" : 0.0,
+		"TILE_ID" : 3
+	
+	
+	},
+	{
+		"RELATIVE_XPOS" : 4,
+		"RELATIVE_YPOS" : 1,
+		"SPRITE_XPOS" : 3,
+		"SPRITE_YPOS" : 3,
+		"TERRAIN_TYPE" : 2,
+		"CIVILIAN_POPULATION" : 10,
+		"ANGLE" : 0.0,
+		"TILE_ID" : 4
+	
+	
+	},
+	{
+		"RELATIVE_XPOS" : 5,
+		"RELATIVE_YPOS" : 1,
+		"SPRITE_XPOS" : 2,
+		"SPRITE_YPOS" : 3,
+		"TERRAIN_TYPE" : 1,
+		"CIVILIAN_POPULATION" : 89,
+		"ANGLE" : 0.0,
+		"TILE_ID" : 5
+	
+	
+	},
+	{
+		"RELATIVE_XPOS" : 6,
+		"RELATIVE_YPOS" : 1,
+		"SPRITE_XPOS" : 3,
+		"SPRITE_YPOS" : 3,
+		"TERRAIN_TYPE" : 2,
+		"CIVILIAN_POPULATION" : 10,
+		"ANGLE" : 0.0,
+		"TILE_ID" : 6
+	
+	
+	},
+	{
+		"RELATIVE_XPOS" : 7,
+		"RELATIVE_YPOS" : 1,
+		"SPRITE_XPOS" : 3,
+		"SPRITE_YPOS" : 3,
+		"TERRAIN_TYPE" : 2,
+		"CIVILIAN_POPULATION" : 10,
+		"ANGLE" : 0.0,
+		"TILE_ID" : 7
+	
+	
+	},
+	{
+		"RELATIVE_XPOS" : 8,
+		"RELATIVE_YPOS" : 1,
+		"SPRITE_XPOS" : 3,
+		"SPRITE_YPOS" : 3,
+		"TERRAIN_TYPE" : 2,
+		"CIVILIAN_POPULATION" : 10,
+		"ANGLE" : 0.0,
+		"TILE_ID" : 8
+	
+	
+	},
+	{
+		"RELATIVE_XPOS" : 1,
+		"RELATIVE_YPOS" : 2,
+		"SPRITE_XPOS" : 3,
+		"SPRITE_YPOS" : 3,
+		"TERRAIN_TYPE" : 2,
+		"CIVILIAN_POPULATION" : 10,
+		"ANGLE" : 0.0,
+		"TILE_ID" : 9
+	
+	
+	},
+	{
+		"RELATIVE_XPOS" : 2,
+		"RELATIVE_YPOS" : 2,
+		"SPRITE_XPOS" : 3,
+		"SPRITE_YPOS" : 3,
+		"TERRAIN_TYPE" : 2,
+		"CIVILIAN_POPULATION" : 10,
+		"ANGLE" : 0.0,
+		"TILE_ID" : 10
+	
+	
+	},
+	{
+		"RELATIVE_XPOS" : 3,
+		"RELATIVE_YPOS" : 2,
+		"SPRITE_XPOS" : 3,
+		"SPRITE_YPOS" : 3,
+		"TERRAIN_TYPE" : 2,
+		"CIVILIAN_POPULATION" : 10,
+		"ANGLE" : 0.0,
+		"TILE_ID" : 11
+	
+	
+	},
+	{
+		"RELATIVE_XPOS" : 4,
+		"RELATIVE_YPOS" : 2,
+		"SPRITE_XPOS" : 3,
+		"SPRITE_YPOS" : 3,
+		"TERRAIN_TYPE" : 2,
+		"CIVILIAN_POPULATION" : 10,
+		"ANGLE" : 0.0,
+		"TILE_ID" : 12
+	
+	
+	},
+	{
+		"RELATIVE_XPOS" : 5,
+		"RELATIVE_YPOS" : 2,
+		"SPRITE_XPOS" : 3,
+		"SPRITE_YPOS" : 3,
+		"TERRAIN_TYPE" : 2,
+		"CIVILIAN_POPULATION" : 10,
+		"ANGLE" : 0.0,
+		"TILE_ID" : 13
+	
+	
+	},
+	{
+		"RELATIVE_XPOS" : 6,
+		"RELATIVE_YPOS" : 2,
+		"SPRITE_XPOS" : 3,
+		"SPRITE_YPOS" : 3,
+		"TERRAIN_TYPE" : 2,
+		"CIVILIAN_POPULATION" : 10,
+		"ANGLE" : 0.0,
+		"TILE_ID" : 14
+	
+	
+	},
+	{
+		"RELATIVE_XPOS" : 7,
+		"RELATIVE_YPOS" : 2,
+		"SPRITE_XPOS" : 3,
+		"SPRITE_YPOS" : 3,
+		"TERRAIN_TYPE" : 2,
+		"CIVILIAN_POPULATION" : 10,
+		"ANGLE" : 0.0,
+		"TILE_ID" : 15
+	
+	
+	},
+	{
+		"RELATIVE_XPOS" : 8,
+		"RELATIVE_YPOS" : 2,
+		"SPRITE_XPOS" : 3,
+		"SPRITE_YPOS" : 3,
+		"TERRAIN_TYPE" : 2,
+		"CIVILIAN_POPULATION" : 10,
+		"ANGLE" : 0.0,
+		"TILE_ID" : 16
+	
+	
+	},
+	{
+		"RELATIVE_XPOS" : 1,
+		"RELATIVE_YPOS" : 3,
+		"SPRITE_XPOS" : 3,
+		"SPRITE_YPOS" : 3,
+		"TERRAIN_TYPE" : 2,
+		"CIVILIAN_POPULATION" : 10,
+		"ANGLE" : 0.0,
+		"TILE_ID" : 17
+	
+	
+	},
+	{
+		"RELATIVE_XPOS" : 2,
+		"RELATIVE_YPOS" : 3,
+		"SPRITE_XPOS" : 3,
+		"SPRITE_YPOS" : 3,
+		"TERRAIN_TYPE" : 2,
+		"CIVILIAN_POPULATION" : 10,
+		"ANGLE" : 0.0,
+		"TILE_ID" : 18
+	
+	
+	},
+	{
+		"RELATIVE_XPOS" : 3,
+		"RELATIVE_YPOS" : 3,
+		"SPRITE_XPOS" : 3,
+		"SPRITE_YPOS" : 3,
+		"TERRAIN_TYPE" : 2,
+		"CIVILIAN_POPULATION" : 10,
+		"ANGLE" : 0.0,
+		"TILE_ID" : 19
+	
+	
+	},
+	{
+		"RELATIVE_XPOS" : 4,
+		"RELATIVE_YPOS" : 3,
+		"SPRITE_XPOS" : 2,
+		"SPRITE_YPOS" : 3,
+		"TERRAIN_TYPE" : 1,
+		"CIVILIAN_POPULATION" : 200,
+		"ANGLE" : 0.0,
+		"TILE_ID" : 20
+	
+	
+	},
+	{
+		"RELATIVE_XPOS" : 5,
+		"RELATIVE_YPOS" : 3,
+		"SPRITE_XPOS" : 2,
+		"SPRITE_YPOS" : 3,
+		"TERRAIN_TYPE" : 1,
+		"CIVILIAN_POPULATION" : 200,
+		"ANGLE" : 0.0,
+		"TILE_ID" : 21
+	
+	
+	},
+	{
+		"RELATIVE_XPOS" : 6,
+		"RELATIVE_YPOS" : 3,
+		"SPRITE_XPOS" : 2,
+		"SPRITE_YPOS" : 3,
+		"TERRAIN_TYPE" : 1,
+		"CIVILIAN_POPULATION" : 200,
+		"ANGLE" : 0.0,
+		"TILE_ID" : 22
+	
+	
+	},
+	{
+		"RELATIVE_XPOS" : 7,
+		"RELATIVE_YPOS" : 3,
+		"SPRITE_XPOS" : 3,
+		"SPRITE_YPOS" : 3,
+		"TERRAIN_TYPE" : 2,
+		"CIVILIAN_POPULATION" : 20,
+		"ANGLE" : 0.0,
+		"TILE_ID" : 23
+	
+	
+	},
+	{
+		"RELATIVE_XPOS" : 8,
+		"RELATIVE_YPOS" : 3,
+		"SPRITE_XPOS" : 3,
+		"SPRITE_YPOS" : 3,
+		"TERRAIN_TYPE" : 2,
+		"CIVILIAN_POPULATION" : 20,
+		"ANGLE" : 0.0,
+		"TILE_ID" : 24
+	
+	
+	},
+	{
+		"RELATIVE_XPOS" : 1,
+		"RELATIVE_YPOS" : 4,
+		"SPRITE_XPOS" : 3,
+		"SPRITE_YPOS" : 3,
+		"TERRAIN_TYPE" : 2,
+		"CIVILIAN_POPULATION" : 20,
+		"ANGLE" : 0.0,
+		"TILE_ID" : 25
+	
+	
+	},
+	{
+		"RELATIVE_XPOS" : 2,
+		"RELATIVE_YPOS" : 4,
+		"SPRITE_XPOS" : 3,
+		"SPRITE_YPOS" : 3,
+		"TERRAIN_TYPE" : 2,
+		"CIVILIAN_POPULATION" : 20,
+		"ANGLE" : 0.0,
+		"TILE_ID" : 26
+	
+	
+	},
+	{
+		"RELATIVE_XPOS" : 3,
+		"RELATIVE_YPOS" : 4,
+		"SPRITE_XPOS" : 3,
+		"SPRITE_YPOS" : 3,
+		"TERRAIN_TYPE" : 2,
+		"CIVILIAN_POPULATION" : 20,
+		"ANGLE" : 0.0,
+		"TILE_ID" : 27
+	
+	
+	},
+	{
+		"RELATIVE_XPOS" : 4,
+		"RELATIVE_YPOS" : 4,
+		"SPRITE_XPOS" : 3,
+		"SPRITE_YPOS" : 3,
+		"TERRAIN_TYPE" : 2,
+		"CIVILIAN_POPULATION" : 20,
+		"ANGLE" : 0.0,
+		"TILE_ID" : 28
+	
+	
+	},
+	{
+		"RELATIVE_XPOS" : 5,
+		"RELATIVE_YPOS" : 4,
+		"SPRITE_XPOS" : 3,
+		"SPRITE_YPOS" : 3,
+		"TERRAIN_TYPE" : 2,
+		"CIVILIAN_POPULATION" : 20,
+		"ANGLE" : 0.0,
+		"TILE_ID" : 29
+	
+	
+	},
+	{
+		"RELATIVE_XPOS" : 6,
+		"RELATIVE_YPOS" : 4,
+		"SPRITE_XPOS" : 3,
+		"SPRITE_YPOS" : 3,
+		"TERRAIN_TYPE" : 2,
+		"CIVILIAN_POPULATION" : 20,
+		"ANGLE" : 0.0,
+		"TILE_ID" : 30
+	
+	
+	},
+	{
+		"RELATIVE_XPOS" : 7,
+		"RELATIVE_YPOS" : 4,
+		"SPRITE_XPOS" : 3,
+		"SPRITE_YPOS" : 3,
+		"TERRAIN_TYPE" : 2,
+		"CIVILIAN_POPULATION" : 20,
+		"ANGLE" : 0.0,
+		"TILE_ID" : 31
+	
+	
+	},
+	{
+		"RELATIVE_XPOS" : 8,
+		"RELATIVE_YPOS" : 4,
+		"SPRITE_XPOS" : 3,
+		"SPRITE_YPOS" : 3,
+		"TERRAIN_TYPE" : 2,
+		"CIVILIAN_POPULATION" : 20,
+		"ANGLE" : 0.0,
+		"TILE_ID" : 32
+	
+	
+	},
+	{
+		"RELATIVE_XPOS" : 1,
+		"RELATIVE_YPOS" : 5,
+		"SPRITE_XPOS" : 3,
+		"SPRITE_YPOS" : 3,
+		"TERRAIN_TYPE" : 2,
+		"CIVILIAN_POPULATION" : 20,
+		"ANGLE" : 0.0,
+		"TILE_ID" : 33
+	
+	
+	},
+	{
+		"RELATIVE_XPOS" : 2,
+		"RELATIVE_YPOS" : 5,
+		"SPRITE_XPOS" : 5,
+		"SPRITE_YPOS" : 3,
+		"TERRAIN_TYPE" : 4,
+		"CIVILIAN_POPULATION" : 20,
+		"ANGLE" : 0.0,
+		"TILE_ID" : 34
+	
+	
+	},
+	{
+		"RELATIVE_XPOS" : 3,
+		"RELATIVE_YPOS" : 5,
+		"SPRITE_XPOS" : 5,
+		"SPRITE_YPOS" : 3,
+		"TERRAIN_TYPE" : 4,
+		"CIVILIAN_POPULATION" : 20,
+		"ANGLE" : 0.0,
+		"TILE_ID" : 35
+	
+	
+	},
+	{
+		"RELATIVE_XPOS" : 4,
+		"RELATIVE_YPOS" : 5,
+		"SPRITE_XPOS" : 5,
+		"SPRITE_YPOS" : 3,
+		"TERRAIN_TYPE" : 4,
+		"CIVILIAN_POPULATION" : 20,
+		"ANGLE" : 0.0,
+		"TILE_ID" : 36
+	
+	
+	},
+	{
+		"RELATIVE_XPOS" : 5,
+		"RELATIVE_YPOS" : 5,
+		"SPRITE_XPOS" : 3,
+		"SPRITE_YPOS" : 3,
+		"TERRAIN_TYPE" : 2,
+		"CIVILIAN_POPULATION" : 20,
+		"ANGLE" : 0.0,
+		"TILE_ID" : 37
+	
+	
+	},
+	{
+		"RELATIVE_XPOS" : 6,
+		"RELATIVE_YPOS" : 5,
+		"SPRITE_XPOS" : 3,
+		"SPRITE_YPOS" : 3,
+		"TERRAIN_TYPE" : 2,
+		"CIVILIAN_POPULATION" : 20,
+		"ANGLE" : 0.0,
+		"TILE_ID" : 38
+	
+	
+	},
+	{
+		"RELATIVE_XPOS" : 7,
+		"RELATIVE_YPOS" : 5,
+		"SPRITE_XPOS" : 3,
+		"SPRITE_YPOS" : 3,
+		"TERRAIN_TYPE" : 2,
+		"CIVILIAN_POPULATION" : 20,
+		"ANGLE" : 0.0,
+		"TILE_ID" : 39
+	
+	
+	},
+	{
+		"RELATIVE_XPOS" : 8,
+		"RELATIVE_YPOS" : 5,
+		"SPRITE_XPOS" : 3,
+		"SPRITE_YPOS" : 3,
+		"TERRAIN_TYPE" : 2,
+		"CIVILIAN_POPULATION" : 20,
+		"ANGLE" : 0.0,
+		"TILE_ID" : 40
+	
+	
+	},
+	{
+		"RELATIVE_XPOS" : 1,
+		"RELATIVE_YPOS" : 6,
+		"SPRITE_XPOS" : 3,
+		"SPRITE_YPOS" : 3,
+		"TERRAIN_TYPE" : 2,
+		"CIVILIAN_POPULATION" : 20,
+		"ANGLE" : 0.0,
+		"TILE_ID" : 41
+	
+	
+	},
+	{
+		"RELATIVE_XPOS" : 2,
+		"RELATIVE_YPOS" : 6,
+		"SPRITE_XPOS" : 3,
+		"SPRITE_YPOS" : 3,
+		"TERRAIN_TYPE" : 2,
+		"CIVILIAN_POPULATION" : 20,
+		"ANGLE" : 0.0,
+		"TILE_ID" : 42
+	
+	
+	},
+	{
+		"RELATIVE_XPOS" : 3,
+		"RELATIVE_YPOS" : 6,
+		"SPRITE_XPOS" : 3,
+		"SPRITE_YPOS" : 5,
+		"TERRAIN_TYPE" : 4,
+		"CIVILIAN_POPULATION" : 20,
+		"ANGLE" : 0.0,
+		"TILE_ID" : 43
+	
+	
+	},
+	{
+		"RELATIVE_XPOS" : 4,
+		"RELATIVE_YPOS" : 6,
+		"SPRITE_XPOS" : 3,
+		"SPRITE_YPOS" : 5,
+		"TERRAIN_TYPE" : 4,
+		"CIVILIAN_POPULATION" : 20,
+		"ANGLE" : 0.0,
+		"TILE_ID" : 44
+	
+	
+	},
+		{
+		"RELATIVE_XPOS" : 5,
+		"RELATIVE_YPOS" : 6,
+		"SPRITE_XPOS" : 3,
+		"SPRITE_YPOS" : 5,
+		"TERRAIN_TYPE" : 4,
+		"CIVILIAN_POPULATION" : 20,
+		"ANGLE" : 0.0,
+		"TILE_ID" : 45
+	
+	
+	},
+	{
+		"RELATIVE_XPOS" : 6,
+		"RELATIVE_YPOS" : 6,
+		"SPRITE_XPOS" : 3,
+		"SPRITE_YPOS" : 5,
+		"TERRAIN_TYPE" : 4,
+		"CIVILIAN_POPULATION" : 20,
+		"ANGLE" : 0.0,
+		"TILE_ID" : 46
+	
+	
+	},
+	{
+		"RELATIVE_XPOS" : 7,
+		"RELATIVE_YPOS" : 6,
+		"SPRITE_XPOS" : 3,
+		"SPRITE_YPOS" : 3,
+		"TERRAIN_TYPE" : 2,
+		"CIVILIAN_POPULATION" : 20,
+		"ANGLE" : 0.0,
+		"TILE_ID" : 47
+	
+	
+	},
+	{
+		"RELATIVE_XPOS" : 8,
+		"RELATIVE_YPOS" : 6,
+		"SPRITE_XPOS" : 3,
+		"SPRITE_YPOS" : 3,
+		"TERRAIN_TYPE" : 2,
+		"CIVILIAN_POPULATION" : 20,
+		"ANGLE" : 0.0,
+		"TILE_ID" : 48
+	
+	
+	}
+]

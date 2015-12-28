@@ -54,3 +54,20 @@ void endSDL(SDL_Renderer *render, SDL_Window *screen, TTF_Font *font)
 	SDL_Quit();
 
 }
+/*
+	void endQuotes(quoteData **quotes, int size):
+	To deinit the quotes
+
+*/
+void endQuotes(quoteData **quotes, int size)
+{
+	int i;
+	for(i = 0; i < size; i++)
+	{
+		free(quotes[i]);
+	
+	}
+
+	free(quotes);
+
+}

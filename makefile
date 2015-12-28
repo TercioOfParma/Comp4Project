@@ -16,15 +16,15 @@ all:
 	rm	"init.o"
 	rm	"input.o"
 debug:
-	gcc	-c	src/main.h	-Wall
-	gcc	-c	src/input.c	-Wall
-	gcc	-c	src/init.c	-Wall
-	gcc	-c	src/deinit.c	-Wall
-	gcc	-c	src/simulation.c	-Wall
-	gcc	-c	src/activity.c	-Wall
-	gcc	-c	src/draw.c	-Wall
-	gcc	-c	src/main.c	-Wall
-	gcc	-o	CWCDEBUG	main.o	draw.o	activity.o	simulation.o	deinit.o	init.o	input.o	-lmingw32	-lSDL2Main	-lSDL2	-lSDL2_image	-lSDL2_ttf	-lSDL2_mixer	-ljansson	-Wall
+	gcc	-c	src/main.h	-Wall	-g
+	gcc	-c	src/input.c	-Wall	-g
+	gcc	-c	src/init.c	-Wall	-g
+	gcc	-c	src/deinit.c	-Wall	-g
+	gcc	-c	src/simulation.c	-Wall	-g
+	gcc	-c	src/activity.c	-Wall	-g
+	gcc	-c	src/draw.c	-Wall	-g
+	gcc	-c	src/main.c	-Wall	-g
+	gcc	-o	CWCDEBUG	main.o	draw.o	activity.o	simulation.o	deinit.o	init.o	input.o	-lmingw32	-lSDL2Main	-lSDL2	-lSDL2_image	-lSDL2_ttf	-lSDL2_mixer	-ljansson	-Wall	-g
 	rm	"main.o"
 	rm	"draw.o"
 	rm	"activity.o"

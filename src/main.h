@@ -76,6 +76,9 @@ const static int F_GRADE = 30;
 const static int G_GRADE = 20;
 const static int N_GRADE = 10;
 const static char *ACTIVITY_FILE = "activity.json";
+const static char *QUOTELIST_FILE = "quoteList.json";
+const static int TILE_WIDTH = 64;
+const static int TILE_HEIGHT = 64;
 
 //----------------------------------- STRUTURE DEFINITIONS -----------------------------------
 
@@ -149,13 +152,12 @@ typedef struct
 */
 typedef struct
 {
-	SDL_Texture *display;
+	SDL_Rect spriteDimensions;
 	SDL_Rect dimensions;
+	double angle; //used to spin the tiles so they don't look odd
 	//tile information
 	int tileID;
 	int civilianPopulation;
-	int relativeX;
-	int relativeY;
 	int terrainType;
 	//for A* Algorithm
 	int gScore;
@@ -287,21 +289,21 @@ mapData *loadMapData(char *filename);
 sideData *loadSideData(char *filename, int *success);
 unitData **loadUnitData(char *sideFile, int *success);//likely a very big function
 tileData **loadTileData(char *tileFile, int *success);
-quoteListData *loadQuoteListData(char *filename, int *success);
+quoteListData *loadQuoteListData(char *filename, int *success);//DONE
 quoteData **loadQuotes(char *filename, int *success);//DONE
 activityData *loadActivity(char *filename, int *success);//DONE
 questionData **loadQuestions(char *filename, int *success);//DONE
 
 //----------DEINITIALISATION-----------
 void endSDL(SDL_Renderer *render, SDL_Window *screen, TTF_Font *font);//DONE
-void endUnitDataArray(unitData **units);
+void endUnitDataArray(unitData **units, int size);
 void endSideData(sideData *side);
-void endTileData(tileData **tiles);
+void endTileData(tileData **tiles, int size);
 void endQuoteListData(quoteListData *quotes);
-void endQuotes(quoteData **quotes);
+void endQuotes(quoteData **quotes, int size);
 void endActivity(activityData *activity);//DONE
 void endQuestions(questionData **questions, int size);//DONE
-void endLevels(levelData *levels);
+void endLevel(levelData *level);
 
 //----------DRAWING AND GRAPHICAL-----
 void drawTerrain(tileData **toDraw, int size, SDL_Renderer *render);

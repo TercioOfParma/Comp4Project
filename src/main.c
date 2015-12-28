@@ -29,6 +29,7 @@ int main(int argc, char *argv[])
 	//CUSTOM RUNTIME STRUCTURES
 	optionsData options;
 	activityData *activity;
+	quoteListData *quotes;
 	//SDL2 + EXTENSION LIBRARIES AND JANSSON STRUCTURES
 	SDL_Window *wind;
 	SDL_Renderer *render;
@@ -43,6 +44,7 @@ int main(int argc, char *argv[])
 	font = loadFont(&options, &success);
 	//use below here for testing
 	activity = loadActivity("data/Hill 875/", &success);
+	quotes = loadQuoteListData("data/Hill 875/", &success);
 
 	//------------------------------------------------ MAIN LOOP ------------------------------------------------
 	while(success != FAIL)
