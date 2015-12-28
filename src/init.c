@@ -404,7 +404,6 @@ quoteData **loadQuotes(char *filename, int *success)
 		}
 		temp[i]->quote = json_string_value(json_object_get(quoteDataJSON, "QUOTE"));
 		temp[i]->analysis = json_string_value(json_object_get(quoteDataJSON, "ANALYSIS"));
-		fprintf(stderr, "%d %s %s\n",i, temp[i]->quote, temp[i]->analysis);
 	}
 	return temp;
 }
@@ -637,7 +636,7 @@ quoteListData *loadQuoteListData(char *filename, int *success)
 	Used to load tiles for maps
 
 */
-tileData **loadTileData(char *tileFile, int size, int *success)
+tileData **loadTileData(char *tileFile, int *success)
 {
 	char *tileDataFile = loadTextFile(tileFile, success);
 	tileData **temp;
@@ -645,10 +644,10 @@ tileData **loadTileData(char *tileFile, int size, int *success)
 	json_error_t errorHandle;
 	int numberOfTiles, i;
 	
-	tempJsonHandle = json_loads(tileDataFILE,0, &errorHandle);
+	tempJsonHandle = json_loads(tileDataFile,0, &errorHandle);
 	if(!tempJsonHandle)
 	{
-		fprintf(stderr, "json_loads has failed on %s: %s \n", filename, errorHandle.text);
+		fprintf(stderr, "json_loads has failed on %s: %s \n", tileFile, errorHandle.text);
 		*success = FAIL;
 		return temp;
 	
@@ -664,11 +663,11 @@ tileData **loadTileData(char *tileFile, int size, int *success)
 	
 	}
 	numberOfTiles = json_integer_value(json_object_get(tileDataJSON,"NO_TILES"));
-	temp = malloc(sizeof(tileData *) * size);
+	temp = malloc(sizeof(tileData *) * numberOfTiles);
 	for(i = 0; i < numberOfTiles; i++)
 	{
 		temp[i] = malloc(sizeof(tileData));
-		questionDataJSON = json_array_get(tempJsonHandle, i);
+		tileDataJSON = json_array_get(tempJsonHandle, i);
 		if(!json_is_object(tileDataJSON))
 		{
 			fprintf(stderr,"json_object_get failed, didn't get an object\n");
@@ -677,19 +676,20 @@ tileData **loadTileData(char *tileFile, int size, int *success)
 			return temp;
 	
 		}
-		temp[i]->spriteDimensions.x = json_integer_value(json_object_get(tileDataJSON,"SPRITE_XPOS")) * TILE_WIDTH * 2;
-		temp[i]->spriteDimensions.y = json_integer_value(json_object_get(tileDataJSON,"SPRITE_YPOS")) * TILE_HEIGHT * 2;
+		temp[i]->spriteDimensions.x = (json_integer_value(json_object_get(tileDataJSON,"SPRITE_XPOS")) - 1) * TILE_WIDTH * 2;
+		temp[i]->spriteDimensions.y = (json_integer_value(json_object_get(tileDataJSON,"SPRITE_YPOS")) - 1 )* TILE_HEIGHT * 2;
 		temp[i]->spriteDimensions.w = TILE_WIDTH * 2;//the sprites are stored in 128x128 format, but will be displayed in 64x64
 		temp[i]->spriteDimensions.h = TILE_HEIGHT * 2;
 		temp[i]->dimensions.h = TILE_HEIGHT;
 		temp[i]->dimensions.w = TILE_WIDTH;
-		temp[i]->dimensions.x = json_integer_value(json_object_get(tileDataJSON,"RELATIVE_XPOS")) * TILE_WIDTH;
-		temp[i]->dimensions.y = json_integer_value(json_object_get(tileDataJSON,"RELATIVE_YPOS")) * TILE_HEIGHT;
-		temp[i]->dimensions.civilianPopulation = json_integer_value(json_object_get(tileDataJSON,"CIVILIAN_POPULATION"));
-		temp[i]->dimensions.terrainType = json_integer_value(json_object_get(tileDataJSON,"TERRAIN_TYPE"));
-		temp[i]->dimensions.tileID = json_integer_value(json_object_get(tileDataJSON,"TILE_ID"));
-		temp[i]->dimensions.angle = json_real_value(json_object_get(tileDataJSON,"ANGLE"));
+		temp[i]->dimensions.x = json_integer_value(json_object_get(tileDataJSON,"RELATIVE_XPOS")) * TILE_WIDTH + STARTX_MAP;
+		temp[i]->dimensions.y = json_integer_value(json_object_get(tileDataJSON,"RELATIVE_YPOS")) * TILE_HEIGHT + STARTY_MAP;
+		temp[i]->civilianPopulation = json_integer_value(json_object_get(tileDataJSON,"CIVILIAN_POPULATION"));
+		temp[i]->terrainType = json_integer_value(json_object_get(tileDataJSON,"TERRAIN_TYPE"));
+		temp[i]->tileID = json_integer_value(json_object_get(tileDataJSON,"TILE_ID"));
+		temp[i]->angle = json_real_value(json_object_get(tileDataJSON,"ANGLE"));
 	}
+	
 	return temp;
 
 

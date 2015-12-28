@@ -79,6 +79,8 @@ const static char *ACTIVITY_FILE = "activity.json";
 const static char *QUOTELIST_FILE = "quoteList.json";
 const static int TILE_WIDTH = 64;
 const static int TILE_HEIGHT = 64;
+const static int STARTX_MAP = 100;
+const static int STARTY_MAP = 100;
 
 //----------------------------------- STRUTURE DEFINITIONS -----------------------------------
 
@@ -288,7 +290,7 @@ char *miscIDToFilePath(int ID, char *path);//this will be used to map tilesets a
 mapData *loadMapData(char *filename);
 sideData *loadSideData(char *filename, int *success);
 unitData **loadUnitData(char *sideFile, int *success);//likely a very big function
-tileData **loadTileData(char *tileFile, int *success);
+tileData **loadTileData(char *tileFile, int size, int *success);
 quoteListData *loadQuoteListData(char *filename, int *success);//DONE
 quoteData **loadQuotes(char *filename, int *success);//DONE
 activityData *loadActivity(char *filename, int *success);//DONE
@@ -306,7 +308,7 @@ void endQuestions(questionData **questions, int size);//DONE
 void endLevel(levelData *level);
 
 //----------DRAWING AND GRAPHICAL-----
-void drawTerrain(tileData **toDraw, int size, SDL_Renderer *render);
+void drawTerrain(tileData **toDraw, int size, SDL_Renderer *render, SDL_Texture *tileMap);
 void drawUnits(unitData *toDraw, int size,  SDL_Renderer *render);
 void drawMenuElements(buttonData **buttons,int size, SDL_Renderer *render);// DONE
 void drawMenuElementsText(buttonDataText **buttons, int size, SDL_Renderer *render);//DONE

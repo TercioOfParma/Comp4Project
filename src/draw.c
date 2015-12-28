@@ -132,3 +132,12 @@ void drawQuestion(questionData **questions, int questionNo, SDL_Renderer *render
 	}
 
 }
+
+void drawTerrain(tileData **toDraw, int size, SDL_Renderer *render, SDL_Texture *tileMap)
+{
+	int i;
+	for(i = 0; i < size; i++)
+	{
+		SDL_RenderCopyEx(render, tileMap, &(toDraw[i]->spriteDimensions), &(toDraw[i]->dimensions), toDraw[i]->angle, NULL, SDL_FLIP_NONE);
+	}
+}

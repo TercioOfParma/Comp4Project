@@ -30,11 +30,14 @@ int main(int argc, char *argv[])
 	optionsData options;
 	activityData *activity;
 	quoteListData *quotes;
+	tileData **map;
 	//SDL2 + EXTENSION LIBRARIES AND JANSSON STRUCTURES
 	SDL_Window *wind;
 	SDL_Renderer *render;
 	TTF_Font *font;
 	SDL_Event eventHandle;
+	SDL_Texture *tileset;
+	SDL_Rect tileSetData;
 	//------------------------------------------------ INITIALISATION -------------------------------------------
 	
 	optionsFile = loadTextFile(OPTIONS_FILE, &success);
@@ -45,7 +48,8 @@ int main(int argc, char *argv[])
 	//use below here for testing
 	activity = loadActivity("data/Hill 875/", &success);
 	quotes = loadQuoteListData("data/Hill 875/", &success);
-
+	tileset = loadImage("data/Hill 875/spriteSheet.png", render, &tileSetData, &success);
+	map = loadTileData("data/Hill 875/tileData.json", &success);
 	//------------------------------------------------ MAIN LOOP ------------------------------------------------
 	while(success != FAIL)
 	{
@@ -57,7 +61,9 @@ int main(int argc, char *argv[])
 		
 		}
 
-
+		drawTerrain(map, 48, render, tileset);
+		SDL_RenderPresent(render);
+		getch();
 		quizTerminated = startQuiz(activity, render, font, &success);
 		SDL_RenderPresent(render);
 		if(eventHandle.type == SDL_QUIT || quizTerminated == 0)
