@@ -2,6 +2,7 @@
 	{
 		"SIDE_UNIT_ID" : 501,
 		"OBJECTIVE_XPOS" : 0,
-		"OBJECTIVE_YPOS" : 0
+		"OBJECTIVE_YPOS" : 0,
+		"UNIT_NUMBER" : 2
 	}
 ]

@@ -20,6 +20,7 @@
 
 void drawMenuElements(buttonData **buttons,int size, SDL_Renderer *render)
 {
+	fprintf(stderr, "Drawing buttons....\n");
 	int i;
 	for(i =0; i < size; i++)
 	{
@@ -34,7 +35,7 @@ void drawMenuElements(buttonData **buttons,int size, SDL_Renderer *render)
 */
 textData *renderText(TTF_Font *font, SDL_Renderer *render, const char *stringToTexture ,int *success)
 {
-
+	fprintf(stderr, "Rendering text....\n");
 	textData *temp = malloc(sizeof(textData));
 	SDL_Surface *tempSurf;
 	SDL_Texture *tempTex;
@@ -68,6 +69,7 @@ textData *renderText(TTF_Font *font, SDL_Renderer *render, const char *stringToT
 */
 void drawText(textData *toDraw, SDL_Renderer *render)
 {
+	fprintf(stderr, "Drawing text....\n");
 	SDL_RenderCopy(render, toDraw->display, NULL, &(toDraw->dimensions));
 
 }
@@ -78,6 +80,7 @@ void drawText(textData *toDraw, SDL_Renderer *render)
 */
 void drawMenuElementsText(buttonDataText **buttons, int size, SDL_Renderer *render)
 {
+	fprintf(stderr, "Drawing buttons with text....\n");
 	int i;
 	for(i = 0; i < size; i++)
 	{
@@ -93,6 +96,7 @@ void drawMenuElementsText(buttonDataText **buttons, int size, SDL_Renderer *rend
 */
 void drawQuote(quoteData **quotes, int quoteNo, SDL_Renderer *render, TTF_Font *font)
 {
+	fprintf(stderr, "Drawing quote....\n");
 	int wasSuccess = SUCCESS;
 	quotes[quoteNo]->display[QUOTE_POS] = renderText(font, render, (quotes[quoteNo]->quote), &wasSuccess);
 	quotes[quoteNo]->display[ANALYSIS_POS] = renderText(font, render, (quotes[quoteNo]->analysis), &wasSuccess);
@@ -116,7 +120,7 @@ void drawQuote(quoteData **quotes, int quoteNo, SDL_Renderer *render, TTF_Font *
 */
 void drawQuestion(questionData **questions, int questionNo, SDL_Renderer *render, TTF_Font *font)
 {
-	
+	fprintf(stderr, "Drawing question and answers....\n");
 	int wasSuccess = SUCCESS;
 	int i;
 	questions[questionNo]->display[QUESTION_POS] = renderText(font, render, questions[questionNo]->question, &wasSuccess);
@@ -139,9 +143,24 @@ void drawQuestion(questionData **questions, int questionNo, SDL_Renderer *render
 */
 void drawTerrain(tileData **toDraw, int size, SDL_Renderer *render, SDL_Texture *tileMap)
 {
+	fprintf(stderr, "Drawing terrain....\n");
 	int i;
 	for(i = 0; i < size; i++)
 	{
 		SDL_RenderCopyEx(render, tileMap, &(toDraw[i]->spriteDimensions), &(toDraw[i]->dimensions), toDraw[i]->angle, NULL, SDL_FLIP_NONE);
+	}
+}
+/*
+	void drawUnits(unitData *toDraw, int size,  SDL_Renderer *render):
+	Draws a unit tile from the base texture that has all the textures
+
+*/
+void drawUnits(unitData **toDraw, int size, SDL_Renderer *render, SDL_Texture *tileMap)
+{
+	fprintf(stderr, "Drawing units....\n");
+	int i;
+	for(i = 1; i <= size; i++)
+	{
+		SDL_RenderCopy(render, tileMap, &(toDraw[i]->spriteDimensions), &(toDraw[i]->dimensions));
 	}
 }

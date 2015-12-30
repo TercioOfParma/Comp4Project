@@ -19,6 +19,7 @@
 */
 void endQuestions(questionData **questions, int size)
 {
+	fprintf(stderr, "Deinitialising questions....\n");
 	int i;
 	for(i = 0; i < size; i++)
 	{
@@ -34,6 +35,7 @@ void endQuestions(questionData **questions, int size)
 */
 void endActivity(activityData *activity)
 {
+	fprintf(stderr, "Deinitialising Activity....\n");
 	endQuestions(activity->questions, activity->maximumMark);
 	free(activity);
 
@@ -45,6 +47,7 @@ void endActivity(activityData *activity)
 */
 void endSDL(SDL_Renderer *render, SDL_Window *screen, TTF_Font *font)
 {
+	fprintf(stderr, "Deinitialising SDL2, extensions libraries, hardware rendering and window....\n");
 	SDL_DestroyRenderer(render);
 	SDL_DestroyWindow(screen);
 	TTF_CloseFont(font);
@@ -61,6 +64,7 @@ void endSDL(SDL_Renderer *render, SDL_Window *screen, TTF_Font *font)
 */
 void endQuotes(quoteData **quotes, int size)
 {
+	fprintf(stderr, "Deinitialising quotes....\n");
 	int i;
 	for(i = 0; i < size; i++)
 	{
@@ -81,5 +85,53 @@ void endQuotes(quoteData **quotes, int size)
 */
 void endQuoteListData(quoteListData *quotes)
 {
+	fprintf(stderr, "Deinitialising quoteList....\n");
 	free(quotes);
+}
+/*
+	void endTileData(tileData **tiles, int size):
+	To deinit the map
+	
+
+*/
+void endTileData(tileData **tiles, int size)
+{
+	fprintf(stderr, "Deinitialising map tiles....\n");
+	int i;
+	for(i = 0; i < size; i++)
+	{
+		free(tiles[i]);
+	
+	}
+	free(tiles);
+}
+/*
+	void endUnitDataArray(unitData **units, int size):
+	To deinit the units
+	
+
+*/
+void endUnitDataArray(unitData **units, int size)
+{
+	fprintf(stderr, "Deinitialising units....\n");
+	int i;
+	for(i = 1; i <= size; i++)
+	{
+		free(units[i]);
+	
+	}
+	free(units);
+}
+/*
+	void endSideData(sideData *side):
+	To deinit the side
+	
+
+*/
+void endSideData(sideData *side)
+{
+	fprintf(stderr, "Deinitialising a side....\n");
+	endUnitDataArray(side->units, side->noUnits);
+	free(side);
+
 }

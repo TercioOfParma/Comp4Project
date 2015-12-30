@@ -19,6 +19,7 @@
 */
 char computeGrade(activityData *quiz, int noCorrect)
 {
+	fprintf(stderr, "Calculating grade....\n");
 	int percentage = ((float)noCorrect / (float)quiz->maximumMark) * 100;
 	if(percentage >= A_GRADE)
 	{
@@ -65,6 +66,7 @@ char computeGrade(activityData *quiz, int noCorrect)
 */
 int startQuiz(activityData *quiz, SDL_Renderer *render, TTF_Font *font, int *success)
 {
+	fprintf(stderr, "Running quiz....\n");
 	int gotCorrect, i, randomQuestion, j, clicked;
 	char results[MAX_TEXT_OUTPUT], grade;
 	SDL_Event eventHandle;
@@ -102,12 +104,12 @@ int startQuiz(activityData *quiz, SDL_Renderer *render, TTF_Font *font, int *suc
 				{
 					if(j == quiz->questions[randomQuestion]->answerNo)
 					{
-						fprintf(stderr, "Correct\n");
+						fprintf(stdout, "Correct\n");
 						gotCorrect++;
 					}
 					else
 					{
-						fprintf(stderr, "Faggot, you chose %d, the answer was %d\n", j, quiz->questions[randomQuestion]->answerNo);
+						fprintf(stdout, "Incorrect, you chose %d, the answer was %d\n", j, quiz->questions[randomQuestion]->answerNo);
 					}
 					randomQuestion = rand() % quiz->maximumMark ;
 					if(randomQuestion == 0)
@@ -135,7 +137,6 @@ int startQuiz(activityData *quiz, SDL_Renderer *render, TTF_Font *font, int *suc
 	grade = computeGrade(quiz, gotCorrect);
 	snprintf(results, MAX_TEXT_OUTPUT, "YOU GOT %d / %d, THAT IS A GRADE %c, PLEASE PRESS ENTER INTO THE CONSOLE", gotCorrect, quiz->maximumMark, grade);
 	displayActivityResults(quiz, results, render, font);
-	getch();
 	return 0;
 }
 /*
@@ -145,6 +146,7 @@ int startQuiz(activityData *quiz, SDL_Renderer *render, TTF_Font *font, int *suc
 */
 void displayActivityResults(activityData *quiz, char *resultsToDisplay, SDL_Renderer *render, TTF_Font *font)
 {
+	fprintf(stderr, "Displaying results of the activity....\n");
 	int wasSuccess = SUCCESS;
 	textData *toDisplay = renderText(font, render, resultsToDisplay, &wasSuccess);
 	if(wasSuccess == FAIL)

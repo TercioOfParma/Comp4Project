@@ -26,7 +26,7 @@
 char *loadTextFile(const char *filename, int *success)
 {
 
-
+	fprintf(stderr, "Loading file %s... \n", filename);
 	int fileDescriptor;
 	
 	fileDescriptor = open(filename, O_RDONLY, 0600);//avoids the race condition issues
@@ -81,6 +81,7 @@ char *loadTextFile(const char *filename, int *success)
 
 int getFileSize(FILE *sizeToGet, int *success)
 {
+	fprintf(stderr, "Getting File name...\n");
 	int fileSize = 0;
 	fseek(sizeToGet,0,SEEK_END);
 	fileSize = ftell(sizeToGet);
@@ -102,6 +103,7 @@ int getFileSize(FILE *sizeToGet, int *success)
 
 optionsData initOptions(char *fileContents, int *success)
 {
+	fprintf(stderr, "Loading options... \n");
 	optionsData tempOpt;
 	json_t *tempJsonHandle, *optionsData;
 	json_error_t errorHandle;
@@ -127,12 +129,12 @@ optionsData initOptions(char *fileContents, int *success)
 	//gets the program options
 	tempOpt.SCREEN_WIDTH = json_integer_value(json_object_get(optionsData,"SCREEN_WIDTH"));
 	tempOpt.SCREEN_HEIGHT = json_integer_value(json_object_get(optionsData,"SCREEN_HEIGHT"));
-	tempOpt.WINDOW_TITLE = json_string_value(json_object_get(optionsData, "WINDOW_TITLE"));
+	tempOpt.WINDOW_TITLE = (char *)json_string_value(json_object_get(optionsData, "WINDOW_TITLE"));
 	tempOpt.SAMPLE_SIZE = json_integer_value(json_object_get(optionsData,"SAMPLE_SIZE"));
 	tempOpt.SAMPLE_FREQUENCY = json_integer_value(json_object_get(optionsData,"SAMPLE_FREQUENCY"));
 	tempOpt.NO_CHANNELS = json_integer_value(json_object_get(optionsData,"NO_CHANNELS"));
 	tempOpt.FONT_SIZE = json_integer_value(json_object_get(optionsData,"FONT_SIZE"));
-	tempOpt.DEFAULT_FONT = json_string_value(json_object_get(optionsData, "DEFAULT_FONT"));
+	tempOpt.DEFAULT_FONT = (char *)json_string_value(json_object_get(optionsData, "DEFAULT_FONT"));
 	return tempOpt;
 }
 
@@ -144,6 +146,7 @@ optionsData initOptions(char *fileContents, int *success)
 
 SDL_Window *initSDL(optionsData *opt, int *success)
 {
+	fprintf(stderr, "Initialising SDL2 and SDL2 Extension Libraries....\n");
 	SDL_Window *temp;
 	int SDL_Flags, IMG_Flags;
 	SDL_Flags = SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_AUDIO;
@@ -199,6 +202,7 @@ SDL_Window *initSDL(optionsData *opt, int *success)
 
 SDL_Renderer *createRenderer(SDL_Window *screen, int *success)
 {
+	fprintf(stderr, "Creating SDL2 Renderer....\n");
 	SDL_Renderer *temp;
 	int Render_Flags = SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC;//Hardware acceleration and a frame rate capped by the refresh rate of the monitor
 	temp = SDL_CreateRenderer(screen, -1, Render_Flags);
@@ -220,6 +224,7 @@ SDL_Renderer *createRenderer(SDL_Window *screen, int *success)
 
 Mix_Music *loadMusic(const char *filename, int *success)
 {
+	fprintf(stderr, "Loading music from %s....\n", filename);
 	Mix_Music *temp = Mix_LoadMUS(filename);
 	if(!temp)
 	{
@@ -238,6 +243,7 @@ Mix_Music *loadMusic(const char *filename, int *success)
 */
 Mix_Chunk *loadEffect(const char *filename, int *success)
 {
+	fprintf(stderr, "Loading effect from %s....\n", filename);
 	Mix_Chunk *temp = Mix_LoadWAV(filename);
 	if(!temp)
 	{
@@ -255,7 +261,7 @@ Mix_Chunk *loadEffect(const char *filename, int *success)
 */
 TTF_Font *loadFont(optionsData *opt, int *success)
 {
-	
+	fprintf(stderr, "Loading font from %s....\n", opt->DEFAULT_FONT);
 	TTF_Font *temp = TTF_OpenFont(opt->DEFAULT_FONT, opt->FONT_SIZE);
 	if(!temp)
 	{
@@ -274,6 +280,7 @@ TTF_Font *loadFont(optionsData *opt, int *success)
 */
 SDL_Texture *loadImage(const char *filename, SDL_Renderer *render, SDL_Rect *dimen, int *success)
 {
+	fprintf(stderr, "Loading image and converting it to texture from %s....\n", filename);
 	SDL_Surface *temp;
 	SDL_Texture *tempTex;
 	temp = IMG_Load(filename);//image library used to load things other than bitmaps
@@ -307,6 +314,7 @@ SDL_Texture *loadImage(const char *filename, SDL_Renderer *render, SDL_Rect *dim
 */
 buttonData *loadButton(SDL_Texture *display, SDL_Rect *posAndSize, int type, int *success)
 {
+	fprintf(stderr, "Loading a button....\n");
 	buttonData *temp = malloc(sizeof(buttonData));
 	if(!temp)
 	{
@@ -329,6 +337,7 @@ buttonData *loadButton(SDL_Texture *display, SDL_Rect *posAndSize, int type, int
 */
 buttonDataText *loadButtonText(SDL_Texture *display, SDL_Rect *posAndSize, SDL_Renderer *render, const char *initialData, TTF_Font *font, int type, int *success)
 {
+	fprintf(stderr, "Loading a button with text....\n");
 	buttonDataText *temp = malloc(sizeof(buttonDataText));
 	if(!temp)
 	{
@@ -362,6 +371,7 @@ buttonDataText *loadButtonText(SDL_Texture *display, SDL_Rect *posAndSize, SDL_R
 */
 quoteData **loadQuotes(char *filename, int *success)
 {
+	fprintf(stderr, "Loading quotes from %s....\n", filename);
 	char *quoteDataFILE = loadTextFile(filename, success);
 	quoteData **temp;
 	json_t *tempJsonHandle, *quoteDataJSON;
@@ -400,8 +410,8 @@ quoteData **loadQuotes(char *filename, int *success)
 			return temp;
 	
 		}
-		temp[i]->quote = json_string_value(json_object_get(quoteDataJSON, "QUOTE"));
-		temp[i]->analysis = json_string_value(json_object_get(quoteDataJSON, "ANALYSIS"));
+		temp[i]->quote = (char *)json_string_value(json_object_get(quoteDataJSON, "QUOTE"));
+		temp[i]->analysis = (char *)json_string_value(json_object_get(quoteDataJSON, "ANALYSIS"));
 	}
 	return temp;
 }
@@ -412,6 +422,7 @@ quoteData **loadQuotes(char *filename, int *success)
 */
 questionData **loadQuestions(char *filename, int *success)
 {
+	fprintf(stderr, "Loading questions from %s....\n", filename);
 	char *questionDataFILE = loadTextFile(filename, success);
 	questionData **temp;
 	json_t *tempJsonHandle, *questionDataJSON;
@@ -450,10 +461,10 @@ questionData **loadQuestions(char *filename, int *success)
 			return temp;
 	
 		}
-		temp[i]->question = json_string_value(json_object_get(questionDataJSON, "QUESTION"));
-		temp[i]->answers[0] = json_string_value(json_object_get(questionDataJSON, "ANSWERONE"));
-		temp[i]->answers[1] = json_string_value(json_object_get(questionDataJSON, "ANSWERTWO"));
-		temp[i]->answers[2] = json_string_value(json_object_get(questionDataJSON, "ANSWERTHREE"));
+		temp[i]->question = (char *)json_string_value(json_object_get(questionDataJSON, "QUESTION"));
+		temp[i]->answers[0] = (char *) json_string_value(json_object_get(questionDataJSON, "ANSWERONE"));
+		temp[i]->answers[1] = (char *) json_string_value(json_object_get(questionDataJSON, "ANSWERTWO"));
+		temp[i]->answers[2] = (char *) json_string_value(json_object_get(questionDataJSON, "ANSWERTHREE"));
 		temp[i]->answerNo = json_integer_value(json_object_get(questionDataJSON, "CORRECT"));
 	}
 	return temp;
@@ -468,6 +479,7 @@ questionData **loadQuestions(char *filename, int *success)
 */
 char *miscIDToFilePath(int ID, char *path)
 {
+	fprintf(stderr, "Mapping ID to an actual file path within data folder %s....\n", path);
 	char filePath [MAX_TEXT_OUTPUT];
 	char *mappingFileContents,*mappedPath, stringPath[MAX_TEXT_OUTPUT];
 	json_t *tempJsonHandle, *mappingDataJSON;
@@ -496,8 +508,7 @@ char *miscIDToFilePath(int ID, char *path)
 	}
 	
 	itoa(ID, stringPath, 10);
-	fprintf(stderr, "%s", stringPath);
-	mappedPath = json_string_value(json_object_get(mappingDataJSON, stringPath));
+	mappedPath = (char *)json_string_value(json_object_get(mappingDataJSON, stringPath));
 	if(!mappedPath)
 	{
 		fprintf(stderr, "The ID you have requested doesn't exist\n");
@@ -514,6 +525,7 @@ char *miscIDToFilePath(int ID, char *path)
 */
 activityData *loadActivity(char *filename, int *success)
 {
+	fprintf(stderr, "Loading an activity from %s....\n", filename);
 	char *activityDataFile, pathToLoad[MAX_TEXT_OUTPUT], *questionFile;
 	int wasSuccess = SUCCESS;
 	json_t *tempJsonHandle, *activityDataJSON;
@@ -558,7 +570,7 @@ activityData *loadActivity(char *filename, int *success)
 	}
 	temp->questions = loadQuestions(questionFile, &wasSuccess);
 	temp->maximumMark = json_integer_value(json_object_get(activityDataJSON, "MAXIMUM_MARK"));
-	temp->title = json_string_value(json_object_get(activityDataJSON, "TITLE"));
+	temp->title = (char *) json_string_value(json_object_get(activityDataJSON, "TITLE"));
 	if(wasSuccess == FAIL)
 	{
 		fprintf(stderr, "loadActivity has failed : %s", strerror(errno));
@@ -577,6 +589,7 @@ activityData *loadActivity(char *filename, int *success)
 */
 quoteListData *loadQuoteListData(char *filename, int *success)
 {
+	fprintf(stderr, "Loading quoteList from %s....\n", filename);
 	char *quoteListDataFile, pathToLoad[MAX_TEXT_OUTPUT], *quoteFile;
 	int wasSuccess = SUCCESS;
 	json_t *tempJsonHandle, *quoteListDataJSON;
@@ -637,6 +650,7 @@ quoteListData *loadQuoteListData(char *filename, int *success)
 */
 tileData **loadTileData(char *tileFile, int *success)
 {
+	fprintf(stderr, "Loading a tilemap from %s....\n", tileFile);
 	char *tileDataFile = loadTextFile(tileFile, success);
 	tileData **temp;
 	json_t *tempJsonHandle, *tileDataJSON;
@@ -702,6 +716,7 @@ tileData **loadTileData(char *tileFile, int *success)
 */
 unitData *loadUnit(char *unitFile, int ID, int *success)
 {
+	fprintf(stderr, "Loading unit ID %d....\n", ID);
 	int i, loadedUnitID, found, numberOfUnits;
 	json_t *tempJsonHandle, *unitDataJSON;
 	json_error_t errorHandle;
@@ -774,8 +789,9 @@ unitData *loadUnit(char *unitFile, int ID, int *success)
 	temp->dimensions.w = TILE_WIDTH;
 	temp->dimensions.h = TILE_HEIGHT;
 	temp->alive = TRUE;
-	temp->name = json_string_value(json_object_get(unitDataJSON, "NAME"));
-	temp->description = json_string_value(json_object_get(unitDataJSON, "DESCRIPTION"));
+	temp->name = (char *) json_string_value(json_object_get(unitDataJSON, "NAME"));
+	temp->description = (char *) json_string_value(json_object_get(unitDataJSON, "DESCRIPTION"));
+	fprintf(stderr, "Got a unit called %s\n", temp->name);
 	for(i = 0; i < SIZE_OF_MODIFIERS; i++)
 	{
 		temp->modifiers[i] = FALSE;
@@ -790,6 +806,7 @@ unitData *loadUnit(char *unitFile, int ID, int *success)
 */
 unitData **loadUnitData(char *sideUnitDataFilePath, char *unitDescriptorDataFilePath, int *success)
 {
+	fprintf(stderr, "Loading unit Data from %s using the descriptor file %s....\n", sideUnitDataFilePath, unitDescriptorDataFilePath);
 	unitData **temp;
 	json_t *tempJsonHandle, *unitDataJSON;
 	json_error_t errorHandle;
@@ -812,7 +829,7 @@ unitData **loadUnitData(char *sideUnitDataFilePath, char *unitDescriptorDataFile
 		json_decref(tempJsonHandle);
 		return temp;//I.E. NULL	
 	}
-	numberOfUnits = json_integer_value(json_object_get(unitDataJSON, "NUMBER_UNITS"));
+	numberOfUnits = json_integer_value(json_object_get(unitDataJSON, "NUMBER_UNITS")) + 1;
 	temp = malloc(sizeof(unitData *) * numberOfUnits);
 	if(!temp)
 	{
@@ -820,7 +837,7 @@ unitData **loadUnitData(char *sideUnitDataFilePath, char *unitDescriptorDataFile
 		*success = FAIL;
 		return NULL;
 	}
-	for(i = 0; i < numberOfUnits; i++)
+	for(i = 1; i < numberOfUnits; i++)
 	{
 		unitDataJSON = json_array_get(tempJsonHandle, i);
 		if(!json_is_object(unitDataJSON))
@@ -833,8 +850,10 @@ unitData **loadUnitData(char *sideUnitDataFilePath, char *unitDescriptorDataFile
 		}
 		unitID = json_integer_value(json_object_get(unitDataJSON, "UNIT_ID"));
 		temp[i] = loadUnit(overallUnitDataFile, unitID,success);
-		temp[i]->relativeX = json_integer_value(json_object_get(unitDataJSON, "RELATIVE_XPOS")) * TILE_WIDTH + STARTX_MAP;
-		temp[i]->relativeY = json_integer_value(json_object_get(unitDataJSON, "RELATIVE_YPOS")) * TILE_HEIGHT + STARTY_MAP;
+		temp[i]->relativeX = json_integer_value(json_object_get(unitDataJSON, "RELATIVE_XPOS"));
+		temp[i]->relativeY = json_integer_value(json_object_get(unitDataJSON, "RELATIVE_YPOS"));
+		temp[i]->dimensions.x = temp[i]->relativeX * TILE_WIDTH + STARTX_MAP;
+		temp[i]->dimensions.y = temp[i]->relativeY * TILE_HEIGHT + STARTY_MAP;
 	}
 	
 	return temp;
@@ -846,6 +865,7 @@ unitData **loadUnitData(char *sideUnitDataFilePath, char *unitDescriptorDataFile
 */
 sideData *loadSideData(char *filename,int sideNumber, int *success)
 {
+	fprintf(stderr, "Loading a side from %s....\n", filename);
 	char *sideDataFile, *sideUnitPath, pathToLoad[MAX_TEXT_OUTPUT];
 	int sideID;
 	sideData *temp;
@@ -857,7 +877,6 @@ sideData *loadSideData(char *filename,int sideNumber, int *success)
 		*success = FAIL;
 		return NULL;
 	}
-	fprintf(stderr, "works\n");
 
 	temp = malloc(sizeof(sideData));
 	if(!temp)
@@ -869,7 +888,7 @@ sideData *loadSideData(char *filename,int sideNumber, int *success)
 	snprintf(pathToLoad, MAX_TEXT_OUTPUT, "%s%s", filename, SIDE_FILES[sideNumber]);
 	sideDataFile = loadTextFile(pathToLoad, success);
 	tempJsonHandle = json_loads(sideDataFile,0, &errorHandle);
-	fprintf(stderr, "works\n");
+	
 
 	if(!tempJsonHandle)
 	{
@@ -887,7 +906,6 @@ sideData *loadSideData(char *filename,int sideNumber, int *success)
 		return NULL;
 	
 	}
-	fprintf(stderr, "works\n");
 
 	temp->sideID = json_integer_value(json_object_get(sideDataJSON, "SIDE_UNIT_ID"));//This is so we can get 
 	sideUnitPath = miscIDToFilePath(temp->sideID, filename);
@@ -898,11 +916,8 @@ sideData *loadSideData(char *filename,int sideNumber, int *success)
 		return NULL;
 	}
 	snprintf(pathToLoad, MAX_TEXT_OUTPUT, "%s%s", filename, UNIT_FILE);
-	fprintf(stderr, "works\n");
-
+	temp->noUnits = json_integer_value(json_object_get(sideDataJSON, "UNIT_NUMBER"));
 	temp->units = loadUnitData(sideUnitPath,pathToLoad , success);
-	fprintf(stderr, "works\n");
-
 	temp->xObjective = json_integer_value(json_object_get(sideDataJSON, "OBJECTIVE_XPOS"));
 	temp->yObjective = json_integer_value(json_object_get(sideDataJSON, "OBJECTIVE_YPOS"));
 	

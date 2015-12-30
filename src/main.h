@@ -85,6 +85,7 @@ const static int STARTX_MAP = 100;
 const static int STARTY_MAP = 100;
 const static char *SIDE_FILES[] = {"sideone.json", "sidetwo.json"};
 const static char *UNIT_FILE = "unitData.json";
+const static char *LOG_FILE = "log.txt";
 #define LARGE_TEXT_FILE 20000000
 //----------------------------------- STRUTURE DEFINITIONS -----------------------------------
 
@@ -180,6 +181,7 @@ typedef struct
 {
 	unitData **units;
 	int sideID;
+	int noUnits;
 	int losses;
 	int xObjective;
 	int yObjective;
@@ -291,22 +293,22 @@ buttonData *loadButton(SDL_Texture *display, SDL_Rect *posAndSize, int type, int
 buttonDataText *loadButtonText(SDL_Texture *display, SDL_Rect *posAndSize, SDL_Renderer *render, const char *initialData, TTF_Font *font, int type, int *success);//DONE
 levelData *loadLevelData(char *levelFileData, int *success);
 char *mapLevelIDToMapPath(levelData *levelDataToChoose, char *mappingFile, char id, int *success);//used to find the mapData file + directory
-char *miscIDToFilePath(int ID, char *path);//this will be used to map tilesets and unitSide files together DONE
+char *miscIDToFilePath(int ID, char *path);//DONE
 mapData *loadMapData(char *filename, int *success);
-sideData *loadSideData(char *filename,int sideNumber, int *success);
-unitData **loadUnitData(char *sideUnitDataFilePath, char *unitDescriptorDataFilePath, int *success);//likely a very big function
+sideData *loadSideData(char *filename,int sideNumber, int *success);//DONE
+unitData **loadUnitData(char *sideUnitDataFilePath, char *unitDescriptorDataFilePath, int *success);//DONE
 tileData **loadTileData(char *tileFile, int *success);//DONE
 quoteListData *loadQuoteListData(char *filename, int *success);//DONE
 quoteData **loadQuotes(char *filename, int *success);//DONE
 activityData *loadActivity(char *filename, int *success);//DONE
 questionData **loadQuestions(char *filename, int *success);//DONE
-unitData *loadUnit(char *unitFile, int ID, int *success);
+unitData *loadUnit(char *unitFile, int ID, int *success);//DONE
 //----------DEINITIALISATION-----------
 void endSDL(SDL_Renderer *render, SDL_Window *screen, TTF_Font *font);//DONE
-void endUnitDataArray(unitData **units, int size);
-void endSideData(sideData *side);
-void endTileData(tileData **tiles, int size);
-void endQuoteListData(quoteListData *quotes);
+void endUnitDataArray(unitData **units, int size);//DONE
+void endSideData(sideData *side);//DONE
+void endTileData(tileData **tiles, int size);//DONE
+void endQuoteListData(quoteListData *quotes);//DONE
 void endQuotes(quoteData **quotes, int size);//DONE
 void endActivity(activityData *activity);//DONE
 void endQuestions(questionData **questions, int size);//DONE
@@ -314,7 +316,7 @@ void endLevel(levelData *level);
 
 //----------DRAWING AND GRAPHICAL-----
 void drawTerrain(tileData **toDraw, int size, SDL_Renderer *render, SDL_Texture *tileMap);//DONE
-void drawUnits(unitData *toDraw, int size,  SDL_Renderer *render);
+void drawUnits(unitData **toDraw, int size,  SDL_Renderer *render, SDL_Texture *tileMap);//DONE
 void drawMenuElements(buttonData **buttons,int size, SDL_Renderer *render);// DONE
 void drawMenuElementsText(buttonDataText **buttons, int size, SDL_Renderer *render);//DONE
 textData *renderText(TTF_Font *font, SDL_Renderer *render, const char *stringToTexture,int *success);// DONE

@@ -21,11 +21,14 @@
 
 int main(int argc, char *argv[])
 {
+	
 	//------------------------------------------------- VARIABLE DECLARATIONS -----------------------------------
 	//PRIMITIVE DATA TYPES
 	char *optionsFile;
 	int success = SUCCESS;
 	int quizTerminated = 1;
+	//C Library Structures
+	FILE *errorRedirection;
 	//CUSTOM RUNTIME STRUCTURES
 	optionsData options;
 	activityData *activity;
@@ -38,9 +41,10 @@ int main(int argc, char *argv[])
 	SDL_Event eventHandle;
 	SDL_Texture *tileset;
 	SDL_Rect tileSetData;
-	sideData *testSide;
+	sideData *testSideOne, *testSideTwo;
 	//------------------------------------------------ INITIALISATION -------------------------------------------
-	
+	errorRedirection = freopen(LOG_FILE, "w", stderr);//According to the documentation I have read, it isn't an issue on windows stderr isn't a file, and so this evades the race condition issue
+	fprintf(stderr, "Main function....\n");
 	optionsFile = loadTextFile(OPTIONS_FILE, &success);
 	options = initOptions(optionsFile,&success);
 	wind = initSDL(&options, &success);
@@ -51,7 +55,8 @@ int main(int argc, char *argv[])
 	quotes = loadQuoteListData("data/Hill 875/", &success);
 	tileset = loadImage("data/Hill 875/spriteSheet.png", render, &tileSetData, &success);
 	map = loadTileData("data/Hill 875/tileData.json", &success);
-	testSide = loadSideData("data/Hill 875/",0, &success);
+	testSideOne = loadSideData("data/Hill 875/",0, &success);
+	testSideTwo = loadSideData("data/Hill 875/",1, &success);
 	//------------------------------------------------ MAIN LOOP ------------------------------------------------
 	while(success != FAIL)
 	{
@@ -64,6 +69,8 @@ int main(int argc, char *argv[])
 		}
 
 		drawTerrain(map, 48, render, tileset);
+		drawUnits(testSideOne->units, testSideOne->noUnits, render, tileset);
+		drawUnits(testSideTwo->units, testSideTwo->noUnits, render, tileset);
 		SDL_RenderPresent(render);
 		getch();
 		quizTerminated = startQuiz(activity, render, font, &success);
@@ -73,9 +80,12 @@ int main(int argc, char *argv[])
 				success = FAIL;
 			
 		}
+		
 	}
 	//------------------------------------------------ DEINITIALISATION -----------------------------------------
 	endActivity(activity);
+	endSideData(testSideOne);
+	endSideData(testSideTwo);
 	endSDL(render, wind,font);
 	return 0;
 }

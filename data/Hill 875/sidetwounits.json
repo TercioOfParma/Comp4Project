@@ -1,10 +1,15 @@
 [
 	{
-		"NUMBER_UNITS" : 1
+		"NUMBER_UNITS" : 2
 	},
 	{
 		"UNIT_ID" : 2,
 		"RELATIVE_XPOS" : 3,
 		"RELATIVE_YPOS" : 2
+	},
+	{
+		"UNIT_ID" : 2,
+		"RELATIVE_XPOS" : 3,
+		"RELATIVE_YPOS" : 5
 	}
 ]
