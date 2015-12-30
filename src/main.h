@@ -3,6 +3,8 @@
 	PURPOSE : Holds all constants, Data structure definitions and function prototypes in a manner accessible to all of the C files
 	VERSION : 0.001
 	NOTES: This could be broken down, but it is more convenient to access just one file across all
+	
+	FUNCTIONS COMPLETED : 34/56
 */
 
 
@@ -81,7 +83,9 @@ const static int TILE_WIDTH = 64;
 const static int TILE_HEIGHT = 64;
 const static int STARTX_MAP = 100;
 const static int STARTY_MAP = 100;
-
+const static char *SIDE_FILES[] = {"sideone.json", "sidetwo.json"};
+const static char *UNIT_FILE = "unitData.json";
+#define LARGE_TEXT_FILE 20000000
 //----------------------------------- STRUTURE DEFINITIONS -----------------------------------
 
 /*
@@ -95,8 +99,8 @@ typedef struct
 	int movement;
 	int aPRange;
 	int aPAttacks;
-	int aRRange;
-	int aRAttacks;
+	int aTRange;
+	int aTAttacks;
 	int unitType;
 	int wounds;
 	int save;
@@ -111,7 +115,7 @@ typedef struct
 	char modifiers [SIZE_OF_MODIFIERS] ;
 	char alive;
 	//display information
-	SDL_Texture *display;
+	SDL_Rect spriteDimensions;
 	SDL_Rect dimensions;
 
 }unitData;
@@ -161,6 +165,7 @@ typedef struct
 	int tileID;
 	int civilianPopulation;
 	int terrainType;
+	int relativeX, relativeY;
 	//for A* Algorithm
 	int gScore;
 	int fScore;
@@ -176,7 +181,7 @@ typedef struct
 	unitData **units;
 	int sideID;
 	int losses;
-	int xObjectve;
+	int xObjective;
 	int yObjective;
 	int turnsHeld;
 
@@ -287,28 +292,28 @@ buttonDataText *loadButtonText(SDL_Texture *display, SDL_Rect *posAndSize, SDL_R
 levelData *loadLevelData(char *levelFileData, int *success);
 char *mapLevelIDToMapPath(levelData *levelDataToChoose, char *mappingFile, char id, int *success);//used to find the mapData file + directory
 char *miscIDToFilePath(int ID, char *path);//this will be used to map tilesets and unitSide files together DONE
-mapData *loadMapData(char *filename);
-sideData *loadSideData(char *filename, int *success);
-unitData **loadUnitData(char *sideFile, int *success);//likely a very big function
+mapData *loadMapData(char *filename, int *success);
+sideData *loadSideData(char *filename,int sideNumber, int *success);
+unitData **loadUnitData(char *sideUnitDataFilePath, char *unitDescriptorDataFilePath, int *success);//likely a very big function
 tileData **loadTileData(char *tileFile, int *success);//DONE
 quoteListData *loadQuoteListData(char *filename, int *success);//DONE
 quoteData **loadQuotes(char *filename, int *success);//DONE
 activityData *loadActivity(char *filename, int *success);//DONE
 questionData **loadQuestions(char *filename, int *success);//DONE
-
+unitData *loadUnit(char *unitFile, int ID, int *success);
 //----------DEINITIALISATION-----------
 void endSDL(SDL_Renderer *render, SDL_Window *screen, TTF_Font *font);//DONE
 void endUnitDataArray(unitData **units, int size);
 void endSideData(sideData *side);
 void endTileData(tileData **tiles, int size);
 void endQuoteListData(quoteListData *quotes);
-void endQuotes(quoteData **quotes, int size);
+void endQuotes(quoteData **quotes, int size);//DONE
 void endActivity(activityData *activity);//DONE
 void endQuestions(questionData **questions, int size);//DONE
 void endLevel(levelData *level);
 
 //----------DRAWING AND GRAPHICAL-----
-void drawTerrain(tileData **toDraw, int size, SDL_Renderer *render, SDL_Texture *tileMap);
+void drawTerrain(tileData **toDraw, int size, SDL_Renderer *render, SDL_Texture *tileMap);//DONE
 void drawUnits(unitData *toDraw, int size,  SDL_Renderer *render);
 void drawMenuElements(buttonData **buttons,int size, SDL_Renderer *render);// DONE
 void drawMenuElementsText(buttonDataText **buttons, int size, SDL_Renderer *render);//DONE

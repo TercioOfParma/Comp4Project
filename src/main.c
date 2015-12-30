@@ -38,6 +38,7 @@ int main(int argc, char *argv[])
 	SDL_Event eventHandle;
 	SDL_Texture *tileset;
 	SDL_Rect tileSetData;
+	sideData *testSide;
 	//------------------------------------------------ INITIALISATION -------------------------------------------
 	
 	optionsFile = loadTextFile(OPTIONS_FILE, &success);
@@ -50,6 +51,7 @@ int main(int argc, char *argv[])
 	quotes = loadQuoteListData("data/Hill 875/", &success);
 	tileset = loadImage("data/Hill 875/spriteSheet.png", render, &tileSetData, &success);
 	map = loadTileData("data/Hill 875/tileData.json", &success);
+	testSide = loadSideData("data/Hill 875/",0, &success);
 	//------------------------------------------------ MAIN LOOP ------------------------------------------------
 	while(success != FAIL)
 	{

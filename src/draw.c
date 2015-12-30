@@ -132,7 +132,11 @@ void drawQuestion(questionData **questions, int questionNo, SDL_Renderer *render
 	}
 
 }
+/*
+	void drawTerrain(tileData **toDraw, int size, SDL_Renderer *render, SDL_Texture *tileMap):
+	Draws a map tile from the base texture that has all the textures
 
+*/
 void drawTerrain(tileData **toDraw, int size, SDL_Renderer *render, SDL_Texture *tileMap)
 {
 	int i;

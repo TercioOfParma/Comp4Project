@@ -26,6 +26,7 @@
 char *loadTextFile(const char *filename, int *success)
 {
 
+
 	int fileDescriptor;
 	
 	fileDescriptor = open(filename, O_RDONLY, 0600);//avoids the race condition issues
@@ -51,7 +52,7 @@ char *loadTextFile(const char *filename, int *success)
 		return NULL;
 	
 	}
-	fileContents = malloc(sizeof(char) * fileSize);
+	fileContents = calloc(1, fileSize + 1);
 	if(!fileContents)
 	{
 		fprintf(stderr, "malloc has failed : %s", strerror(errno));
@@ -59,8 +60,7 @@ char *loadTextFile(const char *filename, int *success)
 		return NULL;
 	
 	}
-	fread(fileContents,1,fileSize, jsonFile);
-	fileContents[fileSize] = '\0';
+	fread(fileContents,fileSize,1, jsonFile);
 	fclose(jsonFile);
 	if(strstr(fileContents, "%x") != NULL)
 	{
@@ -70,8 +70,6 @@ char *loadTextFile(const char *filename, int *success)
 	
 	}
 	return fileContents;
-
-
 
 
 }
@@ -86,7 +84,7 @@ int getFileSize(FILE *sizeToGet, int *success)
 	int fileSize = 0;
 	fseek(sizeToGet,0,SEEK_END);
 	fileSize = ftell(sizeToGet);
-	rewind(sizeToGet);
+	rewind(sizeToGet);//back to the start
 	if(errno > 0)
 	{
 		fprintf(stderr, "ftell has failed : %s", strerror(errno));
@@ -108,7 +106,7 @@ optionsData initOptions(char *fileContents, int *success)
 	json_t *tempJsonHandle, *optionsData;
 	json_error_t errorHandle;
 	
-	tempJsonHandle = json_loads(fileContents,0, &errorHandle);
+	tempJsonHandle = json_loads(fileContents,0, &errorHandle);//loads the JSON file into Jansson 
 	if(!tempJsonHandle)
 	{
 		fprintf(stderr, "json_loads has failed : %s \n", errorHandle.text);
@@ -118,7 +116,7 @@ optionsData initOptions(char *fileContents, int *success)
 	}
 	
 	optionsData = json_array_get(tempJsonHandle, 0);
-	if(!json_is_object(optionsData))
+	if(!json_is_object(optionsData))//makes sure that what is being opened is actually a JSON object
 	{
 		fprintf(stderr,"json_object_get failed, didn't get an object\n");
 		*success = FAIL;
@@ -126,7 +124,7 @@ optionsData initOptions(char *fileContents, int *success)
 		return tempOpt;
 	
 	}
-
+	//gets the program options
 	tempOpt.SCREEN_WIDTH = json_integer_value(json_object_get(optionsData,"SCREEN_WIDTH"));
 	tempOpt.SCREEN_HEIGHT = json_integer_value(json_object_get(optionsData,"SCREEN_HEIGHT"));
 	tempOpt.WINDOW_TITLE = json_string_value(json_object_get(optionsData, "WINDOW_TITLE"));
@@ -202,7 +200,7 @@ SDL_Window *initSDL(optionsData *opt, int *success)
 SDL_Renderer *createRenderer(SDL_Window *screen, int *success)
 {
 	SDL_Renderer *temp;
-	int Render_Flags = SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC;
+	int Render_Flags = SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC;//Hardware acceleration and a frame rate capped by the refresh rate of the monitor
 	temp = SDL_CreateRenderer(screen, -1, Render_Flags);
 	if(!temp)
 	{
@@ -278,7 +276,7 @@ SDL_Texture *loadImage(const char *filename, SDL_Renderer *render, SDL_Rect *dim
 {
 	SDL_Surface *temp;
 	SDL_Texture *tempTex;
-	temp = IMG_Load(filename);
+	temp = IMG_Load(filename);//image library used to load things other than bitmaps
 	if(!temp)
 	{
 		fprintf(stderr, "IMG_LoadBMP has failed: %s \n", IMG_GetError());
@@ -286,8 +284,8 @@ SDL_Texture *loadImage(const char *filename, SDL_Renderer *render, SDL_Rect *dim
 		return NULL;
 	
 	}
-	SDL_SetColorKey(temp, SDL_TRUE, SDL_MapRGB(temp->format, 255,0,255));
-	tempTex = SDL_CreateTextureFromSurface(render, temp);
+	SDL_SetColorKey(temp, SDL_TRUE, SDL_MapRGB(temp->format, 255,0,255));//makes the background colour transparent
+	tempTex = SDL_CreateTextureFromSurface(render, temp);//converts to renderable type
 	if(!tempTex)
 	{
 		fprintf(stderr, "SDL_CreateTextureFromSurface has failed : %s \n", SDL_GetError());
@@ -340,7 +338,7 @@ buttonDataText *loadButtonText(SDL_Texture *display, SDL_Rect *posAndSize, SDL_R
 	
 	
 	}
-	temp->details = malloc(sizeof(textData));
+	temp->details = malloc(sizeof(textData));//text data
 	if(!temp->details)
 	{
 		fprintf(stderr, "malloc has failed on buttonData : %s", SDL_GetError());
@@ -353,7 +351,7 @@ buttonDataText *loadButtonText(SDL_Texture *display, SDL_Rect *posAndSize, SDL_R
 	temp->dimensions = *posAndSize;
 	temp->type = type;
 	temp->details = renderText(font, render, initialData, success);
-	temp->details->dimensions.x = posAndSize->x + (posAndSize->w / 5);
+	temp->details->dimensions.x = posAndSize->x + (posAndSize->w / 5);//places the text in the centre of the button
 	temp->details->dimensions.y = posAndSize->y + (posAndSize->h / 5);
 	return temp;
 }
@@ -498,6 +496,7 @@ char *miscIDToFilePath(int ID, char *path)
 	}
 	
 	itoa(ID, stringPath, 10);
+	fprintf(stderr, "%s", stringPath);
 	mappedPath = json_string_value(json_object_get(mappingDataJSON, stringPath));
 	if(!mappedPath)
 	{
@@ -682,8 +681,10 @@ tileData **loadTileData(char *tileFile, int *success)
 		temp[i]->spriteDimensions.h = TILE_HEIGHT * 2;
 		temp[i]->dimensions.h = TILE_HEIGHT;
 		temp[i]->dimensions.w = TILE_WIDTH;
-		temp[i]->dimensions.x = json_integer_value(json_object_get(tileDataJSON,"RELATIVE_XPOS")) * TILE_WIDTH + STARTX_MAP;
-		temp[i]->dimensions.y = json_integer_value(json_object_get(tileDataJSON,"RELATIVE_YPOS")) * TILE_HEIGHT + STARTY_MAP;
+		temp[i]->relativeX = json_integer_value(json_object_get(tileDataJSON,"RELATIVE_XPOS"));//This is useful for movement and such
+		temp[i]->relativeY = json_integer_value(json_object_get(tileDataJSON,"RELATIVE_YPOS"));
+		temp[i]->dimensions.x = temp[i]->relativeX * TILE_WIDTH + STARTX_MAP;
+		temp[i]->dimensions.y = temp[i]->relativeY * TILE_HEIGHT + STARTY_MAP;
 		temp[i]->civilianPopulation = json_integer_value(json_object_get(tileDataJSON,"CIVILIAN_POPULATION"));
 		temp[i]->terrainType = json_integer_value(json_object_get(tileDataJSON,"TERRAIN_TYPE"));
 		temp[i]->tileID = json_integer_value(json_object_get(tileDataJSON,"TILE_ID"));
@@ -693,4 +694,217 @@ tileData **loadTileData(char *tileFile, int *success)
 	return temp;
 
 
+}
+/*
+	tileData **loadTileData(char *tileFile, int *success):
+	Used to load a unit from a unitFile based on the Unit's position in the unit file
+
+*/
+unitData *loadUnit(char *unitFile, int ID, int *success)
+{
+	int i, loadedUnitID, found, numberOfUnits;
+	json_t *tempJsonHandle, *unitDataJSON;
+	json_error_t errorHandle;
+	unitData *temp = malloc(sizeof(unitData));
+	if(!temp)
+	{
+		fprintf(stderr, "Malloc has failed on loadUnit : %s \n", strerror(errno));
+		*success = FAIL;
+		return NULL;
+	}
+	found = FAIL;
+	tempJsonHandle = json_loads(unitFile,0, &errorHandle);
+	if(!tempJsonHandle)
+	{
+		fprintf(stderr, "json_loads has failed on %s: %s \n", unitFile, errorHandle.text);
+		*success = FAIL;
+		return temp;
+	
+	}
+	unitDataJSON = json_array_get(tempJsonHandle, 0);
+	if(!json_is_object(unitDataJSON))
+	{
+		fprintf(stderr,"json_object_get failed, didn't get an object\n");
+		*success = FAIL;
+		json_decref(tempJsonHandle);
+		return temp;
+		
+	}
+	numberOfUnits = json_integer_value(json_object_get(unitDataJSON, "NO_UNITS"));
+	for(i = 0; i < numberOfUnits; i++)//linear search is used here as N (or size) will be quite low (<50) although a hard coded limit is illogical as it could limit teaching potential of military capabilities
+	{
+		unitDataJSON = json_array_get(tempJsonHandle, ID);
+		if(!json_is_object(unitDataJSON))
+		{
+			fprintf(stderr,"json_object_get failed, didn't get an object\n");
+			*success = FAIL;
+			json_decref(tempJsonHandle);
+			return temp;
+		
+		}
+		loadedUnitID = json_integer_value(json_object_get(unitDataJSON, "ID"));
+		if(loadedUnitID == ID)
+		{
+			found = SUCCESS;
+			break;
+		
+		}
+	}
+	if(found == FAIL)
+	{
+		fprintf(stderr, "loadUnit has failed, ID %d doesn't exist", ID);
+		*success = FAIL;
+		return NULL;
+	}
+	
+	temp->unitID = loadedUnitID;
+	temp->movement = json_integer_value(json_object_get(unitDataJSON, "MOVEMENT"));
+	temp->aPRange = json_integer_value(json_object_get(unitDataJSON, "ANTI_PERSONNEL_RANGE"));
+	temp->aPAttacks = json_integer_value(json_object_get(unitDataJSON, "ANTI_PERSONNEL_DICE"));
+	temp->aTRange = json_integer_value(json_object_get(unitDataJSON, "ANTI_VEHICLE_RANGE"));
+	temp->aTAttacks = json_integer_value(json_object_get(unitDataJSON, "ANTI_VEHICLE_DICE"));
+	temp->unitType = json_integer_value(json_object_get(unitDataJSON, "UNIT_TYPE"));
+	temp->wounds = json_integer_value(json_object_get(unitDataJSON, "WOUNDS"));
+	temp->save = json_integer_value(json_object_get(unitDataJSON, "SAVE"));
+	temp->morale = json_integer_value(json_object_get(unitDataJSON, "MORALE"));
+	temp->spriteDimensions.x = json_integer_value(json_object_get(unitDataJSON, "SPRITE_XPOS")) * TILE_WIDTH * 2;//loads the positions of the sprite 
+	temp->spriteDimensions.y = json_integer_value(json_object_get(unitDataJSON, "SPRITE_YPOS")) * TILE_HEIGHT * 2;
+	temp->spriteDimensions.w = TILE_WIDTH * 2;
+	temp->spriteDimensions.h = TILE_HEIGHT * 2;
+	temp->dimensions.w = TILE_WIDTH;
+	temp->dimensions.h = TILE_HEIGHT;
+	temp->alive = TRUE;
+	temp->name = json_string_value(json_object_get(unitDataJSON, "NAME"));
+	temp->description = json_string_value(json_object_get(unitDataJSON, "DESCRIPTION"));
+	for(i = 0; i < SIZE_OF_MODIFIERS; i++)
+	{
+		temp->modifiers[i] = FALSE;
+	}
+	
+	return temp;
+}
+/*
+	unitData **loadUnitData(char *sideUnitDataFilePath, char *unitDescriptorDataFilePath, int *success):
+	Used to load all the units with the assistance of the above helper function
+
+*/
+unitData **loadUnitData(char *sideUnitDataFilePath, char *unitDescriptorDataFilePath, int *success)
+{
+	unitData **temp;
+	json_t *tempJsonHandle, *unitDataJSON;
+	json_error_t errorHandle;
+	int i, numberOfUnits, unitID;
+	char *sideUnitDataFile = loadTextFile(sideUnitDataFilePath, success);
+	char *overallUnitDataFile = loadTextFile(unitDescriptorDataFilePath, success);
+	tempJsonHandle = json_loads(sideUnitDataFile,0, &errorHandle);
+	if(!tempJsonHandle)
+	{
+		fprintf(stderr, "json_loads has failed on %s: %s \n", sideUnitDataFile, errorHandle.text);
+		*success = FAIL;
+		return temp;
+	
+	}
+	unitDataJSON = json_array_get(tempJsonHandle, 0);
+	if(!json_is_object(unitDataJSON))
+	{
+		fprintf(stderr,"json_object_get failed, didn't get an object\n");
+		*success = FAIL;
+		json_decref(tempJsonHandle);
+		return temp;//I.E. NULL	
+	}
+	numberOfUnits = json_integer_value(json_object_get(unitDataJSON, "NUMBER_UNITS"));
+	temp = malloc(sizeof(unitData *) * numberOfUnits);
+	if(!temp)
+	{
+		fprintf(stderr, "malloc has failed in loadUnitData : %s \n", strerror(errno));
+		*success = FAIL;
+		return NULL;
+	}
+	for(i = 0; i < numberOfUnits; i++)
+	{
+		unitDataJSON = json_array_get(tempJsonHandle, i);
+		if(!json_is_object(unitDataJSON))
+		{
+			fprintf(stderr,"json_object_get failed, didn't get an object\n");
+			*success = FAIL;
+			json_decref(tempJsonHandle);
+			return temp;
+		
+		}
+		unitID = json_integer_value(json_object_get(unitDataJSON, "UNIT_ID"));
+		temp[i] = loadUnit(overallUnitDataFile, unitID,success);
+		temp[i]->relativeX = json_integer_value(json_object_get(unitDataJSON, "RELATIVE_XPOS")) * TILE_WIDTH + STARTX_MAP;
+		temp[i]->relativeY = json_integer_value(json_object_get(unitDataJSON, "RELATIVE_YPOS")) * TILE_HEIGHT + STARTY_MAP;
+	}
+	
+	return temp;
+}
+/*
+	sideData *loadSideData(char *filename,int sideNumber, int *success):
+	Loads a side in the scenario
+
+*/
+sideData *loadSideData(char *filename,int sideNumber, int *success)
+{
+	char *sideDataFile, *sideUnitPath, pathToLoad[MAX_TEXT_OUTPUT];
+	int sideID;
+	sideData *temp;
+	json_t *tempJsonHandle, *sideDataJSON;
+	json_error_t errorHandle;
+	if(sideNumber > 1 && sideNumber < 0)
+	{
+		fprintf(stderr, "sideNumber Not valid\n");
+		*success = FAIL;
+		return NULL;
+	}
+	fprintf(stderr, "works\n");
+
+	temp = malloc(sizeof(sideData));
+	if(!temp)
+	{
+		fprintf(stderr, "malloc has failed in loadSideData, %s \n", strerror(errno));
+		*success = FAIL;
+		return NULL;
+	}
+	snprintf(pathToLoad, MAX_TEXT_OUTPUT, "%s%s", filename, SIDE_FILES[sideNumber]);
+	sideDataFile = loadTextFile(pathToLoad, success);
+	tempJsonHandle = json_loads(sideDataFile,0, &errorHandle);
+	fprintf(stderr, "works\n");
+
+	if(!tempJsonHandle)
+	{
+		fprintf(stderr, "json_loads has failed : %s \n", errorHandle.text);
+		*success = FAIL;
+		return NULL;
+	
+	}
+	sideDataJSON = json_array_get(tempJsonHandle, 0);
+	if(!json_is_object(sideDataJSON))
+	{
+		fprintf(stderr,"json_object_get failed, didn't get an object\n");
+		json_decref(tempJsonHandle);
+		*success = FAIL;
+		return NULL;
+	
+	}
+	fprintf(stderr, "works\n");
+
+	temp->sideID = json_integer_value(json_object_get(sideDataJSON, "SIDE_UNIT_ID"));//This is so we can get 
+	sideUnitPath = miscIDToFilePath(temp->sideID, filename);
+	if(!sideUnitPath)
+	{
+		fprintf(stderr, "Side unit file doesn't exist \n");
+		*success = FAIL;
+		return NULL;
+	}
+	snprintf(pathToLoad, MAX_TEXT_OUTPUT, "%s%s", filename, UNIT_FILE);
+	fprintf(stderr, "works\n");
+
+	temp->units = loadUnitData(sideUnitPath,pathToLoad , success);
+	fprintf(stderr, "works\n");
+
+	temp->xObjective = json_integer_value(json_object_get(sideDataJSON, "OBJECTIVE_XPOS"));
+	temp->yObjective = json_integer_value(json_object_get(sideDataJSON, "OBJECTIVE_YPOS"));
+	
+	return temp;
 }

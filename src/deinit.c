@@ -64,10 +64,22 @@ void endQuotes(quoteData **quotes, int size)
 	int i;
 	for(i = 0; i < size; i++)
 	{
+		SDL_DestroyTexture(quotes[i]->display[0]->display);
+		SDL_DestroyTexture(quotes[i]->display[1]->display);
 		free(quotes[i]);
-	
 	}
 
 	free(quotes);
 
+}
+/*
+	void endQuoteListData(quoteListData *quotes):
+	To deinit the quoteList
+	NOTE : needs to have the quotes inside deinitialised first
+	
+
+*/
+void endQuoteListData(quoteListData *quotes)
+{
+	free(quotes);
 }
