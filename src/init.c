@@ -781,6 +781,7 @@ unitData *loadUnit(char *unitFile, int ID, int *success)
 	temp->unitType = json_integer_value(json_object_get(unitDataJSON, "UNIT_TYPE"));
 	temp->wounds = json_integer_value(json_object_get(unitDataJSON, "WOUNDS"));
 	temp->save = json_integer_value(json_object_get(unitDataJSON, "SAVE"));
+	temp->coverSave = DEFAULT_COVER_SAVE;
 	temp->morale = json_integer_value(json_object_get(unitDataJSON, "MORALE"));
 	temp->spriteDimensions.x = json_integer_value(json_object_get(unitDataJSON, "SPRITE_XPOS")) * TILE_WIDTH * 2;//loads the positions of the sprite 
 	temp->spriteDimensions.y = json_integer_value(json_object_get(unitDataJSON, "SPRITE_YPOS")) * TILE_HEIGHT * 2;
@@ -1057,6 +1058,7 @@ levelData *loadLevelData(SDL_Renderer *render, int *success)
 	
 	}
 	noLevels = json_integer_value(json_object_get(levelDataJSON, "NO_MAPS"));
+	temp->noLevels = noLevels;
 	temp->maps = malloc(sizeof(mapData *) * noLevels);
 	for(i = 0; i < noLevels; i++)
 	{

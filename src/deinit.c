@@ -135,3 +135,17 @@ void endSideData(sideData *side)
 	free(side);
 
 }
+
+void endLevel(levelData *level)
+{
+	int i;
+	for(i = 0; i < level->noLevels; i++)
+	{
+		endTileData(level->maps[i]->tiles, level->maps[i]->tiles[0]->noTiles);
+		endSideData(level->maps[i]->sides[0]);
+		endSideData(level->maps[i]->sides[1]);
+		endQuoteListData(level->maps[i]->quoteList);
+		endActivity(level->maps[i]->activity);
+	}
+	free(level);
+}

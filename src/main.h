@@ -31,7 +31,7 @@ const static int MODIFIERPOSITION_PANICKED = 1;
 const static int MODIFIERPOSITION_STUNNED = 2;
 const static int MODIFIERPOSITION_PINNED = 3;
 const static int MODIFIERPOSITION_STUCK = 4;
-const static int MODIFIERPOSITION_IMPETOUOUS = 5;
+const static int MODIFIERPOSITION_IMPETUOUS = 5;
 const static char FALSE = 0;
 const static char TRUE = 1;
 const static char FAIL = 0;
@@ -90,6 +90,14 @@ const static char *MAPPING_FILE_MAPS = "levelMapping.json";
 const static char *MAP_FILE = "maps.json";
 const static char *TILESET_FILE = "tileset.png";
 const static char *TILE_FILE = "tileData.json";
+const static int TO_HIT = 4;
+const static int DEFAULT_COVER_SAVE = 7;
+const static int URBAN_COVER_SAVE = 5;
+const static int JUNGLE_COVER_SAVE = 6;
+const static int PINNED_THRESHOLD = 2;
+const static int PANICKED_THRESHOLD = 3;
+const static int ROUT_THRESHOLD = 3;
+const static int STUNNED_THRESHOLD = 3;
 #define LARGE_TEXT_FILE 20000000
 //----------------------------------- STRUTURE DEFINITIONS -----------------------------------
 
@@ -119,6 +127,9 @@ typedef struct
 	//in simulation modifiers
 	char modifiers [SIZE_OF_MODIFIERS] ;
 	char alive;
+	int moved;
+	int shot;
+	int coverSave;
 	//display information
 	SDL_Rect spriteDimensions;
 	SDL_Rect dimensions;
@@ -274,6 +285,7 @@ typedef struct
 
 typedef struct
 {
+	int noLevels;
 	mapData **maps;
 
 }levelData;
@@ -294,7 +306,7 @@ SDL_Texture *loadImage(const char *filename, SDL_Renderer *render, SDL_Rect *dim
 buttonData *loadButton(SDL_Texture *display, SDL_Rect *posAndSize, int type, int *success);// DONE
 //there was createTextData here, but i felt it unneccessary, Can always roll back changes need be
 buttonDataText *loadButtonText(SDL_Texture *display, SDL_Rect *posAndSize, SDL_Renderer *render, const char *initialData, TTF_Font *font, int type, int *success);//DONE
-levelData *loadLevelData(SDL_Renderer *render, int *success);
+levelData *loadLevelData(SDL_Renderer *render, int *success);//DONE
 char *mapLevelIDToMapPath(int id, int *success);//DONE
 char *miscIDToFilePath(int ID, char *path);//DONE
 mapData *loadMapData(char *levelDataFile ,int mapNo, SDL_Renderer *render,int *success);//DONE
@@ -315,7 +327,7 @@ void endQuoteListData(quoteListData *quotes);//DONE
 void endQuotes(quoteData **quotes, int size);//DONE
 void endActivity(activityData *activity);//DONE
 void endQuestions(questionData **questions, int size);//DONE
-void endLevel(levelData *level);
+void endLevel(levelData *level);//DONE
 
 //----------DRAWING AND GRAPHICAL-----
 void drawTerrain(tileData **toDraw, int size, SDL_Renderer *render, SDL_Texture *tileMap);//DONE
@@ -337,12 +349,10 @@ int handleKeyboardSimulation(SDL_Event *keyboardInput, unitData **units);
 int handleMapClicked(unitData **applicableUnits, tileData **tiles,  buttonData **buttons, buttonDataText **textButtons);
 int checkQuestionClicked(SDL_Rect *mouseDimensions, questionData *question, int answerNo);//DONE
 //---------SIMULATION----------------
-int aStarWithTerrain(unitData **applicableUnits, int unitNo, tileData **tiles, int xPos, int yPos);
-void movementMorale(unitData **applicableUnits);
-void moveUnit(unitData **applicableUnits, int givenUnit);
-void shootUnit(unitData **shootingSideUnits, int shootingSideNo, unitData **recievingSideUnits, int recievingSideNo);
-void resolveShooting(unitData **shootingSideUnits, int shootingSideNo, unitData **recievingSideUnits, int recievingSideNo,int inflictedCasualties, int recievedCasualties);
-void calculateMoraleModifier(unitData **losingSideUnits, int losingSideNo, int result);
+int aStarWithTerrain(sideData *applicableUnits, int unitNo, tileData **tiles, int xPos, int yPos);
+void moveUnit(sideData *applicableUnits, tileData **tiles, int xPos, int yPos, int givenUnit);//DONE
+int shootUnit(sideData *shootingSideUnits, int shootingSideNo, sideData *recievingSideUnits, int recievingSideNo, tileData **tiles);//DONE
+void resolveShooting(sideData *shootingSideUnits, int shootingSideNo, sideData *recievingSideUnits, int recievingSideNo,int inflictedCasualties, int recievedCasualties);//DONE
 void displaySimulationResults(sideData *sideOne, sideData *sideTwo, tileData *map);
 
 //---------ACTIVITY------------------

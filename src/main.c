@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
 	int success = SUCCESS;
 	int quizTerminated = 1;
 	//C Library Structures
-	FILE *errorRedirection;
+	//FILE *errorRedirection;
 	//CUSTOM RUNTIME STRUCTURES
 	optionsData options;
 	levelData *test;
@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
 	TTF_Font *font;
 	SDL_Event eventHandle;
 	//------------------------------------------------ INITIALISATION -------------------------------------------
-	errorRedirection = freopen(LOG_FILE, "w", stderr);//According to the documentation I have read, it isn't an issue on windows stderr isn't a file, and so this evades the race condition issue
+	//errorRedirection = freopen(LOG_FILE, "w", stderr);//According to the documentation I have read, it isn't an issue on windows stderr isn't a file, and so this evades the race condition issue
 	fprintf(stderr, "Main function....\n");
 	optionsFile = loadTextFile(OPTIONS_FILE, &success);
 	options = initOptions(optionsFile,&success);
@@ -61,6 +61,15 @@ int main(int argc, char *argv[])
 		drawUnits(test->maps[0]->sides[0]->units, test->maps[0]->sides[0]->noUnits, render, test->maps[0]->tileset);
 		drawUnits(test->maps[0]->sides[1]->units, test->maps[0]->sides[1]->noUnits, render, test->maps[0]->tileset);
 		SDL_RenderPresent(render);
+		shootUnit(test->maps[0]->sides[0],1,test->maps[0]->sides[1], 1, test->maps[0]->tiles);
+		shootUnit(test->maps[0]->sides[1],1,test->maps[0]->sides[0], 1, test->maps[0]->tiles);
+		moveUnit(test->maps[0]->sides[0],test->maps[0]->tiles, 5, 5, 1);
+		getch();
+		SDL_RenderClear(render);
+		drawTerrain(test->maps[0]->tiles, test->maps[0]->tiles[0]->noTiles, render, test->maps[0]->tileset);
+		drawUnits(test->maps[0]->sides[0]->units, test->maps[0]->sides[0]->noUnits, render, test->maps[0]->tileset);
+		drawUnits(test->maps[0]->sides[1]->units, test->maps[0]->sides[1]->noUnits, render, test->maps[0]->tileset);
+		SDL_RenderPresent(render);
 		getch();
 		quizTerminated = startQuiz(test->maps[0]->activity, render, font, &success);
 		SDL_RenderPresent(render);
@@ -72,9 +81,7 @@ int main(int argc, char *argv[])
 		
 	}
 	//------------------------------------------------ DEINITIALISATION -----------------------------------------
-	//endActivity(activity);
-	//endSideData(testSideOne);
-	//endSideData(testSideTwo);
+	endLevel(test);
 	endSDL(render, wind,font);
 	return 0;
 }
