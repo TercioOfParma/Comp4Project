@@ -4,7 +4,7 @@
 	},
 	{
 		"ID" : 1,
-		"MOVEMENT" : 10,
+		"MOVEMENT" : 15,
 		"NAME" : "GIs",
 		"DESCRIPTION" : "Conscripted soldiers, transported across thousands of miles of sea",
 		"ANTI_PERSONNEL_RANGE" : 30,
@@ -20,7 +20,7 @@
 	},
 	{
 		"ID" : 2,
-		"MOVEMENT" : 10,
+		"MOVEMENT" : 15,
 		"NAME" : "Vietcong",
 		"DESCRIPTION" : "Peasants fighting for their homeland and the communist creed",
 		"ANTI_PERSONNEL_RANGE" : 30,

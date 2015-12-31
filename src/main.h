@@ -98,7 +98,8 @@ const static int PINNED_THRESHOLD = 2;
 const static int PANICKED_THRESHOLD = 3;
 const static int ROUT_THRESHOLD = 3;
 const static int STUNNED_THRESHOLD = 3;
-#define LARGE_TEXT_FILE 20000000
+const static int SQRT_TWO = 14;
+#define LARGE 200000
 //----------------------------------- STRUTURE DEFINITIONS -----------------------------------
 
 /*
@@ -184,8 +185,8 @@ typedef struct
 	int relativeX, relativeY;
 	int noTiles;
 	//for A* Algorithm
-	int gScore;
-	int fScore;
+	int hScore;
+	char explored;
 	//during simulation data
 	char isOccupied;
 }tileData;
@@ -349,12 +350,12 @@ int handleKeyboardSimulation(SDL_Event *keyboardInput, unitData **units);
 int handleMapClicked(unitData **applicableUnits, tileData **tiles,  buttonData **buttons, buttonDataText **textButtons);
 int checkQuestionClicked(SDL_Rect *mouseDimensions, questionData *question, int answerNo);//DONE
 //---------SIMULATION----------------
-int aStarWithTerrain(sideData *applicableUnits, int unitNo, tileData **tiles, int xPos, int yPos);
+int aStarWithTerrain(sideData *applicableUnits, int unitNo, tileData **tiles, int xPos, int yPos, int size);
 void moveUnit(sideData *applicableUnits, tileData **tiles, int xPos, int yPos, int givenUnit);//DONE
 int shootUnit(sideData *shootingSideUnits, int shootingSideNo, sideData *recievingSideUnits, int recievingSideNo, tileData **tiles);//DONE
 void resolveShooting(sideData *shootingSideUnits, int shootingSideNo, sideData *recievingSideUnits, int recievingSideNo,int inflictedCasualties, int recievedCasualties);//DONE
 void displaySimulationResults(sideData *sideOne, sideData *sideTwo, tileData *map);
-
+int findDistance(tileData *tileOne, tileData *tileTwo);//DONE
 //---------ACTIVITY------------------
 int startQuiz(activityData *quiz, SDL_Renderer *render, TTF_Font *font, int *success);//DONE
 //there was askQuestion here but it seemed unneccessary, so Its been folded into startQuiz

@@ -16,11 +16,139 @@
 	used to see if a unit can move or shoot a tile
 
 */
-int aStarWithTerrain(sideData *applicableUnits, int unitNo, tileData **tiles, int xPos, int yPos)
+int aStarWithTerrain(sideData *applicableUnits, int unitNo, tileData **tiles, int xPos, int yPos, int size)
 {
 	fprintf(stderr, "A* Algorithm to %d %d\n", xPos, yPos);
-	return 2;
+	int posBeginX, posBeginY, posEndX, posEndY, posArrayStart, posArrayEnd, posCurrentX, posCurrentY, posArrayCurrent, i, favouredPositionArray, favouredPositionLength, totalLength, favouredPositionToEnd;
+	posArrayStart = 0;
+	posArrayEnd = 0;
+	posBeginX = 0;
+	posEndX = 0;
+	posBeginY = 0;
+	posEndY = 0;
+	while(posBeginX != applicableUnits->units[unitNo]->relativeX || posBeginY != applicableUnits->units[unitNo]->relativeY )
+	{
+			posArrayStart++;	
+			posBeginX = tiles[posArrayStart]->relativeX;
+			posBeginY = tiles[posArrayStart]->relativeY;
+	}
+	while(posEndX != xPos || posEndY != yPos)
+	{
+			posArrayEnd++;	
+			posEndX = tiles[posArrayEnd]->relativeX;
+			posEndY = tiles[posArrayEnd]->relativeY;
+			
+	}
+	if(posArrayStart == posArrayEnd)
+	{
+		return 0;
+	
+	}
+	tiles[posArrayStart]->hScore = 0;
+	posCurrentX = posBeginX;
+	posCurrentY = posBeginY;
+	posArrayCurrent = posArrayStart;
+	totalLength = 0;
+	for(i = 0; i < size; i++)
+	{
+		tiles[i]->explored = FALSE;
+	
+	}
+	while(TRUE)
+	{
+		tiles[posArrayCurrent]->explored = TRUE;
+		favouredPositionLength = LARGE;
+		favouredPositionToEnd = LARGE;
+		for(i = 0; i < size; i++)
+		{
+			if(abs(tiles[i]->relativeX - tiles[posArrayCurrent]->relativeX) == 1 || abs(tiles[i]->relativeY - tiles[posArrayCurrent]->relativeY) == 1 && tiles[i]->explored == FALSE)
+			{
+				
+				if(tiles[i]->terrainType != TERRAIN_RIVER || tiles[i]->terrainType != TERRAIN_MOUNTAIN || applicableUnits->units[unitNo]->unitType == UNITTYPE_HELICOPTER)
+				{
+					if(tiles[i]->terrainType == TERRAIN_URBAN || tiles[i]->terrainType == TERRAIN_JUNGLE && applicableUnits->units[unitNo]->unitType != UNITTYPE_INFANTRY)
+					{
+						tiles[i]->hScore = findDistance(tiles[i], tiles[posArrayStart]) + findDistance(tiles[i], tiles[posArrayEnd]) + 5;//rough terrain movement and shooting modifier for non infantry in jungle and cities
+						
+					}
+					else
+					{
+						tiles[i]->hScore = findDistance(tiles[i], tiles[posArrayStart]) + findDistance(tiles[i], tiles[posArrayEnd]);
+					}
+					if(favouredPositionLength > tiles[i]->hScore)
+					{
+						
+						favouredPositionLength = tiles[i]->hScore;
+						favouredPositionArray = i;
+						favouredPositionToEnd = findDistance(tiles[i], tiles[posArrayEnd]);
+					}
+					else if(favouredPositionLength == tiles[i]->hScore && favouredPositionToEnd > findDistance(tiles[i], tiles[posArrayEnd]))
+					{
+						
+						favouredPositionLength = tiles[i]->hScore;
+						favouredPositionArray = i;
+						favouredPositionToEnd = findDistance(tiles[i], tiles[posArrayEnd]);
+					
+					}
+					if(findDistance(tiles[i], tiles[posArrayEnd]) == 0)
+					{
+						favouredPositionLength = tiles[i]->hScore;
+						favouredPositionArray = i;
+						break;
+					}
+				}
+			}
+		}
+		if(favouredPositionLength != LARGE)
+		{
+			totalLength += favouredPositionLength;
+			posArrayCurrent = favouredPositionArray;
+			posCurrentY = tiles[favouredPositionArray]->relativeY;
+			posCurrentX = tiles[favouredPositionArray]->relativeX;
+		}
+		if(posCurrentY == yPos && posCurrentX == xPos)
+		{
+			break;
+		
+		}
+	}
+	fprintf(stderr, "works\n");
+	if(totalLength <= applicableUnits->units[unitNo]->movement)
+	{
+		fprintf(stdout, "Legal Move!\n");
+		return totalLength;
+	
+	}
+	else
+	{
+		fprintf(stdout, "illegal Move!\n");
+		return LARGE;
+	
+	}
+	fprintf(stderr, "works\n");
+	return LARGE;
+}
+/*
+	int aStarWithTerrain(sideData *applicableUnits, int unitNo, tileData **tiles, int xPos, int yPos):
+	used to see if a unit can move or shoot a tile
 
+*/
+int findDistance(tileData *tileOne, tileData *tileTwo)
+{
+	int totalDistance, xDistance, yDistance;
+	totalDistance = 0;
+	xDistance = abs(tileOne->relativeX - tileTwo->relativeX);
+	yDistance = abs(tileOne->relativeY - tileTwo->relativeY);
+	while(xDistance != 0 && yDistance != 0)
+	{
+		xDistance--;
+		yDistance--;
+		totalDistance += SQRT_TWO;
+	
+	}
+	totalDistance = totalDistance + (xDistance * 10) + (yDistance * 10);
+	
+	return totalDistance;
 }
 /*
 	void moveUnit(sideData *applicableUnits, int givenUnit):
@@ -40,12 +168,12 @@ void moveUnit(sideData *applicableUnits, tileData **tiles, int xPos, int yPos, i
 	{
 		stuckMove = (applicableUnits->units[givenUnit]->movement / 3);
 		applicableUnits->units[givenUnit]->movement -= stuckMove;
-		aStarResult = aStarWithTerrain(applicableUnits, givenUnit, tiles, xPos, yPos);
+		aStarResult = aStarWithTerrain(applicableUnits, givenUnit, tiles, xPos, yPos, tiles[0]->noTiles);
 		applicableUnits->units[givenUnit]->movement += stuckMove;
 	}
 	else
 	{
-		aStarResult = aStarWithTerrain(applicableUnits, givenUnit, tiles, xPos, yPos);
+		aStarResult = aStarWithTerrain(applicableUnits, givenUnit, tiles, xPos, yPos, tiles[0]->noTiles);
 	}
 	if(aStarResult <= applicableUnits->units[givenUnit]->movement && applicableUnits->units[givenUnit]->modifiers[MODIFIERPOSITION_STUNNED] == FALSE && applicableUnits->units[givenUnit]->modifiers[MODIFIERPOSITION_PANICKED] == FALSE && applicableUnits->units[givenUnit]->modifiers[MODIFIERPOSITION_PINNED] == FALSE)
 	{
@@ -92,7 +220,8 @@ int shootUnit(sideData *shootingSideUnits, int shootingSideNo, sideData *recievi
 	srand(time(NULL));
 	fprintf(stderr, "Shooting unit %d, %s\n", shootingSideUnits->units[shootingSideNo]->unitID, shootingSideUnits->units[shootingSideNo]->name);
 	shootingSideUnits->units[shootingSideNo]->shot = FALSE;
-	int aStarResult = aStarWithTerrain(shootingSideUnits,shootingSideNo, tiles, recievingSideUnits->units[recievingSideNo]->relativeX, recievingSideUnits->units[recievingSideNo]->relativeY);
+	fprintf(stderr, "%d\n", tiles[0]->noTiles);
+	int aStarResult = aStarWithTerrain(shootingSideUnits,shootingSideNo, tiles, recievingSideUnits->units[recievingSideNo]->relativeX, recievingSideUnits->units[recievingSideNo]->relativeY, tiles[0]->noTiles - 1);
 	int i, totalHits, currentHit;
 	totalHits = 0;
 	if(aStarResult <= shootingSideUnits->units[shootingSideNo]->aPRange &&  recievingSideUnits->units[recievingSideNo]->unitType == UNITTYPE_INFANTRY)
@@ -125,7 +254,13 @@ int shootUnit(sideData *shootingSideUnits, int shootingSideNo, sideData *recievi
 		fprintf(stdout, "Invalid Shoot!\n");
 		return 0;
 	}
-	fprintf(stdout, "%s delived %d damage to %s\n", shootingSideUnits->units[shootingSideNo]->name, totalHits, recievingSideUnits->units[recievingSideNo]->name);
+	if(recievingSideUnits->units[recievingSideNo]->wounds <= 0)
+	{
+		recievingSideUnits->units[recievingSideNo]->alive = FALSE;
+		fprintf(stdout, "%s has been taken out !\n", recievingSideUnits->units[recievingSideNo]->name);
+	}
+	
+	fprintf(stdout, "The %s delived %d damage to the %s\n", shootingSideUnits->units[shootingSideNo]->name, totalHits, recievingSideUnits->units[recievingSideNo]->name);
 	return totalHits;
 }
 /*
