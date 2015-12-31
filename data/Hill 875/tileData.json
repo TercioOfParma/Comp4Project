@@ -1,6 +1,6 @@
 [
 	{
-		"NO_TILES" : 48
+		"NO_TILES" : 49
 	},
 	{
 		"RELATIVE_XPOS" : 1,
@@ -481,5 +481,15 @@
 		"CIVILIAN_POPULATION" : 20,
 		"ANGLE" : 0.0,
 		"TILE_ID" : 48
+	},
+	{
+		"RELATIVE_XPOS" : 1,
+		"RELATIVE_YPOS" : 7,
+		"SPRITE_XPOS" : 3,
+		"SPRITE_YPOS" : 3,
+		"TERRAIN_TYPE" : 2,
+		"CIVILIAN_POPULATION" : 20,
+		"ANGLE" : 0.0,
+		"TILE_ID" : 49
 	}
 ]

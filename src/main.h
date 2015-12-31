@@ -4,7 +4,7 @@
 	VERSION : 0.001
 	NOTES: This could be broken down, but it is more convenient to access just one file across all
 	
-	FUNCTIONS COMPLETED : 34/56
+	FUNCTIONS COMPLETED : 42/56
 */
 
 
@@ -86,6 +86,10 @@ const static int STARTY_MAP = 100;
 const static char *SIDE_FILES[] = {"sideone.json", "sidetwo.json"};
 const static char *UNIT_FILE = "unitData.json";
 const static char *LOG_FILE = "log.txt";
+const static char *MAPPING_FILE_MAPS = "levelMapping.json";
+const static char *MAP_FILE = "maps.json";
+const static char *TILESET_FILE = "tileset.png";
+const static char *TILE_FILE = "tileData.json";
 #define LARGE_TEXT_FILE 20000000
 //----------------------------------- STRUTURE DEFINITIONS -----------------------------------
 
@@ -167,6 +171,7 @@ typedef struct
 	int civilianPopulation;
 	int terrainType;
 	int relativeX, relativeY;
+	int noTiles;
 	//for A* Algorithm
 	int gScore;
 	int fScore;
@@ -211,26 +216,6 @@ typedef struct
 
 }quoteListData;
 /*
-	mapData: holds information on a simulation scenario
-
-*/
-typedef struct
-{
-	//subordinate scenario componenets
-	tileData **tiles;
-	quoteListData *quoteList;
-	sideData *sides[NO_SIDES];
-	//map information
-	int mapID;
-	int tilesetID;
-	int quoteID;
-	int mapWidth;
-	int mapHeight;
-	char *title;
-	char *description;
-
-}mapData;
-/*
 	questionData: holds information on a question
 
 */
@@ -267,8 +252,26 @@ typedef struct
 
 }optionsData;
 /*
-	levelData: holds information on the levels
+	mapData: holds information on a simulation scenario
+
 */
+typedef struct
+{
+	//subordinate scenario componenets
+	tileData **tiles;
+	quoteListData *quoteList;
+	sideData *sides[NO_SIDES];
+	//map information
+	int mapID;
+	char *title;
+	char *description;
+	char *path;
+	textData *descriptionData;
+	textData *titleData;
+	activityData *activity;
+	SDL_Texture *tileset;
+}mapData;
+
 typedef struct
 {
 	mapData **maps;
@@ -292,9 +295,9 @@ buttonData *loadButton(SDL_Texture *display, SDL_Rect *posAndSize, int type, int
 //there was createTextData here, but i felt it unneccessary, Can always roll back changes need be
 buttonDataText *loadButtonText(SDL_Texture *display, SDL_Rect *posAndSize, SDL_Renderer *render, const char *initialData, TTF_Font *font, int type, int *success);//DONE
 levelData *loadLevelData(char *levelFileData, int *success);
-char *mapLevelIDToMapPath(levelData *levelDataToChoose, char *mappingFile, char id, int *success);//used to find the mapData file + directory
+char *mapLevelIDToMapPath(int id, int *success);//DONE
 char *miscIDToFilePath(int ID, char *path);//DONE
-mapData *loadMapData(char *filename, int *success);
+mapData *loadMapData(char *levelDataFile ,int mapNo, SDL_Renderer *render,int *success);//DONE
 sideData *loadSideData(char *filename,int sideNumber, int *success);//DONE
 unitData **loadUnitData(char *sideUnitDataFilePath, char *unitDescriptorDataFilePath, int *success);//DONE
 tileData **loadTileData(char *tileFile, int *success);//DONE
@@ -332,7 +335,6 @@ int handleMouseButtonMainMenu(SDL_Rect mouseDimensions, buttonData **buttons, bu
 int handleMouseButtonSelectionMenu(SDL_Rect mouseDimensions, buttonData **buttons, buttonDataText **buttonsText);
 int handleKeyboardSimulation(SDL_Event *keyboardInput, unitData **units);
 int handleMapClicked(unitData **applicableUnits, tileData **tiles,  buttonData **buttons, buttonDataText **textButtons);
-int handleActivityClicked(questionData **questions, buttonData **buttons, buttonDataText **textButtons);
 int checkQuestionClicked(SDL_Rect *mouseDimensions, questionData *question, int answerNo);//DONE
 //---------SIMULATION----------------
 int aStarWithTerrain(unitData **applicableUnits, int unitNo, tileData **tiles, int xPos, int yPos);

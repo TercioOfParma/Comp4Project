@@ -301,7 +301,6 @@ SDL_Texture *loadImage(const char *filename, SDL_Renderer *render, SDL_Rect *dim
 	}
 	dimen->w = temp->w;
 	dimen->h = temp->h;
-	
 	SDL_FreeSurface(temp);
 	return tempTex;
 
@@ -479,7 +478,7 @@ questionData **loadQuestions(char *filename, int *success)
 */
 char *miscIDToFilePath(int ID, char *path)
 {
-	fprintf(stderr, "Mapping ID to an actual file path within data folder %s....\n", path);
+	fprintf(stderr, "Mapping ID to an actual file path within data directory %s....\n", path);
 	char filePath [MAX_TEXT_OUTPUT];
 	char *mappingFileContents,*mappedPath, stringPath[MAX_TEXT_OUTPUT];
 	json_t *tempJsonHandle, *mappingDataJSON;
@@ -676,6 +675,7 @@ tileData **loadTileData(char *tileFile, int *success)
 	
 	}
 	numberOfTiles = json_integer_value(json_object_get(tileDataJSON,"NO_TILES"));
+	
 	temp = malloc(sizeof(tileData *) * numberOfTiles);
 	for(i = 0; i < numberOfTiles; i++)
 	{
@@ -704,7 +704,7 @@ tileData **loadTileData(char *tileFile, int *success)
 		temp[i]->tileID = json_integer_value(json_object_get(tileDataJSON,"TILE_ID"));
 		temp[i]->angle = json_real_value(json_object_get(tileDataJSON,"ANGLE"));
 	}
-	
+	temp[0]->noTiles = numberOfTiles;
 	return temp;
 
 
@@ -922,4 +922,103 @@ sideData *loadSideData(char *filename,int sideNumber, int *success)
 	temp->yObjective = json_integer_value(json_object_get(sideDataJSON, "OBJECTIVE_YPOS"));
 	
 	return temp;
+}
+/*
+	mapData *loadMapData(char *levelDataFile ,int mapNo, int *success):
+	Loads a map
+
+*/
+mapData *loadMapData(char *levelDataFile ,int mapNo, SDL_Renderer *render,int *success)//This doesn't need an ID as all the maps are loaded in sequence
+{
+	fprintf(stderr, "Loading map.....\n");
+	mapData *temp = malloc(sizeof(mapData));
+	json_t *tempJsonHandle, *mapDataJSON;
+	json_error_t errorHandle;
+	SDL_Rect placeholder;
+	char tilesetPath[MAX_TEXT_OUTPUT], *mapFileContent, tileFilePath[MAX_TEXT_OUTPUT];
+	if(!temp)
+	{
+		fprintf(stderr, "Malloc has failed in loadMapData : %s \n", strerror(errno));
+		*success = FAIL;
+		return NULL;
+	}
+	mapFileContent = loadTextFile(levelDataFile, success);
+	tempJsonHandle = json_loads(mapFileContent,0, &errorHandle);
+	if(!tempJsonHandle)
+	{
+		fprintf(stderr, "json_loads has failed : %s \n", errorHandle.text);
+		*success = FAIL;
+		return NULL;
+	
+	}
+	mapDataJSON = json_array_get(tempJsonHandle, mapNo);
+	if(!json_is_object(mapDataJSON))
+	{
+		fprintf(stderr,"json_object_get failed, didn't get an object\n");
+		json_decref(tempJsonHandle);
+		*success = FAIL;
+		return NULL;
+	
+	}
+	temp->mapID = json_integer_value(json_object_get(mapDataJSON, "MAP_ID"));
+	temp->path = mapLevelIDToMapPath(temp->mapID, success);
+	temp->activity = loadActivity(temp->path, success);
+	temp->quoteList = loadQuoteListData(temp->path, success);
+	snprintf(tileFilePath, MAX_TEXT_OUTPUT, "%s%s", temp->path, TILE_FILE);
+	temp->tiles = loadTileData(tileFilePath, success);
+	temp->sides[0] = loadSideData(temp->path, 0, success);
+	temp->sides[1] = loadSideData(temp->path, 1, success);
+	temp->title = (char *) json_string_value(json_object_get(mapDataJSON, "TITLE"));
+	temp->description = (char *) json_string_value(json_object_get(mapDataJSON, "DESCRIPTION"));
+	snprintf(tilesetPath, MAX_TEXT_OUTPUT,"%s%s", temp->path, TILESET_FILE);
+	temp->tileset = loadImage(tilesetPath, render, &placeholder, success);
+	return temp;
+}
+
+/*
+	char *mapLevelIDToMapPath(int id, int *success):
+	Loads map ID to find the data
+
+
+*/
+char *mapLevelIDToMapPath(int id, int *success)
+{
+	fprintf(stderr, "Mapping ID to an actual file path in root directory, ID : %d....\n", id);
+	char filePath [MAX_TEXT_OUTPUT];
+	char *mappingFileContents,*mappedPath, stringPath[MAX_TEXT_OUTPUT];
+	json_t *tempJsonHandle, *mappingDataJSON;
+	json_error_t errorHandle;
+	int wasSuccess = SUCCESS;
+	
+	mappingFileContents = loadTextFile(MAPPING_FILE_MAPS, &wasSuccess);
+	
+	tempJsonHandle = json_loads(mappingFileContents,0, &errorHandle);
+	if(!tempJsonHandle)
+	{
+		fprintf(stderr, "%s", mappingFileContents);
+		fprintf(stderr, "json_loads has failed on %s: %s \n", filePath, errorHandle.text);
+		return NULL;
+	
+	}
+	
+	mappingDataJSON = json_array_get(tempJsonHandle, 0);
+	if(!json_is_object(mappingDataJSON))
+	{
+		fprintf(stderr,"json_object_get failed, didn't get an object\n");
+		json_decref(tempJsonHandle);
+		return NULL;
+	
+	}
+	
+	itoa(id, stringPath, 10);
+	mappedPath = (char *)json_string_value(json_object_get(mappingDataJSON, stringPath));
+	if(!mappedPath)
+	{
+		fprintf(stderr, "The ID you have requested doesn't exist\n");
+		return NULL;
+	
+	}
+	
+	return mappedPath;
+
 }
