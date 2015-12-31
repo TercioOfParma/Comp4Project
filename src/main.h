@@ -294,7 +294,7 @@ SDL_Texture *loadImage(const char *filename, SDL_Renderer *render, SDL_Rect *dim
 buttonData *loadButton(SDL_Texture *display, SDL_Rect *posAndSize, int type, int *success);// DONE
 //there was createTextData here, but i felt it unneccessary, Can always roll back changes need be
 buttonDataText *loadButtonText(SDL_Texture *display, SDL_Rect *posAndSize, SDL_Renderer *render, const char *initialData, TTF_Font *font, int type, int *success);//DONE
-levelData *loadLevelData(char *levelFileData, int *success);
+levelData *loadLevelData(SDL_Renderer *render, int *success);
 char *mapLevelIDToMapPath(int id, int *success);//DONE
 char *miscIDToFilePath(int ID, char *path);//DONE
 mapData *loadMapData(char *levelDataFile ,int mapNo, SDL_Renderer *render,int *success);//DONE

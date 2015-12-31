@@ -81,7 +81,7 @@ char *loadTextFile(const char *filename, int *success)
 
 int getFileSize(FILE *sizeToGet, int *success)
 {
-	fprintf(stderr, "Getting File name...\n");
+	fprintf(stderr, "Getting File size...\n");
 	int fileSize = 0;
 	fseek(sizeToGet,0,SEEK_END);
 	fileSize = ftell(sizeToGet);
@@ -972,6 +972,7 @@ mapData *loadMapData(char *levelDataFile ,int mapNo, SDL_Renderer *render,int *s
 	temp->description = (char *) json_string_value(json_object_get(mapDataJSON, "DESCRIPTION"));
 	snprintf(tilesetPath, MAX_TEXT_OUTPUT,"%s%s", temp->path, TILESET_FILE);
 	temp->tileset = loadImage(tilesetPath, render, &placeholder, success);
+	fprintf(stderr, "Map loading done!.....\n");
 	return temp;
 }
 
@@ -1020,5 +1021,47 @@ char *mapLevelIDToMapPath(int id, int *success)
 	}
 	
 	return mappedPath;
+
+}
+/*
+	levelData *loadLevelData(char *levelFileData, int *success):
+	Loads the levels
+
+
+*/
+levelData *loadLevelData(SDL_Renderer *render, int *success)
+{
+	fprintf(stderr, "Loading level data.....\n");
+	levelData *temp = malloc(sizeof(levelData));
+	char *levelFileContents;
+	json_t *tempJsonHandle, *levelDataJSON;
+	json_error_t errorHandle;
+	int noLevels, i;
+	levelFileContents = loadTextFile(LEVELS_FILE, success);
+	
+	tempJsonHandle = json_loads(levelFileContents,0, &errorHandle);
+	if(!tempJsonHandle)
+	{
+		fprintf(stderr, "%s", levelFileContents);
+		fprintf(stderr, "json_loads has failed on %s: %s \n", LEVELS_FILE, errorHandle.text);
+		return NULL;
+	
+	}
+	
+	levelDataJSON = json_array_get(tempJsonHandle, 0);
+	if(!json_is_object(levelDataJSON))
+	{
+		fprintf(stderr,"json_object_get failed, didn't get an object\n");
+		json_decref(tempJsonHandle);
+		return NULL;
+	
+	}
+	noLevels = json_integer_value(json_object_get(levelDataJSON, "NO_MAPS"));
+	temp->maps = malloc(sizeof(mapData *) * noLevels);
+	for(i = 0; i < noLevels; i++)
+	{
+		temp->maps[i] = loadMapData((char *) MAP_FILE,i,render,success);
+	}
+	return temp;
 
 }

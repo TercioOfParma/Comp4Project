@@ -28,18 +28,17 @@ int main(int argc, char *argv[])
 	int success = SUCCESS;
 	int quizTerminated = 1;
 	//C Library Structures
-	//FILE *errorRedirection;
+	FILE *errorRedirection;
 	//CUSTOM RUNTIME STRUCTURES
 	optionsData options;
-	mapData *test;
+	levelData *test;
 	//SDL2 + EXTENSION LIBRARIES AND JANSSON STRUCTURES
 	SDL_Window *wind;
 	SDL_Renderer *render;
 	TTF_Font *font;
 	SDL_Event eventHandle;
-	sideData *testSideOne, *testSideTwo;
 	//------------------------------------------------ INITIALISATION -------------------------------------------
-	//errorRedirection = freopen(LOG_FILE, "w", stderr);//According to the documentation I have read, it isn't an issue on windows stderr isn't a file, and so this evades the race condition issue
+	errorRedirection = freopen(LOG_FILE, "w", stderr);//According to the documentation I have read, it isn't an issue on windows stderr isn't a file, and so this evades the race condition issue
 	fprintf(stderr, "Main function....\n");
 	optionsFile = loadTextFile(OPTIONS_FILE, &success);
 	options = initOptions(optionsFile,&success);
@@ -47,7 +46,7 @@ int main(int argc, char *argv[])
 	render = createRenderer(wind, &success);
 	font = loadFont(&options, &success);
 	//use below here for testing
-	test = loadMapData((char *)MAP_FILE,0,render,&success);
+	test = loadLevelData(render, &success);
 	//------------------------------------------------ MAIN LOOP ------------------------------------------------
 	while(success != FAIL)
 	{
@@ -58,14 +57,13 @@ int main(int argc, char *argv[])
 		
 		
 		}
-		drawTerrain(test->tiles, test->tiles[0]->noTiles, render, test->tileset);
-		drawUnits(test->sides[0]->units, test->sides[0]->noUnits, render, test->tileset);
-		drawUnits(test->sides[1]->units, test->sides[1]->noUnits, render, test->tileset);
+		drawTerrain(test->maps[0]->tiles, test->maps[0]->tiles[0]->noTiles, render, test->maps[0]->tileset);
+		drawUnits(test->maps[0]->sides[0]->units, test->maps[0]->sides[0]->noUnits, render, test->maps[0]->tileset);
+		drawUnits(test->maps[0]->sides[1]->units, test->maps[0]->sides[1]->noUnits, render, test->maps[0]->tileset);
 		SDL_RenderPresent(render);
 		getch();
-		quizTerminated = startQuiz(test->activity, render, font, &success);
+		quizTerminated = startQuiz(test->maps[0]->activity, render, font, &success);
 		SDL_RenderPresent(render);
-		getch();
 		if(eventHandle.type == SDL_QUIT || quizTerminated == 0)
 		{
 				success = FAIL;
