@@ -703,6 +703,7 @@ tileData **loadTileData(char *tileFile, int *success)
 		temp[i]->terrainType = json_integer_value(json_object_get(tileDataJSON,"TERRAIN_TYPE"));
 		temp[i]->tileID = json_integer_value(json_object_get(tileDataJSON,"TILE_ID"));
 		temp[i]->angle = json_real_value(json_object_get(tileDataJSON,"ANGLE"));
+		temp[i]->isSelected = FALSE;
 	}
 	temp[0]->noTiles = numberOfTiles;
 	return temp;
@@ -792,6 +793,7 @@ unitData *loadUnit(char *unitFile, int ID, int *success)
 	temp->alive = TRUE;
 	temp->name = (char *) json_string_value(json_object_get(unitDataJSON, "NAME"));
 	temp->description = (char *) json_string_value(json_object_get(unitDataJSON, "DESCRIPTION"));
+	temp->selected = FALSE;
 	fprintf(stderr, "Got a unit called %s\n", temp->name);
 	for(i = 0; i < SIZE_OF_MODIFIERS; i++)
 	{

@@ -359,7 +359,7 @@ void displaySimulationResults(sideData *sideOne, sideData *sideTwo, tileData *ma
 	char soldiersKilledStr [MAX_TEXT_OUTPUT];
 	textData *winningMessage, *numberSoldiersDead;
 	wasSuccess = SUCCESS;
-	for(i = 0; i < sideOne->noUnits; i++)
+	for(i = 1; i < sideOne->noUnits; i++)
 	{
 		if(sideOne->units[i]->alive == TRUE)
 		{
@@ -368,7 +368,7 @@ void displaySimulationResults(sideData *sideOne, sideData *sideTwo, tileData *ma
 		}
 	
 	}
-	for(i = 0; i < sideTwo->noUnits; i++)
+	for(i = 1; i < sideTwo->noUnits; i++)
 	{
 		if(sideTwo->units[i]->alive == TRUE)
 		{
@@ -402,5 +402,52 @@ void displaySimulationResults(sideData *sideOne, sideData *sideTwo, tileData *ma
 	
 	}
 
+
+}
+/*
+	void simulationMain(mapData *map, SDL_Renderer *render, TTF_Font *font, buttonData *nextTurn, SDL_Event *events, int *success):
+	Handles a simulation 
+*/
+void simulationMain(mapData *map, SDL_Renderer *render, TTF_Font *font, buttonData *nextTurn, SDL_Event *events, int *success)
+{
+	int oneSideDead = FALSE;
+	int i;
+	fprintf(stderr, "works\n");
+	while(oneSideDead != TRUE)
+	{
+		SDL_RenderClear(render);
+		while(SDL_PollEvent(events))
+		{
+		
+		
+		}
+		if(events->type == SDL_QUIT)
+		{
+			*success = FAIL;
+			return;
+		}
+		drawTerrain(map->tiles, map->tiles[0]->noTiles, render, map->tileset);
+		drawUnits(map->sides[0]->units, map->sides[0]->noUnits, render, map->tileset);
+		drawUnits(map->sides[1]->units, map->sides[1]->noUnits, render, map->tileset);
+		fprintf(stderr, "works\n");
+		for(i = 1; i < map->sides[0]->noUnits; i++)
+		{
+			if(map->sides[0]->units[i]->alive == FALSE)
+			{
+				oneSideDead = TRUE;
+			
+			}
+		}	
+		for(i = 1; i < map->sides[1]->noUnits; i++)
+		{
+			if(map->sides[1]->units[i]->alive == FALSE)
+			{
+				oneSideDead = TRUE;
+			
+			}
+	
+		}
+		SDL_RenderPresent(render);
+	}
 
 }

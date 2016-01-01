@@ -64,12 +64,11 @@ char computeGrade(activityData *quiz, int noCorrect)
 	Starts and runs a quiz
 
 */
-int startQuiz(activityData *quiz, SDL_Renderer *render, TTF_Font *font, int *success)
+int startQuiz(activityData *quiz, SDL_Renderer *render, TTF_Font *font, SDL_Event *events,  int *success)
 {
 	fprintf(stderr, "Running quiz....\n");
 	int gotCorrect, i, randomQuestion, j, clicked;
 	char results[MAX_TEXT_OUTPUT], grade;
-	SDL_Event eventHandle;
 	SDL_Rect mouseDimensions;
 	mouseDimensions.w = 5;//so that the person can actually click something
 	mouseDimensions.h = 5;
@@ -84,13 +83,13 @@ int startQuiz(activityData *quiz, SDL_Renderer *render, TTF_Font *font, int *suc
 	}
 	while(i < quiz->maximumMark)
 	{
-		while(SDL_PollEvent(&eventHandle))
+		while(SDL_PollEvent(events))
 		{
 			SDL_GetMouseState(&(mouseDimensions.x), &(mouseDimensions.y));
-			if(eventHandle.type == SDL_MOUSEBUTTONDOWN)
+			if(events->type == SDL_MOUSEBUTTONDOWN)
 			{
 				clicked = FAIL;
-				for(j = 0; j <= NO_ANSWERS; j++)
+				for(j = 0; j < NO_ANSWERS; j++)
 				{
 					clicked = checkQuestionClicked(&mouseDimensions, quiz->questions[randomQuestion], j);
 					if(clicked == SUCCESS)
@@ -122,7 +121,7 @@ int startQuiz(activityData *quiz, SDL_Renderer *render, TTF_Font *font, int *suc
 				}
 			
 			}
-			if(eventHandle.type == SDL_QUIT)
+			if(events->type == SDL_QUIT)
 			{
 				*success = FAIL;
 				return 0;

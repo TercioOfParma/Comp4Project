@@ -106,10 +106,16 @@ const static int LOSSES_MESSAGE_POSITIONX = 400;
 const static int LOSSES_MESSAGE_POSITIONY = 200;
 #define START_BUTTON 0
 #define QUIT_BUTTON 1
-#define NO_BUTTON_MAIN 2
-#define NO_BUTTON_SECONDARY 100
+#define NO_BUTTON_MAIN 3
+#define NO_BUTTON_SECONDARY 10000
 const static int QUIT_KEY = 2;
-const static int END_TURN_BUTTON = 200;
+const static int END_TURN_BUTTON = 20000;
+const static char *STARTBUTTON_PATH = "gfx/start_button.png";
+const static char *QUITBUTTON_PATH = "gfx/quit_button.png";
+const static char *NEXTTURNBUTTON_PATH = "gfx/next_turn_button.png";
+const static char *BLANKBUTTON_PATH = "gfx/blank_button.png";
+const static int START_BUTTON_TYPE = 1;
+const static int QUIT_BUTTON_TYPE = 2;
 //----------------------------------- STRUTURE DEFINITIONS -----------------------------------
 
 /*
@@ -144,6 +150,7 @@ typedef struct
 	//display information
 	SDL_Rect spriteDimensions;
 	SDL_Rect dimensions;
+	char selected;
 
 }unitData;
 /*
@@ -199,6 +206,7 @@ typedef struct
 	char explored;
 	//during simulation data
 	char isOccupied;
+	char isSelected;
 }tileData;
 /*
 	sideData: Used to hold all the data on a  side in the simulation
@@ -354,11 +362,14 @@ void drawQuestion(questionData **questions, int questionNo, SDL_Renderer *render
 //----------INPUT---------------------
 int checkButtonClicked(SDL_Rect *mouseDimensions, buttonData *button);//DONE
 int checkButtonTextClicked(SDL_Rect *mouseDimensions, buttonDataText *button);//DONE
-int handleMouseButtonMainMenu(SDL_Rect mouseDimensions, buttonData **buttons, int size, SDL_Renderer *render);//DONE
-int handleMouseButtonSelectionMenu(SDL_Rect mouseDimensions,buttonDataText **buttonsText, int size, SDL_Renderer *render);//DONE
+int handleMouseButtonMainMenu(buttonData **buttons, int size, SDL_Renderer *render, SDL_Event *events);//DONE
+int handleMouseButtonSelectionMenu(buttonDataText **buttonsText, int size, SDL_Renderer *render, SDL_Event *events);//DONE
 int handleKeyboardSimulation(SDL_Event *keyboardInput, unitData **units);//DONE
-int handleMapClicked(unitData **applicableUnits, tileData **tiles,  buttonData *endTurn);
+int handleMapClicked(sideData *applicableUnits, tileData **tiles,  buttonData *endTurn, SDL_Event *events);//DONE
 int checkQuestionClicked(SDL_Rect *mouseDimensions, questionData *question, int answerNo);//DONE
+int checkUnitClicked(SDL_Rect *mouseDimensions, unitData *unit);//DONE
+int checkTileClicked(SDL_Rect *mouseDimensions, tileData *tile);//DONE
+
 //---------SIMULATION----------------
 int aStarWithTerrain(sideData *applicableUnits, int unitNo, tileData **tiles, int xPos, int yPos, int size);//DONE
 void moveUnit(sideData *applicableUnits, tileData **tiles, int xPos, int yPos, int givenUnit);//DONE
@@ -366,8 +377,10 @@ int shootUnit(sideData *shootingSideUnits, int shootingSideNo, sideData *recievi
 void resolveShooting(sideData *shootingSideUnits, int shootingSideNo, sideData *recievingSideUnits, int recievingSideNo,int inflictedCasualties, int recievedCasualties);//DONE
 void displaySimulationResults(sideData *sideOne, sideData *sideTwo, tileData *map, TTF_Font *font, SDL_Renderer *render);//DONE
 int findDistance(tileData *tileOne, tileData *tileTwo);//DONE
+void simulationMain(mapData *map, SDL_Renderer *render, TTF_Font *font, buttonData *nextTurn, SDL_Event *events, int *success);
+
 //---------ACTIVITY------------------
-int startQuiz(activityData *quiz, SDL_Renderer *render, TTF_Font *font, int *success);//DONE
+int startQuiz(activityData *quiz, SDL_Renderer *render, TTF_Font *font, SDL_Event *events,  int *success);//DONE
 //there was askQuestion here but it seemed unneccessary, so Its been folded into startQuiz
 char computeGrade(activityData *quiz, int noCorrect);//DONE
 void displayActivityResults(activityData *quiz, char *resultsToDisplay, SDL_Renderer *render, TTF_Font *font);//DONE

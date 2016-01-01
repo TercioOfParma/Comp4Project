@@ -1,7 +1,12 @@
 [
 	{
 		"MAP_ID" : 1,
-		"TITLE" : "Hill 875 - The battle of Dak To",
+		"TITLE" : "Hill 875",
+		"DESCRIPTION" : "A Nasty ass battle"
+	},
+	{
+		"MAP_ID" : 2,
+		"TITLE" : "Hue City",
 		"DESCRIPTION" : "A Nasty ass battle"
 	}
 ]

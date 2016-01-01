@@ -1,0 +1,61 @@
+[
+	{
+		"NO_QUESTIONS" : 9
+	},
+	{
+		"QUESTION" : "When was the battle of Hill 875?",
+		"ANSWERONE" : "1 January 1968",
+		"ANSWERTWO" : "2 May 1966",
+		"ANSWERTHREE" : "3 November 1967",
+		"CORRECT" : 3
+	},
+	{
+		"QUESTION" : "Who was the enemy of the American Forces at  Hill 875?",
+		"ANSWERONE" : "1 Vietcong",
+		"ANSWERTWO" : "2 NVA",
+		"ANSWERTHREE" : "3 Both",
+		"CORRECT" : 3
+	},
+	{
+		"QUESTION" : "'Was it all worth it, no one really knows', what does this show about the attitude of American media to Vietnam after the battle?",
+		"ANSWERONE" : "1 It is fully supportive of the american forces on the ground",
+		"ANSWERTWO" : "2 There is evidence of doubt showing itself",
+		"ANSWERTHREE" : "3 Fully anti War",
+		"CORRECT" : 2
+	},
+	{
+		"QUESTION" : "Does Han Solo die?",
+		"ANSWERONE" : "1 Yes",
+		"ANSWERTWO" : "2 No",
+		"ANSWERTHREE" : "3 Don't know",
+		"CORRECT" : 1
+	},
+	{
+		"QUESTION" : "How did the battle effect the portrayl of the Vietnam War to American Civilians and media?",
+		"ANSWERONE" : "1 It was positive",
+		"ANSWERTWO" : "2 It was negative",
+		"ANSWERTHREE" : "3 It did nothing",
+		"CORRECT" : 2
+	},
+	{
+		"QUESTION" : "Was the battle a strategic victory?",
+		"ANSWERONE" : "1 Yes",
+		"ANSWERTWO" : "2 Yes, the Americans annihilated the Vietnamese",
+		"ANSWERTHREE" : "3 Yes, but it was Pyhrric",
+		"CORRECT" : 3
+	},
+	{
+		"QUESTION" : "What was the battle's other name?",
+		"ANSWERONE" : "1 Dak To",
+		"ANSWERTWO" : "2 Phu Bai",
+		"ANSWERTHREE" : "3 Hue City",
+		"CORRECT" : 1
+	},
+	{
+		"QUESTION" : "'To a large extent, the change in coverage after Hill 875 reflected the strained morale of the troops themselves', what historiographical school of thought does this echo?",
+		"ANSWERONE" : "1 Marxist",
+		"ANSWERTWO" : "2 Revisionist",
+		"ANSWERTHREE" : "3 Post revisionist",
+		"CORRECT" : 2
+	}
+]
