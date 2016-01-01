@@ -271,7 +271,7 @@ int shootUnit(sideData *shootingSideUnits, int shootingSideNo, sideData *recievi
 
 void resolveShooting(sideData *shootingSideUnits, int shootingSideNo, sideData *recievingSideUnits, int recievingSideNo,int inflictedCasualties, int recievedCasualties)
 {
-	
+	fprintf(stderr, "Resolving shooting.......\n");
 	int combatRes = inflictedCasualties - recievedCasualties;
 	int moraleTest = (rand() % 6 + 1) * 2;
 	if(combatRes == 0)
@@ -343,6 +343,64 @@ void resolveShooting(sideData *shootingSideUnits, int shootingSideNo, sideData *
 	}
 	
 	
+
+
+}
+/*
+	void displaySimulationResults(sideData *sideOne, sideData *sideTwo, tileData *map):
+	displays the result of a simulation
+
+*/
+
+void displaySimulationResults(sideData *sideOne, sideData *sideTwo, tileData *map, TTF_Font *font, SDL_Renderer *render)
+{
+	fprintf(stderr, "Displaying Simulation Results.......\n");
+	int noAliveOne, noAliveTwo, i, wasSuccess;
+	char soldiersKilledStr [MAX_TEXT_OUTPUT];
+	textData *winningMessage, *numberSoldiersDead;
+	wasSuccess = SUCCESS;
+	for(i = 0; i < sideOne->noUnits; i++)
+	{
+		if(sideOne->units[i]->alive == TRUE)
+		{
+			noAliveOne = 1;
+		
+		}
+	
+	}
+	for(i = 0; i < sideTwo->noUnits; i++)
+	{
+		if(sideTwo->units[i]->alive == TRUE)
+		{
+			noAliveTwo = 1;
+		
+		}
+	
+	}
+	snprintf(soldiersKilledStr, MAX_TEXT_OUTPUT, "Number dead : %d soldiers", sideTwo->losses + sideOne->losses);
+	if(noAliveOne == 1)
+	{
+		winningMessage = renderText(font, render, "Side One Wins!", &wasSuccess);
+		numberSoldiersDead = renderText(font, render, soldiersKilledStr, &wasSuccess);
+		winningMessage->dimensions.x = WINNING_MESSAGE_POSITIONX;
+		winningMessage->dimensions.y = WINNING_MESSAGE_POSITIONY;
+		numberSoldiersDead->dimensions.x = LOSSES_MESSAGE_POSITIONX;
+		numberSoldiersDead->dimensions.y = LOSSES_MESSAGE_POSITIONY;
+		drawText(winningMessage, render);
+		drawText(numberSoldiersDead, render);
+	}
+	else if(noAliveTwo == 1)
+	{
+		winningMessage = renderText(font, render, "Side Two Wins!", &wasSuccess);
+		numberSoldiersDead = renderText(font, render, soldiersKilledStr, &wasSuccess);
+		winningMessage->dimensions.x = WINNING_MESSAGE_POSITIONX;
+		winningMessage->dimensions.y = WINNING_MESSAGE_POSITIONY;
+		numberSoldiersDead->dimensions.x = LOSSES_MESSAGE_POSITIONX;
+		numberSoldiersDead->dimensions.y = LOSSES_MESSAGE_POSITIONY;
+		drawText(winningMessage, render);
+		drawText(numberSoldiersDead, render);
+	
+	}
 
 
 }
