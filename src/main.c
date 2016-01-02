@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
 	optionsData options;
 	levelData *test;
 	buttonData **frontButtons;
-	buttonData *turnButton;
+	buttonData **turnButton;
 	buttonDataText **secondaryButtons;
 	//SDL2 + EXTENSION LIBRARIES AND JANSSON STRUCTURES
 	SDL_Window *wind;
@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
 	SDL_Texture *startButton, *quitButton, *nextTurnButton, *blankButton;
 	SDL_Rect placeHolder;
 	//------------------------------------------------ INITIALISATION -------------------------------------------
-	//errorRedirection = freopen(LOG_FILE, "w", stderr);//According to the documentation I have read, it isn't an issue on windows stderr isn't a file, and so this evades the race condition issue
+	errorRedirection = freopen(LOG_FILE, "w", stderr);//According to the documentation I have read, it isn't an issue on windows stderr isn't a file, and so this evades the race condition issue
 	fprintf(stderr, "Main function....\n");
 	optionsFile = loadTextFile(OPTIONS_FILE, &success);
 	options = initOptions(optionsFile,&success);
@@ -65,7 +65,11 @@ int main(int argc, char *argv[])
 	frontButtons[0]->dimensions.y = 100;
 	frontButtons[1]->dimensions.x = 100;
 	frontButtons[1]->dimensions.y = 300;
-	turnButton = loadButton(nextTurnButton, &placeHolder, END_TURN_BUTTON, &success);
+	placeHolder.x = 10;
+	placeHolder.y = 10;
+	
+	turnButton = malloc(sizeof(buttonData *));
+	turnButton[0] = loadButton(nextTurnButton, &placeHolder, END_TURN_BUTTON, &success);
 	buttonValuePrimary = 0;
 	placeHolder.x = 500;
 	placeHolder.y = 100;

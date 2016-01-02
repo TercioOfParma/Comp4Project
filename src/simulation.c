@@ -347,12 +347,12 @@ void resolveShooting(sideData *shootingSideUnits, int shootingSideNo, sideData *
 
 }
 /*
-	void displaySimulationResults(sideData *sideOne, sideData *sideTwo, tileData *map):
+	void displaySimulationResults(sideData *sideOne, sideData *sideTwo, tileData **map, TTF_Font *font, SDL_Renderer *render):
 	displays the result of a simulation
 
 */
 
-void displaySimulationResults(sideData *sideOne, sideData *sideTwo, tileData *map, TTF_Font *font, SDL_Renderer *render)
+void displaySimulationResults(sideData *sideOne, sideData *sideTwo, tileData **map, TTF_Font *font, SDL_Renderer *render)
 {
 	fprintf(stderr, "Displaying Simulation Results.......\n");
 	int noAliveOne, noAliveTwo, i, wasSuccess;
@@ -408,46 +408,130 @@ void displaySimulationResults(sideData *sideOne, sideData *sideTwo, tileData *ma
 	void simulationMain(mapData *map, SDL_Renderer *render, TTF_Font *font, buttonData *nextTurn, SDL_Event *events, int *success):
 	Handles a simulation 
 */
-void simulationMain(mapData *map, SDL_Renderer *render, TTF_Font *font, buttonData *nextTurn, SDL_Event *events, int *success)
+void simulationMain(mapData *map, SDL_Renderer *render, TTF_Font *font, buttonData **nextTurn, SDL_Event *events, int *success)
 {
+	fprintf(stderr, "Running the simulation....\n");
 	int oneSideDead = FALSE;
-	int i;
-	fprintf(stderr, "works\n");
-	while(oneSideDead != TRUE)
-	{
-		SDL_RenderClear(render);
-		while(SDL_PollEvent(events))
-		{
-		
-		
-		}
-		if(events->type == SDL_QUIT)
-		{
-			*success = FAIL;
-			return;
-		}
-		drawTerrain(map->tiles, map->tiles[0]->noTiles, render, map->tileset);
-		drawUnits(map->sides[0]->units, map->sides[0]->noUnits, render, map->tileset);
-		drawUnits(map->sides[1]->units, map->sides[1]->noUnits, render, map->tileset);
-		fprintf(stderr, "works\n");
-		for(i = 1; i < map->sides[0]->noUnits; i++)
-		{
-			if(map->sides[0]->units[i]->alive == FALSE)
-			{
-				oneSideDead = TRUE;
-			
-			}
-		}	
-		for(i = 1; i < map->sides[1]->noUnits; i++)
-		{
-			if(map->sides[1]->units[i]->alive == FALSE)
-			{
-				oneSideDead = TRUE;
-			
-			}
+	int i, turnNumber, whichSide, turnButtonClicked, turnChanged, selectedStuff, j, oldSelected;
+	turnNumber = 0;
+	whichSide = 0;
+	turnChanged = 0;
+	int time = 0;
 	
+	clock_t start, end;
+	while(oneSideDead != TRUE)
+	{	
+		turnButtonClicked = 0;
+		selectedStuff = 0;
+		oldSelected = 0;
+		if(turnChanged == 1)
+		{
+			turnChanged = 0;
+			turnNumber = turnNumber + 1;
+			fprintf(stdout, "Turn : %d\n", turnNumber);
+			turnButtonClicked = 0;
 		}
-		SDL_RenderPresent(render);
+		if(turnNumber % 2 == 1)
+		{
+			whichSide = 0;
+		
+		}
+		else
+		{
+			whichSide = 1;
+		
+		}
+		
+		while(turnButtonClicked != END_TURN_BUTTON)
+		{
+			if(turnButtonClicked != 0 )
+			{
+				oldSelected = turnButtonClicked;
+			}
+			turnButtonClicked = 0;
+			start = clock();
+			SDL_RenderClear(render);
+			if(time % 1 == 0)
+			{
+				turnButtonClicked = handleMapClicked(map->sides[whichSide], map->tiles, nextTurn, events);
+				if(turnButtonClicked == TILE_SELECTED && oldSelected == UNIT_SELECTED)
+				{
+					selectedStuff = 1;
+				}
+				if(turnButtonClicked == UNIT_SELECTED)
+				{
+					selectedStuff = 2;
+				
+				}
+				if(oldSelected == UNIT_SELECTED && turnButtonClicked == TILE_SELECTED)
+				{
+					fprintf(stdout, "Works 1\n");
+					selectedStuff = 0;
+					for(i = 1; i <= map->sides[whichSide]->noUnits; i++)
+					{
+						if( map->sides[whichSide]->units[i]->selected == TRUE)
+						{
+							break;
+						}
+					}
+					fprintf(stdout, "Works 2\n");
+					for(j = 0; j < map->tiles[0]->noTiles; j++)
+					{
+						if( map->tiles[j]->isSelected == TRUE)
+						{
+							break;
+						}
+					}
+					if(i != map->sides[whichSide]->noUnits + 1 && !(j ==  map->tiles[0]->noTiles))
+					{
+						fprintf(stdout, "%d\n", map->tiles[j]->relativeX);
+						fprintf(stdout, "%d\n", map->tiles[j]->relativeY);
+						moveUnit(map->sides[whichSide], map->tiles, map->tiles[j]->relativeX, map->tiles[j]->relativeY, i);
+						map->tiles[j]->isSelected = FALSE;
+						map->sides[whichSide]->units[i]->selected = FALSE;
+					}
+				}
+			}
+			if(events->type == SDL_QUIT)
+			{
+				*success = FAIL;
+				return;
+			}
+			drawTerrain(map->tiles, map->tiles[0]->noTiles, render, map->tileset);
+			drawUnits(map->sides[0]->units, map->sides[0]->noUnits, render, map->tileset);
+			drawUnits(map->sides[1]->units, map->sides[1]->noUnits, render, map->tileset);;
+			drawMenuElements(nextTurn, 1, render);
+			for(i = 1; i < map->sides[0]->noUnits; i++)
+			{
+				if(map->sides[0]->units[i]->alive == FALSE)
+				{
+					oneSideDead = TRUE;
+				
+				}
+			}	
+			for(i = 1; i < map->sides[1]->noUnits; i++)
+			{
+				if(map->sides[1]->units[i]->alive == FALSE)
+				{
+					oneSideDead = TRUE;
+				
+				}
+	
+			}
+			if(turnButtonClicked == END_TURN_BUTTON)
+			{
+				turnChanged = 1;
+				turnButtonClicked = 0;
+				break;
+			
+			}
+			end = clock();
+			time += end - start;
+			SDL_RenderPresent(render);
+			
+		}
+		
 	}
+	displaySimulationResults(map->sides[0], map->sides[1], map->tiles, font, render);
 
 }

@@ -79,7 +79,7 @@ int checkQuestionClicked(SDL_Rect *mouseDimensions, questionData *question, int 
 */
 int checkUnitClicked(SDL_Rect *mouseDimensions, unitData *unit)
 {
-	fprintf(stderr, "Checking if a unit has been clicked....\n");
+	fprintf(stderr, "Checking if a unit has been clicked: x : %d , y : %d, w : %d, h : %d....\n", unit->dimensions.x, unit->dimensions.y, unit->dimensions.w, unit->dimensions.h);
 	if(SDL_HasIntersection(mouseDimensions, &(unit->dimensions)) == SDL_TRUE)
 	{	
 		return SUCCESS;
@@ -97,13 +97,15 @@ int checkUnitClicked(SDL_Rect *mouseDimensions, unitData *unit)
 */
 int checkTileClicked(SDL_Rect *mouseDimensions, tileData *tile)
 {
-	fprintf(stderr, "Checking if a tile has been clicked....\n");
+	fprintf(stderr, "Checking if a tile has been clicked : x : %d , y : %d, w : %d, h : %d....\n", tile->dimensions.x, tile->dimensions.y, tile->dimensions.w, tile->dimensions.h);
+	fprintf(stderr, "Mouse Coordinates : x : %d , y : %d, w : %d, h : %d....\n", mouseDimensions->x, mouseDimensions->y, mouseDimensions->w, mouseDimensions->h);
 	if(SDL_HasIntersection(mouseDimensions, &(tile->dimensions)) == SDL_TRUE)
 	{	
 		return SUCCESS;
 	}
 	else
 	{
+		fprintf(stderr, "FALSE!\n");
 		return FAIL;
 	}
 }
@@ -218,47 +220,58 @@ int handleKeyboardSimulation(SDL_Event *keyboardInput, unitData **units)
 
 }
 /*
-	int handleMapClicked(unitData **applicableUnits, tileData **tiles,  buttonData **buttons, buttonDataText **textButtons):
+	int handleMapClicked(sideData *applicableUnits, tileData **tiles,  buttonData **endTurn, SDL_Event *events):
 	handles the units and the map being clicked
 
 
 */
-int handleMapClicked(sideData *applicableUnits, tileData **tiles,  buttonData *endTurn, SDL_Event *events)
+int handleMapClicked(sideData *applicableUnits,tileData **tiles,  buttonData **endTurn, SDL_Event *events)
 {
 	SDL_Rect mouseCoords;
 	int i, buttonClickResultTile, buttonClickResultUnit, buttonClickResultButton;
 	mouseCoords.w = 3;
 	mouseCoords.h = 3;
+	
 	while(SDL_PollEvent(events))
 	{
-		SDL_GetMouseState(&(mouseCoords.x), &(mouseCoords.y));
+	
+	}
+	SDL_GetMouseState(&(mouseCoords.x), &(mouseCoords.y));
+	if(events->type == SDL_MOUSEBUTTONDOWN)
+	{
+		
+		for(i = 1; i <= applicableUnits->noUnits; i++)
+		{	
+			buttonClickResultUnit = checkUnitClicked(&mouseCoords, applicableUnits->units[i]);
+			if(buttonClickResultUnit == SUCCESS)
+			{	
+				fprintf(stdout, "Unit of %s selected \n",  applicableUnits->units[i]->name);
+				applicableUnits->units[i]->selected = TRUE;
+				return UNIT_SELECTED;
+			}
+			buttonClickResultUnit = FAIL;
+				
+		}
 		for(i = 0; i < tiles[0]->noTiles; i++)
-		{
+		{	
+			fprintf(stderr, "Mouse Coordinates : x : %d , y : %d, w : %d, h : %d \n", mouseCoords.x, mouseCoords.y, mouseCoords.w, mouseCoords.h);
 			buttonClickResultTile = checkTileClicked(&mouseCoords, tiles[i]);
 			if(buttonClickResultTile == SUCCESS)
 			{
+				fprintf(stdout, "Tile clicked! %d %d \n", tiles[i]->relativeX, tiles[i]->relativeY);
 				tiles[i]->isSelected = TRUE;
-				break;
-			
+				return TILE_SELECTED;
 			}
+			buttonClickResultTile = FAIL;
 		}
-		for(i = 0; i < applicableUnits->noUnits; i++)
+		buttonClickResultButton = checkButtonClicked(&mouseCoords, endTurn[0]);
+		if( buttonClickResultButton == SUCCESS)
 		{
-			buttonClickResultUnit = checkUnitClicked(&mouseCoords, applicableUnits->units[i]);
-			if(buttonClickResultUnit == SUCCESS)
-			{
-				applicableUnits->units[i]->selected = TRUE;
-				break;
-			
-			}
+			fprintf(stderr, "End of turn button Clicked ! \n");
+			return END_TURN_BUTTON;
 		}
-		 buttonClickResultButton = checkButtonClicked(&mouseCoords, endTurn);
+	}
 	
-	}
-	if( buttonClickResultButton == SUCCESS)
-	{
-		return END_TURN_BUTTON;
-	}
 	return 0;
 
 }
