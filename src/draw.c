@@ -161,7 +161,7 @@ void drawUnits(unitData **toDraw, int size, SDL_Renderer *render, SDL_Texture *t
 	int i;
 	for(i = 1; i <= size; i++)
 	{
-		if(toDraw[i]->alive = TRUE)
+		if(toDraw[i]->alive == TRUE)
 		{
 			SDL_RenderCopy(render, tileMap, &(toDraw[i]->spriteDimensions), &(toDraw[i]->dimensions));
 		}

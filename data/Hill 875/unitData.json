@@ -1,6 +1,6 @@
 [
 	{
-		"NO_UNITS" : 2
+		"NO_UNITS" : 3
 	},
 	{
 		"ID" : 1,
@@ -32,6 +32,22 @@
 		"SAVE" : 6,
 		"MORALE" : 6,
 		"SPRITE_XPOS" : 0,
+		"SPRITE_YPOS" : 1
+	},
+	{
+		"ID" : 3,
+		"MOVEMENT" : 45,
+		"NAME" : "Recon Jeep",
+		"DESCRIPTION" : "A Jeep used by both sides to scout out enemy positions. This is flimsy but fast",
+		"ANTI_PERSONNEL_RANGE" : 30,
+		"ANTI_PERSONNEL_DICE" : 2,
+		"ANTI_TANK_RANGE" : 30,
+		"ANTI_TANK_DICE" : 0,
+		"UNIT_TYPE" : 1,
+		"WOUNDS" : 4,
+		"SAVE" : 5,
+		"MORALE" : 6,
+		"SPRITE_XPOS" : 1,
 		"SPRITE_YPOS" : 1
 	}
 ]

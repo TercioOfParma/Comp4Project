@@ -118,6 +118,7 @@ const static int START_BUTTON_TYPE = 1;
 const static int QUIT_BUTTON_TYPE = 2;
 const static int TILE_SELECTED = 10;
 const static int UNIT_SELECTED = 20;
+const static int UNIT_SELECTED_OTHER = 30;
 //----------------------------------- STRUTURE DEFINITIONS -----------------------------------
 
 /*
@@ -367,7 +368,7 @@ int checkButtonTextClicked(SDL_Rect *mouseDimensions, buttonDataText *button);//
 int handleMouseButtonMainMenu(buttonData **buttons, int size, SDL_Renderer *render, SDL_Event *events);//DONE
 int handleMouseButtonSelectionMenu(buttonDataText **buttonsText, int size, SDL_Renderer *render, SDL_Event *events);//DONE
 int handleKeyboardSimulation(SDL_Event *keyboardInput, unitData **units);//DONE
-int handleMapClicked(sideData *applicableUnits, tileData **tiles,  buttonData **endTurn, SDL_Event *events);//DONE
+int handleMapClicked(sideData *applicableUnits, sideData *otherSide, tileData **tiles,  buttonData **endTurn, SDL_Event *events);//DONE
 int checkQuestionClicked(SDL_Rect *mouseDimensions, questionData *question, int answerNo);//DONE
 int checkUnitClicked(SDL_Rect *mouseDimensions, unitData *unit);//DONE
 int checkTileClicked(SDL_Rect *mouseDimensions, tileData *tile);//DONE

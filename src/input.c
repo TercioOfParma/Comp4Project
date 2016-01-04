@@ -220,12 +220,12 @@ int handleKeyboardSimulation(SDL_Event *keyboardInput, unitData **units)
 
 }
 /*
-	int handleMapClicked(sideData *applicableUnits, tileData **tiles,  buttonData **endTurn, SDL_Event *events):
+	int handleMapClicked(sideData *applicableUnits, sideData *otherSide, tileData **tiles,  buttonData **endTurn, SDL_Event *events):
 	handles the units and the map being clicked
 
 
 */
-int handleMapClicked(sideData *applicableUnits,tileData **tiles,  buttonData **endTurn, SDL_Event *events)
+int handleMapClicked(sideData *applicableUnits, sideData *otherSide, tileData **tiles,  buttonData **endTurn, SDL_Event *events)
 {
 	SDL_Rect mouseCoords;
 	int i, buttonClickResultTile, buttonClickResultUnit, buttonClickResultButton;
@@ -243,11 +243,28 @@ int handleMapClicked(sideData *applicableUnits,tileData **tiles,  buttonData **e
 		for(i = 1; i <= applicableUnits->noUnits; i++)
 		{	
 			buttonClickResultUnit = checkUnitClicked(&mouseCoords, applicableUnits->units[i]);
-			if(buttonClickResultUnit == SUCCESS)
+			if(buttonClickResultUnit == SUCCESS && applicableUnits->units[i]->alive == TRUE)
 			{	
 				fprintf(stdout, "Unit of %s selected \n",  applicableUnits->units[i]->name);
 				applicableUnits->units[i]->selected = TRUE;
 				return UNIT_SELECTED;
+			}
+			if(applicableUnits->units[i]->alive == FALSE)
+			{
+				applicableUnits->units[i]->selected = FALSE;
+			
+			}
+			buttonClickResultUnit = FAIL;
+				
+		}
+		for(i = 1; i <= otherSide->noUnits; i++)
+		{	
+			buttonClickResultUnit = checkUnitClicked(&mouseCoords, otherSide->units[i]);
+			if(buttonClickResultUnit == SUCCESS && otherSide->units[i]->alive == TRUE)
+			{	
+				fprintf(stdout, "Unit of %s selected for attack\n",  otherSide->units[i]->name);
+				otherSide->units[i]->selected = TRUE;
+				return UNIT_SELECTED_OTHER;
 			}
 			buttonClickResultUnit = FAIL;
 				

@@ -44,6 +44,7 @@ int main(int argc, char *argv[])
 	SDL_Event eventHandle;
 	SDL_Texture *startButton, *quitButton, *nextTurnButton, *blankButton;
 	SDL_Rect placeHolder;
+	Mix_Music *soundtrack;
 	//------------------------------------------------ INITIALISATION -------------------------------------------
 	errorRedirection = freopen(LOG_FILE, "w", stderr);//According to the documentation I have read, it isn't an issue on windows stderr isn't a file, and so this evades the race condition issue
 	fprintf(stderr, "Main function....\n");
@@ -52,6 +53,7 @@ int main(int argc, char *argv[])
 	wind = initSDL(&options, &success);
 	render = createRenderer(wind, &success);
 	font = loadFont(&options, &success);
+	soundtrack = loadMusic("audio/soundtrack.ogg", &success);
 	//use below here for testing
 	startButton = loadImage(STARTBUTTON_PATH, render, &placeHolder, &success);
 	quitButton = loadImage(QUITBUTTON_PATH, render, &placeHolder, &success);
@@ -75,6 +77,7 @@ int main(int argc, char *argv[])
 	placeHolder.y = 100;
 	secondaryButtons = malloc(sizeof(buttonDataText *) * test->noLevels);
 	buttonValueSecondary = NO_BUTTON_SECONDARY;
+	Mix_PlayMusic(soundtrack, -1);
 	for(i = 0; i <  test->noLevels; i++)
 	{
 		placeHolder.y += 40;
@@ -97,7 +100,7 @@ int main(int argc, char *argv[])
 			simulationMain(test->maps[buttonValueSecondary],render, font, turnButton, &eventHandle, &success);
 			if(success != FAIL)
 			{
-				startQuiz(test->maps[buttonValueSecondary]->activity, render, font, &eventHandle, &success);
+				quizTerminated = startQuiz(test->maps[buttonValueSecondary]->activity, render, font, &eventHandle, &success);
 			}
 		}
 		if(eventHandle.type == SDL_QUIT || quizTerminated == 0 || buttonValuePrimary == QUIT_BUTTON_TYPE)
