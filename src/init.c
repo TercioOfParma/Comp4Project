@@ -23,48 +23,48 @@
 
 */
 
-char *loadTextFile(const char *filename, int *success)
+char *loadTextFile( const char *filename , int *success )
 {
 
-	fprintf(stderr, "Loading file %s... \n", filename);
-	int fileDescriptor;
-	
-	fileDescriptor = open(filename, O_RDONLY, 0600);//avoids the race condition issues
-	if(fileDescriptor == -1)
-	{
-		fprintf(stderr, "open has failed on %s: %s \n", filename, strerror(errno));
-		*success = FAIL;
-		return NULL;
-	}
-	
-	FILE *jsonFile = fdopen(fileDescriptor, "rb");
-	int fileSize;
+	fprintf( stderr , "Loading file %s... \n" , filename );
+	int fileDescriptor, fileSize;
 	char *fileContents;
-	if(!jsonFile)
+	FILE *jsonFile;
+	
+	fileDescriptor = open( filename , O_RDONLY , 0600 );//avoids the race condition issues
+	if( fileDescriptor == -1 )
 	{
-		fprintf(stderr, "fopen has failed : %s \n", strerror(errno));
+		fprintf( stderr , "open has failed on %s: %s \n" , filename , strerror( errno ) );
 		*success = FAIL;
 		return NULL;
 	}
-	fileSize = getFileSize(jsonFile, success);
-	if(!fileSize)
+	
+	jsonFile = fdopen( fileDescriptor , "rb" );
+	if( !jsonFile )
+	{
+		fprintf( stderr , "fopen has failed : %s \n" , strerror( errno ) );
+		*success = FAIL;
+		return NULL;
+	}
+	fileSize = getFileSize( jsonFile , success );
+	if( !fileSize )
 	{
 		return NULL;
 	
 	}
-	fileContents = calloc(1, fileSize + 1);
-	if(!fileContents)
+	fileContents = calloc( 1 , fileSize + 1 );
+	if( !fileContents )
 	{
-		fprintf(stderr, "malloc has failed : %s", strerror(errno));
+		fprintf( stderr , "malloc has failed : %s" , strerror( errno ) );
 		*success = FAIL;
 		return NULL;
 	
 	}
-	fread(fileContents,fileSize,1, jsonFile);
-	fclose(jsonFile);
-	if(strstr(fileContents, "%x") != NULL)
+	fread( fileContents , fileSize , 1 , jsonFile );
+	fclose( jsonFile );
+	if(strstr( fileContents , "%x" ) != NULL)
 	{
-		fprintf(stderr, "stack change formatter detected in file provided, nice try\n");
+		fprintf( stderr , "stack change formatter detected in file provided, nice try\n" );
 		*success = FAIL;
 		return NULL;
 	
@@ -79,16 +79,16 @@ char *loadTextFile(const char *filename, int *success)
 
 */
 
-int getFileSize(FILE *sizeToGet, int *success)
+int getFileSize( FILE *sizeToGet , int *success )
 {
-	fprintf(stderr, "Getting File size...\n");
+	fprintf( stderr , "Getting File size...\n" );
 	int fileSize = 0;
-	fseek(sizeToGet,0,SEEK_END);
-	fileSize = ftell(sizeToGet);
-	rewind(sizeToGet);//back to the start
+	fseek( sizeToGet ,0 , SEEK_END );
+	fileSize = ftell( sizeToGet );
+	rewind( sizeToGet );//back to the start
 	if(errno > 0)
 	{
-		fprintf(stderr, "ftell has failed : %s", strerror(errno));
+		fprintf( stderr , "ftell has failed : %s" , strerror( errno ) );
 		*success = FAIL;
 		return 0;
 	}
@@ -101,40 +101,39 @@ int getFileSize(FILE *sizeToGet, int *success)
 
 */
 
-optionsData initOptions(char *fileContents, int *success)
+optionsData initOptions( char *fileContents , int *success )
 {
-	fprintf(stderr, "Loading options... \n");
+	fprintf( stderr , "Loading options... \n" );
 	optionsData tempOpt;
 	json_t *tempJsonHandle, *optionsData;
 	json_error_t errorHandle;
 	
-	tempJsonHandle = json_loads(fileContents,0, &errorHandle);//loads the JSON file into Jansson 
-	if(!tempJsonHandle)
+	tempJsonHandle = json_loads( fileContents , 0 , &errorHandle );//loads the JSON file into Jansson 
+	if( !tempJsonHandle )
 	{
-		fprintf(stderr, "json_loads has failed : %s \n", errorHandle.text);
+		fprintf( stderr , "json_loads has failed : %s \n" , errorHandle.text );
 		*success = FAIL;
 		return tempOpt;
-	
 	}
 	
-	optionsData = json_array_get(tempJsonHandle, 0);
-	if(!json_is_object(optionsData))//makes sure that what is being opened is actually a JSON object
+	optionsData = json_array_get( tempJsonHandle , 0 );
+	if( !json_is_object(optionsData) )//makes sure that what is being opened is actually a JSON object
 	{
-		fprintf(stderr,"json_object_get failed, didn't get an object\n");
+		fprintf( stderr , "json_object_get failed, didn't get an object\n" );
 		*success = FAIL;
-		json_decref(tempJsonHandle);
+		json_decref( tempJsonHandle );
 		return tempOpt;
 	
 	}
 	//gets the program options
-	tempOpt.SCREEN_WIDTH = json_integer_value(json_object_get(optionsData,"SCREEN_WIDTH"));
-	tempOpt.SCREEN_HEIGHT = json_integer_value(json_object_get(optionsData,"SCREEN_HEIGHT"));
-	tempOpt.WINDOW_TITLE = (char *)json_string_value(json_object_get(optionsData, "WINDOW_TITLE"));
-	tempOpt.SAMPLE_SIZE = json_integer_value(json_object_get(optionsData,"SAMPLE_SIZE"));
-	tempOpt.SAMPLE_FREQUENCY = json_integer_value(json_object_get(optionsData,"SAMPLE_FREQUENCY"));
-	tempOpt.NO_CHANNELS = json_integer_value(json_object_get(optionsData,"NO_CHANNELS"));
-	tempOpt.FONT_SIZE = json_integer_value(json_object_get(optionsData,"FONT_SIZE"));
-	tempOpt.DEFAULT_FONT = (char *)json_string_value(json_object_get(optionsData, "DEFAULT_FONT"));
+	tempOpt.SCREEN_WIDTH = json_integer_value( json_object_get ( optionsData , "SCREEN_WIDTH" ) );
+	tempOpt.SCREEN_HEIGHT = json_integer_value( json_object_get( optionsData , "SCREEN_HEIGHT" ) );
+	tempOpt.WINDOW_TITLE = (char *)json_string_value( json_object_get( optionsData ,  "WINDOW_TITLE" ) );
+	tempOpt.SAMPLE_SIZE = json_integer_value( json_object_get( optionsData , "SAMPLE_SIZE" ) );
+	tempOpt.SAMPLE_FREQUENCY = json_integer_value( json_object_get( optionsData , "SAMPLE_FREQUENCY" ) );
+	tempOpt.NO_CHANNELS = json_integer_value( json_object_get( optionsData , "NO_CHANNELS" ) );
+	tempOpt.FONT_SIZE = json_integer_value( json_object_get( optionsData , "FONT_SIZE" ) );
+	tempOpt.DEFAULT_FONT = (char *)json_string_value( json_object_get( optionsData , "DEFAULT_FONT" ) );
 	return tempOpt;
 }
 
@@ -144,55 +143,54 @@ optionsData initOptions(char *fileContents, int *success)
 
 */
 
-SDL_Window *initSDL(optionsData *opt, int *success)
+SDL_Window *initSDL( optionsData *opt , int *success )
 {
-	fprintf(stderr, "Initialising SDL2 and SDL2 Extension Libraries....\n");
+	fprintf( stderr , "Initialising SDL2 and SDL2 Extension Libraries....\n" );
 	SDL_Window *temp;
 	int SDL_Flags, IMG_Flags;
 	SDL_Flags = SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_AUDIO;
 	IMG_Flags = IMG_INIT_JPG | IMG_INIT_PNG;
 	//Main SDL2 Library
-	if(SDL_Init(SDL_Flags) < 0)
+	if( SDL_Init( SDL_Flags ) < 0 )
 	{
-		fprintf(stderr, "SDL_Init has failed : %s \n", SDL_GetError());
+		fprintf( stderr , "SDL_Init has failed : %s \n" , SDL_GetError() );
 		*success = FAIL;
 		return NULL;
 	}
 	//TTF Font Library
-	if(TTF_Init() != 0)
+	if( TTF_Init() != 0 )
 	{
-		fprintf(stderr, "TFF_Init has failed : %s \n", TTF_GetError());
+		fprintf( stderr , "TFF_Init has failed : %s \n" , TTF_GetError() );
 		*success = FAIL;
 		return NULL;
 	}
 	//Image library
-	if(!(IMG_Init(IMG_Flags) & IMG_Flags))
+	if( !( IMG_Init( IMG_Flags ) & IMG_Flags ) )
 	{
-		fprintf(stderr, "IMG_Init has failed, %s \n", IMG_GetError());
+		fprintf( stderr , "IMG_Init has failed, %s \n" , IMG_GetError() );
 		*success = FAIL;
 		return NULL;
 	
 	}
 	//Audio library
-	if(Mix_OpenAudio(opt->SAMPLE_FREQUENCY, MIX_DEFAULT_FORMAT, opt->NO_CHANNELS, opt->SAMPLE_SIZE) < 0)//first arg : frequency of audio, second arg : format, third arg : Number of audio channels, forth arg : sample size
+	if( Mix_OpenAudio( opt->SAMPLE_FREQUENCY , MIX_DEFAULT_FORMAT , opt->NO_CHANNELS , opt->SAMPLE_SIZE ) < 0 )//first arg : frequency of audio, second arg : format, third arg : Number of audio channels, forth arg : sample size
 	{
-		fprintf(stderr, "Mix_OpenAudio has failed, %s \n", Mix_GetError());
+		fprintf( stderr , "Mix_OpenAudio has failed, %s \n" , Mix_GetError() );
 		*success = FAIL;
 		return NULL;
 	
 	}
 	//initialise window
-	temp = SDL_CreateWindow(opt->WINDOW_TITLE, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, opt->SCREEN_WIDTH, opt->SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-	if(!temp)
+	temp = SDL_CreateWindow( opt->WINDOW_TITLE , SDL_WINDOWPOS_UNDEFINED , SDL_WINDOWPOS_UNDEFINED , opt->SCREEN_WIDTH ,
+	opt->SCREEN_HEIGHT , SDL_WINDOW_SHOWN );
+	if( !temp )
 	{
-		fprintf(stderr, "SDL_CreateWindow has failed : %s \n", SDL_GetError());
+		fprintf( stderr , "SDL_CreateWindow has failed : %s \n" , SDL_GetError() );
 		*success = FAIL;
 		return NULL;
-	
 	}
 	
 	return temp;
-
 }
 /*
 	SDL_Renderer *createRenderer(SDL_Window *screen, int *success):
@@ -200,15 +198,15 @@ SDL_Window *initSDL(optionsData *opt, int *success)
 
 */
 
-SDL_Renderer *createRenderer(SDL_Window *screen, int *success)
+SDL_Renderer *createRenderer( SDL_Window *screen , int *success )
 {
-	fprintf(stderr, "Creating SDL2 Renderer....\n");
+	fprintf( stderr , "Creating SDL2 Renderer....\n" );
 	SDL_Renderer *temp;
 	int Render_Flags = SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC;//Hardware acceleration and a frame rate capped by the refresh rate of the monitor
-	temp = SDL_CreateRenderer(screen, -1, Render_Flags);
-	if(!temp)
+	temp = SDL_CreateRenderer( screen , -1 , Render_Flags );
+	if( !temp )
 	{
-		fprintf(stderr, "SDL_CreateRenderer has failed : %s \n", SDL_GetError());
+		fprintf( stderr , "SDL_CreateRenderer has failed : %s \n" , SDL_GetError() );
 		*success = FAIL;
 		return NULL;
 	}
@@ -222,13 +220,13 @@ SDL_Renderer *createRenderer(SDL_Window *screen, int *success)
 
 */
 
-Mix_Music *loadMusic(const char *filename, int *success)
+Mix_Music *loadMusic( const char *filename , int *success )
 {
-	fprintf(stderr, "Loading music from %s....\n", filename);
-	Mix_Music *temp = Mix_LoadMUS(filename);
-	if(!temp)
+	fprintf( stderr , "Loading music from %s....\n" , filename );
+	Mix_Music *temp = Mix_LoadMUS( filename );
+	if( !temp )
 	{
-		fprintf(stderr, "Mix_LoadMUS has failed : %s \n", Mix_GetError());
+		fprintf( stderr , "Mix_LoadMUS has failed : %s \n" , Mix_GetError() );
 		*success = FAIL;
 		return NULL;
 	}
@@ -241,17 +239,16 @@ Mix_Music *loadMusic(const char *filename, int *success)
 	load sound effects
 
 */
-Mix_Chunk *loadEffect(const char *filename, int *success)
+Mix_Chunk *loadEffect( const char *filename , int *success )
 {
-	fprintf(stderr, "Loading effect from %s....\n", filename);
-	Mix_Chunk *temp = Mix_LoadWAV(filename);
+	fprintf( stderr , "Loading effect from %s....\n" , filename );
+	Mix_Chunk *temp = Mix_LoadWAV( filename );
 	if(!temp)
 	{
-		fprintf(stderr, "Mix_LoadWAV has failed : %s \n", Mix_GetError());
-		*success = FAIL;
+		fprintf( stderr , "Mix_LoadWAV has failed : %s \n" , Mix_GetError() );
+		*success = FAIL ;
 		return NULL;
 	}
-
 	return temp;
 }
 /*
@@ -259,69 +256,64 @@ Mix_Chunk *loadEffect(const char *filename, int *success)
 	load a font structure
 
 */
-TTF_Font *loadFont(optionsData *opt, int *success)
+TTF_Font *loadFont( optionsData *opt , int *success )
 {
-	fprintf(stderr, "Loading font from %s....\n", opt->DEFAULT_FONT);
-	TTF_Font *temp = TTF_OpenFont(opt->DEFAULT_FONT, opt->FONT_SIZE);
-	if(!temp)
+	fprintf( stderr , "Loading font from %s....\n" , opt->DEFAULT_FONT );
+	TTF_Font *temp = TTF_OpenFont( opt->DEFAULT_FONT , opt->FONT_SIZE );
+	if( !temp )
 	{
-		fprintf(stderr, "TTF_OpenFont has failed : %s \n", TTF_GetError());
+		fprintf( stderr , "TTF_OpenFont has failed : %s \n" , TTF_GetError() );
 		*success = FAIL;
 		return NULL;
 	}
-
 	return temp;
-
 }
 /*
 	SDL_Texture *loadImage(const char *filename, SDL_Renderer *render, SDL_Rect *dimen, int *success):
 	load an image, translates it to a hardware renderable texture and returns the original image's dimensions
 
 */
-SDL_Texture *loadImage(const char *filename, SDL_Renderer *render, SDL_Rect *dimen, int *success)
+SDL_Texture *loadImage( const char *filename , SDL_Renderer *render , SDL_Rect *dimen , int *success )
 {
-	fprintf(stderr, "Loading image and converting it to texture from %s....\n", filename);
+	fprintf( stderr , "Loading image and converting it to texture from %s....\n" , filename );
 	SDL_Surface *temp;
 	SDL_Texture *tempTex;
-	temp = IMG_Load(filename);//image library used to load things other than bitmaps
+	
+	temp = IMG_Load( filename );//image library used to load things other than bitmaps
 	if(!temp)
 	{
-		fprintf(stderr, "IMG_LoadBMP has failed: %s \n", IMG_GetError());
+		fprintf( stderr , "IMG_LoadBMP has failed: %s \n" , IMG_GetError() );
 		*success = FAIL;
 		return NULL;
 	
 	}
-	SDL_SetColorKey(temp, SDL_TRUE, SDL_MapRGB(temp->format, 255,0,255));//makes the background colour transparent
-	tempTex = SDL_CreateTextureFromSurface(render, temp);//converts to renderable type
-	if(!tempTex)
+	SDL_SetColorKey( temp , SDL_TRUE , SDL_MapRGB( temp->format , 255 , 0 ,255 ) );//makes the background colour transparent
+	tempTex = SDL_CreateTextureFromSurface( render , temp );//converts to renderable type
+	if( !tempTex )
 	{
-		fprintf(stderr, "SDL_CreateTextureFromSurface has failed : %s \n", SDL_GetError());
+		fprintf( stderr , "SDL_CreateTextureFromSurface has failed : %s \n" , SDL_GetError() );
 		*success = FAIL;
 		return NULL;
 	}
 	dimen->w = temp->w;
 	dimen->h = temp->h;
-	SDL_FreeSurface(temp);
+	SDL_FreeSurface( temp );
 	return tempTex;
-
-
 }
 /*
 	buttonData *loadButton(SDL_Texture *display, SDL_Rect *posAndSize, int type, int *success):
 	Loads a regular button
 
 */
-buttonData *loadButton(SDL_Texture *display, SDL_Rect *posAndSize, int type, int *success)
+buttonData *loadButton( SDL_Texture *display , SDL_Rect *posAndSize , int type , int *success )
 {
-	fprintf(stderr, "Loading a button....\n");
-	buttonData *temp = malloc(sizeof(buttonData));
-	if(!temp)
+	fprintf( stderr , "Loading a button....\n" );
+	buttonData *temp = malloc( sizeof( buttonData ) );
+	if( !temp )
 	{
-		fprintf(stderr, "malloc has failed on buttonData : %s", strerror(errno));
+		fprintf( stderr , "malloc has failed on buttonData : %s" , strerror( errno ) );
 		*success = FAIL;
 		return NULL;
-	
-	
 	}
 	temp->display = display; //will copy the address of the button texture to the object
 	temp->dimensions = *posAndSize;
@@ -334,31 +326,27 @@ buttonData *loadButton(SDL_Texture *display, SDL_Rect *posAndSize, int type, int
 	Loads a button with text
 
 */
-buttonDataText *loadButtonText(SDL_Texture *display, SDL_Rect *posAndSize, SDL_Renderer *render, const char *initialData, TTF_Font *font, int type, int *success)
+buttonDataText *loadButtonText( SDL_Texture *display , SDL_Rect *posAndSize , SDL_Renderer *render , const char *initialData , TTF_Font *font , int type , int *success )
 {
-	fprintf(stderr, "Loading a button with text....\n");
-	buttonDataText *temp = malloc(sizeof(buttonDataText));
-	if(!temp)
+	fprintf( stderr , "Loading a button with text....\n" );
+	buttonDataText *temp = malloc( sizeof( buttonDataText ) );
+	if( !temp )
 	{
-		fprintf(stderr, "malloc has failed on buttonData : %s", strerror(errno));
+		fprintf( stderr , "malloc has failed on buttonData : %s" , strerror( errno ) );
 		*success = FAIL;
 		return NULL;
-	
-	
 	}
-	temp->details = malloc(sizeof(textData));//text data
-	if(!temp->details)
+	temp->details = malloc( sizeof( textData ) );//text data
+	if( !temp->details )
 	{
-		fprintf(stderr, "malloc has failed on buttonData : %s", SDL_GetError());
+		fprintf( stderr , "malloc has failed on buttonData : %s" , SDL_GetError() );
 		*success = FAIL;
 		return NULL;
-	
-	
 	}
 	temp->display = display;
 	temp->dimensions = *posAndSize;
 	temp->type = type;
-	temp->details = renderText(font, render, initialData, success);
+	temp->details = renderText( font , render , initialData , success );
 	temp->details->dimensions.x = posAndSize->x + (posAndSize->w / 5);//places the text in the centre of the button
 	temp->details->dimensions.y = posAndSize->y + (posAndSize->h / 5);
 	return temp;
@@ -370,47 +358,44 @@ buttonDataText *loadButtonText(SDL_Texture *display, SDL_Rect *posAndSize, SDL_R
 */
 quoteData **loadQuotes(char *filename, int *success)
 {
-	fprintf(stderr, "Loading quotes from %s....\n", filename);
-	char *quoteDataFILE = loadTextFile(filename, success);
+	fprintf( stderr , "Loading quotes from %s....\n" , filename );
+	char *quoteDataFILE = loadTextFile( filename , success );
 	quoteData **temp;
 	json_t *tempJsonHandle, *quoteDataJSON;
 	json_error_t errorHandle;
 	int numberOfQuotes, i;
 	
-	tempJsonHandle = json_loads(quoteDataFILE,0, &errorHandle);
-	if(!tempJsonHandle)
+	tempJsonHandle = json_loads( quoteDataFILE , 0 , &errorHandle );
+	if( !tempJsonHandle )
 	{
-		fprintf(stderr, "json_loads has failed on %s: %s \n", filename, errorHandle.text);
+		fprintf( stderr , "json_loads has failed on %s: %s \n", filename , errorHandle.text );
 		*success = FAIL;
+		return temp;
+	}
+	quoteDataJSON = json_array_get( tempJsonHandle , 0 );
+	if( !json_is_object( quoteDataJSON ) )
+	{
+		fprintf( stderr , "json_object_get failed, didn't get an object\n" );
+		*success = FAIL;
+		json_decref( tempJsonHandle );
 		return temp;
 	
 	}
-	
-	quoteDataJSON = json_array_get(tempJsonHandle, 0);
-	if(!json_is_object(quoteDataJSON))
+	numberOfQuotes = json_integer_value( json_object_get( quoteDataJSON , "NO_QUOTES" ) );
+	temp = malloc( sizeof(quoteData *) * numberOfQuotes );
+	for( i = 0 ; i < numberOfQuotes ; i++ )
 	{
-		fprintf(stderr,"json_object_get failed, didn't get an object\n");
-		*success = FAIL;
-		json_decref(tempJsonHandle);
-		return temp;
-	
-	}
-	numberOfQuotes = json_integer_value(json_object_get(quoteDataJSON,"NO_QUOTES"));
-	temp = malloc(sizeof(quoteData *) * numberOfQuotes);
-	for(i = 0; i < numberOfQuotes; i++)
-	{
-		temp[i] = malloc(sizeof(quoteData));
-		quoteDataJSON = json_array_get(tempJsonHandle, i);
-		if(!json_is_object(quoteDataJSON))
+		temp[i] = malloc( sizeof( quoteData ) );
+		quoteDataJSON = json_array_get( tempJsonHandle , i );
+		if( !json_is_object( quoteDataJSON ) )
 		{
-			fprintf(stderr,"json_object_get failed, didn't get an object\n");
+			fprintf( stderr , "json_object_get failed, didn't get an object\n" );
 			*success = FAIL;
-			json_decref(tempJsonHandle);
+			json_decref( tempJsonHandle );
 			return temp;
-	
 		}
-		temp[i]->quote = (char *)json_string_value(json_object_get(quoteDataJSON, "QUOTE"));
-		temp[i]->analysis = (char *)json_string_value(json_object_get(quoteDataJSON, "ANALYSIS"));
+		temp[i]->quote = (char *) json_string_value( json_object_get( quoteDataJSON , "QUOTE" ) );
+		temp[i]->analysis = (char *) json_string_value(json_object_get( quoteDataJSON , "ANALYSIS" ) );
 	}
 	return temp;
 }
@@ -419,227 +404,197 @@ quoteData **loadQuotes(char *filename, int *success)
 	Loads the questions from a specified data file
 
 */
-questionData **loadQuestions(char *filename, int *success)
+questionData **loadQuestions( char *filename , int *success )
 {
-	fprintf(stderr, "Loading questions from %s....\n", filename);
-	char *questionDataFILE = loadTextFile(filename, success);
+	fprintf( stderr , "Loading questions from %s....\n", filename );
+	char *questionDataFILE = loadTextFile( filename , success );
 	questionData **temp;
 	json_t *tempJsonHandle, *questionDataJSON;
 	json_error_t errorHandle;
 	int numberOfQuestions, i;
 	
-	tempJsonHandle = json_loads(questionDataFILE,0, &errorHandle);
-	if(!tempJsonHandle)
+	tempJsonHandle = json_loads( questionDataFILE , 0 , &errorHandle );
+	if( !tempJsonHandle )
 	{
-		fprintf(stderr, "json_loads has failed on %s: %s \n", filename, errorHandle.text);
+		fprintf( stderr , "json_loads has failed on %s: %s \n" , filename , errorHandle.text );
 		*success = FAIL;
 		return temp;
-	
 	}
-	
-	questionDataJSON = json_array_get(tempJsonHandle, 0);
-	if(!json_is_object(questionDataJSON))
+	questionDataJSON = json_array_get( tempJsonHandle , 0 );
+	if( !json_is_object( questionDataJSON ) )
 	{
-		fprintf(stderr,"json_object_get failed, didn't get an object\n");
+		fprintf( stderr , "json_object_get failed, didn't get an object\n" );
 		*success = FAIL;
-		json_decref(tempJsonHandle);
+		json_decref( tempJsonHandle );
 		return temp;
-	
 	}
-	numberOfQuestions = json_integer_value(json_object_get(questionDataJSON,"NO_QUESTIONS"));
-	temp = malloc(sizeof(questionData *) * numberOfQuestions);
-	for(i = 0; i < numberOfQuestions; i++)
+	numberOfQuestions = json_integer_value( json_object_get( questionDataJSON , "NO_QUESTIONS" ));
+	temp = malloc( sizeof( questionData * ) * numberOfQuestions );
+	for( i = 0 ; i < numberOfQuestions ;  i++ )
 	{
-		temp[i] = malloc(sizeof(questionData));
-		questionDataJSON = json_array_get(tempJsonHandle, i);
-		if(!json_is_object(questionDataJSON))
+		temp[i] = malloc( sizeof( questionData ) );
+		questionDataJSON = json_array_get( tempJsonHandle , i );
+		if( !json_is_object( questionDataJSON ) )
 		{
-			fprintf(stderr,"json_object_get failed, didn't get an object\n");
+			fprintf( stderr ,"json_object_get failed, didn't get an object\n" );
 			*success = FAIL;
-			json_decref(tempJsonHandle);
+			json_decref( tempJsonHandle );
 			return temp;
-	
 		}
-		temp[i]->question = (char *)json_string_value(json_object_get(questionDataJSON, "QUESTION"));
-		temp[i]->answers[0] = (char *) json_string_value(json_object_get(questionDataJSON, "ANSWERONE"));
-		temp[i]->answers[1] = (char *) json_string_value(json_object_get(questionDataJSON, "ANSWERTWO"));
-		temp[i]->answers[2] = (char *) json_string_value(json_object_get(questionDataJSON, "ANSWERTHREE"));
-		temp[i]->answerNo = json_integer_value(json_object_get(questionDataJSON, "CORRECT"));
+		temp[i]->question = (char *)json_string_value( json_object_get( questionDataJSON ,  "QUESTION" ) );
+		temp[i]->answers[0] = (char *) json_string_value( json_object_get( questionDataJSON ,  "ANSWERONE" ) );
+		temp[i]->answers[1] = (char *) json_string_value( json_object_get( questionDataJSON , "ANSWERTWO" ) );
+		temp[i]->answers[2] = (char *) json_string_value( json_object_get( questionDataJSON , "ANSWERTHREE" ) );
+		temp[i]->answerNo = json_integer_value( json_object_get( questionDataJSON , "CORRECT" ) );
 	}
 	return temp;
-
-
-
 }
 /*
 	char *miscIDToFilePath(int ID, char *path):
 	Used to map the IDs in non Level Data files to correct file paths
-
 */
-char *miscIDToFilePath(int ID, char *path)
+char *miscIDToFilePath( int ID , char *path )
 {
-	fprintf(stderr, "Mapping ID to an actual file path within data directory %s....\n", path);
-	char filePath [MAX_TEXT_OUTPUT];
-	char *mappingFileContents,*mappedPath, stringPath[MAX_TEXT_OUTPUT];
-	json_t *tempJsonHandle, *mappingDataJSON;
+	fprintf( stderr , "Mapping ID to an actual file path within data directory %s....\n" , path );
+	char filePath [ MAX_TEXT_OUTPUT ];
+	char *mappingFileContents , *mappedPath , stringPath[ MAX_TEXT_OUTPUT ] ;
+	json_t *tempJsonHandle ,  *mappingDataJSON ;
 	json_error_t errorHandle;
 	int wasSuccess = SUCCESS;
 	
-	snprintf(filePath, MAX_TEXT_OUTPUT,  "%s%s", path, MAPPING_FILE_MISC);
-	mappingFileContents = loadTextFile(filePath, &wasSuccess);
+	snprintf( filePath , MAX_TEXT_OUTPUT ,  "%s%s", path , MAPPING_FILE_MISC );
+	mappingFileContents = loadTextFile( filePath , &wasSuccess );
 	
-	tempJsonHandle = json_loads(mappingFileContents,0, &errorHandle);
-	if(!tempJsonHandle)
+	tempJsonHandle = json_loads( mappingFileContents , 0 , &errorHandle );
+	if( !tempJsonHandle )
 	{
-		fprintf(stderr, "%s", mappingFileContents);
-		fprintf(stderr, "json_loads has failed on %s: %s \n", filePath, errorHandle.text);
+		fprintf( stderr , "%s", mappingFileContents );
+		fprintf( stderr , "json_loads has failed on %s: %s \n", filePath , errorHandle.text );
 		return NULL;
-	
 	}
-	
-	mappingDataJSON = json_array_get(tempJsonHandle, 0);
-	if(!json_is_object(mappingDataJSON))
+	mappingDataJSON = json_array_get( tempJsonHandle , 0 );
+	if( !json_is_object( mappingDataJSON ) )
 	{
-		fprintf(stderr,"json_object_get failed, didn't get an object\n");
-		json_decref(tempJsonHandle);
+		fprintf( stderr , "json_object_get failed, didn't get an object\n" );
+		json_decref( tempJsonHandle );
 		return NULL;
-	
 	}
-	
-	itoa(ID, stringPath, 10);
-	mappedPath = (char *)json_string_value(json_object_get(mappingDataJSON, stringPath));
-	if(!mappedPath)
+	itoa( ID , stringPath , 10 );
+	mappedPath = (char *) json_string_value( json_object_get( mappingDataJSON , stringPath ) );
+	if( !mappedPath )
 	{
-		fprintf(stderr, "The ID you have requested doesn't exist\n");
+		fprintf( stderr , "The ID you have requested doesn't exist\n" );
 		return NULL;
-	
 	}
-	
 	return mappedPath;
 }
 /*
 	activityData *loadActivity(char *filename, int *success):
 	Used to load ActivityData structures
-
 */
-activityData *loadActivity(char *filename, int *success)
+activityData *loadActivity( char *filename , int *success )
 {
-	fprintf(stderr, "Loading an activity from %s....\n", filename);
-	char *activityDataFile, pathToLoad[MAX_TEXT_OUTPUT], *questionFile;
+	fprintf( stderr , "Loading an activity from %s....\n" , filename );
+	char *activityDataFile , pathToLoad[ MAX_TEXT_OUTPUT ] , *questionFile ;
 	int wasSuccess = SUCCESS;
-	json_t *tempJsonHandle, *activityDataJSON;
-	json_error_t errorHandle;
-	activityData *temp = malloc(sizeof(activityData));
-	if(!temp)
+	json_t *tempJsonHandle , *activityDataJSON ;
+	json_error_t errorHandle ;
+	activityData *temp = malloc( sizeof( activityData ) );
+	if( !temp )
 	{
-		fprintf(stderr, "malloc has failed on activityData : %s", strerror(errno));
+		fprintf( stderr , "malloc has failed on activityData : %s" , strerror( errno ) );
 		*success = FAIL;
 		return NULL;
-	
-	
 	}
-	snprintf(pathToLoad, MAX_TEXT_OUTPUT, "%s%s", filename, ACTIVITY_FILE);
-	activityDataFile = loadTextFile(pathToLoad, &wasSuccess);
-	tempJsonHandle = json_loads(activityDataFile,0, &errorHandle);
+	snprintf( pathToLoad , MAX_TEXT_OUTPUT , "%s%s" , filename , ACTIVITY_FILE );
+	activityDataFile = loadTextFile( pathToLoad , &wasSuccess );
+	tempJsonHandle = json_loads( activityDataFile , 0 , &errorHandle );
 	
-	if(!tempJsonHandle)
+	if( !tempJsonHandle )
 	{
-		fprintf(stderr, "json_loads has failed : %s \n", errorHandle.text);
+		fprintf( stderr , "json_loads has failed : %s \n" , errorHandle.text );
 		return NULL;
-	
 	}
-	activityDataJSON = json_array_get(tempJsonHandle, 0);
-	if(!json_is_object(activityDataJSON))
+	activityDataJSON = json_array_get( tempJsonHandle , 0 );
+	if( !json_is_object( activityDataJSON ) )
 	{
-		fprintf(stderr,"json_object_get failed, didn't get an object\n");
-		json_decref(tempJsonHandle);
+		fprintf( stderr , "json_object_get failed, didn't get an object\n" );
+		json_decref( tempJsonHandle );
 		return NULL;
-	
 	}
-	
-	temp->activityID = json_integer_value(json_object_get(activityDataJSON, "ACTIVITY_ID"));
-	questionFile = miscIDToFilePath(temp->activityID, filename);
+	temp->activityID = json_integer_value( json_object_get( activityDataJSON , "ACTIVITY_ID" ) );
+	questionFile = miscIDToFilePath( temp->activityID , filename );
 	
 	if(!questionFile)
 	{
-		fprintf(stderr, "loadActivity has failed : %s", strerror(errno));
+		fprintf( stderr , "loadActivity has failed : %s" , strerror( errno ) );
 		*success = FAIL;
 		return NULL;
-	
 	}
-	temp->questions = loadQuestions(questionFile, &wasSuccess);
-	temp->maximumMark = json_integer_value(json_object_get(activityDataJSON, "MAXIMUM_MARK"));
-	temp->title = (char *) json_string_value(json_object_get(activityDataJSON, "TITLE"));
-	if(wasSuccess == FAIL)
+	temp->questions = loadQuestions( questionFile , &wasSuccess );
+	temp->maximumMark = json_integer_value( json_object_get( activityDataJSON , "MAXIMUM_MARK" ) );
+	temp->title = (char *) json_string_value( json_object_get( activityDataJSON,  "TITLE" ) );
+	if( wasSuccess == FAIL )
 	{
-		fprintf(stderr, "loadActivity has failed : %s", strerror(errno));
+		fprintf( stderr , "loadActivity has failed : %s" , strerror(errno) );
 		*success = FAIL;
 		return NULL;
-	
 	}
-	
 	return temp;
-
 }
 /*
 	activityData *loadActivity(char *filename, int *success):
 	Used to load a quoteListData structures
 
 */
-quoteListData *loadQuoteListData(char *filename, int *success)
+quoteListData *loadQuoteListData( char *filename , int *success )
 {
-	fprintf(stderr, "Loading quoteList from %s....\n", filename);
-	char *quoteListDataFile, pathToLoad[MAX_TEXT_OUTPUT], *quoteFile;
+	fprintf( stderr , "Loading quoteList from %s....\n", filename );
+	char *quoteListDataFile, pathToLoad[MAX_TEXT_OUTPUT] , *quoteFile ;
 	int wasSuccess = SUCCESS;
-	json_t *tempJsonHandle, *quoteListDataJSON;
+	json_t *tempJsonHandle , *quoteListDataJSON;
 	json_error_t errorHandle;
-	quoteListData *temp = malloc(sizeof(quoteListData));
-	if(!temp)
+	
+	quoteListData *temp = malloc( sizeof( quoteListData ) );
+	if( !temp )
 	{
-		fprintf(stderr, "malloc has failed on quoteListData : %s", strerror(errno));
+		fprintf( stderr , "malloc has failed on quoteListData : %s" , strerror( errno ) );
 		*success = FAIL;
 		return NULL;
-	
-	
 	}
-	snprintf(pathToLoad, MAX_TEXT_OUTPUT, "%s%s", filename, QUOTELIST_FILE);
-	quoteListDataFile = loadTextFile(pathToLoad, &wasSuccess);
-	tempJsonHandle = json_loads(quoteListDataFile,0, &errorHandle);
+	snprintf( pathToLoad , MAX_TEXT_OUTPUT , "%s%s", filename , QUOTELIST_FILE );
+	quoteListDataFile = loadTextFile( pathToLoad , &wasSuccess );
+	tempJsonHandle = json_loads( quoteListDataFile , 0 , &errorHandle );
 	
-	if(!tempJsonHandle)
+	if( !tempJsonHandle )
 	{
-		fprintf(stderr, "json_loads has failed : %s \n", errorHandle.text);
+		fprintf( stderr , "json_loads has failed : %s \n" , errorHandle.text );
 		return NULL;
-	
 	}
-	quoteListDataJSON = json_array_get(tempJsonHandle, 0);
-	if(!json_is_object(quoteListDataJSON))
+	quoteListDataJSON = json_array_get( tempJsonHandle , 0 );
+	if( !json_is_object(quoteListDataJSON ) )
 	{
-		fprintf(stderr,"json_object_get failed, didn't get an object\n");
-		json_decref(tempJsonHandle);
+		fprintf( stderr , "json_object_get failed, didn't get an object\n" );
+		json_decref( tempJsonHandle );
 		return NULL;
-	
 	}
 	
-	temp->quoteID = json_integer_value(json_object_get(quoteListDataJSON, "QUOTELIST_ID"));
-	quoteFile = miscIDToFilePath(temp->quoteID, filename);
+	temp->quoteID = json_integer_value( json_object_get( quoteListDataJSON , "QUOTELIST_ID" ) );
+	quoteFile = miscIDToFilePath( temp->quoteID , filename );
 	
-	if(!quoteFile)
+	if( !quoteFile )
 	{
-		fprintf(stderr, "loadQuoteListData has failed : %s", strerror(errno));
+		fprintf( stderr , "loadQuoteListData has failed : %s" , strerror(errno) );
 		*success = FAIL;
 		return NULL;
-	
 	}
-	temp->quotes = loadQuotes(quoteFile, &wasSuccess);
-	if(wasSuccess == FAIL)
+	temp->quotes = loadQuotes( quoteFile , &wasSuccess );
+	if( wasSuccess == FAIL )
 	{
-		fprintf(stderr, "loadQuoteListData has failed : %s", strerror(errno));
+		fprintf( stderr , "loadQuoteListData has failed : %s" , strerror( errno ) );
 		*success = FAIL;
 		return NULL;
-	
 	}
-	
 	return temp;
 }
 /*
@@ -647,50 +602,47 @@ quoteListData *loadQuoteListData(char *filename, int *success)
 	Used to load tiles for maps
 
 */
-tileData **loadTileData(char *tileFile, int *success)
+tileData **loadTileData( char *tileFile , int *success )
 {
-	fprintf(stderr, "Loading a tilemap from %s....\n", tileFile);
-	char *tileDataFile = loadTextFile(tileFile, success);
+	fprintf( stderr , "Loading a tilemap from %s....\n" , tileFile );
+	char *tileDataFile = loadTextFile( tileFile , success );
 	tileData **temp;
 	json_t *tempJsonHandle, *tileDataJSON;
 	json_error_t errorHandle;
 	int numberOfTiles, i;
 	
-	tempJsonHandle = json_loads(tileDataFile,0, &errorHandle);
-	if(!tempJsonHandle)
+	tempJsonHandle = json_loads( tileDataFile , 0 , &errorHandle );
+	if( !tempJsonHandle )
 	{
-		fprintf(stderr, "json_loads has failed on %s: %s \n", tileFile, errorHandle.text);
+		fprintf( stderr , "json_loads has failed on %s: %s \n" , tileFile , errorHandle.text );
 		*success = FAIL;
 		return temp;
-	
 	}
 	
-	tileDataJSON = json_array_get(tempJsonHandle, 0);
-	if(!json_is_object(tileDataJSON))
+	tileDataJSON = json_array_get( tempJsonHandle , 0 );
+	if( !json_is_object( tileDataJSON ) ) 
 	{
-		fprintf(stderr,"json_object_get failed, didn't get an object\n");
+		fprintf( stderr , "json_object_get failed, didn't get an object\n" );
 		*success = FAIL;
-		json_decref(tempJsonHandle);
+		json_decref( tempJsonHandle );
 		return temp;
-	
 	}
-	numberOfTiles = json_integer_value(json_object_get(tileDataJSON,"NO_TILES"));
+	numberOfTiles = json_integer_value( json_object_get( tileDataJSON , "NO_TILES" ) );
 	
-	temp = malloc(sizeof(tileData *) * numberOfTiles);
-	for(i = 0; i < numberOfTiles; i++)
+	temp = malloc( sizeof( tileData * ) * numberOfTiles );
+	for( i = 0 ; i < numberOfTiles ; i++ )
 	{
-		temp[i] = malloc(sizeof(tileData));
-		tileDataJSON = json_array_get(tempJsonHandle, i);
-		if(!json_is_object(tileDataJSON))
+		temp[i] = malloc( sizeof( tileData ) );
+		tileDataJSON = json_array_get( tempJsonHandle , i );
+		if( !json_is_object( tileDataJSON ) )
 		{
-			fprintf(stderr,"json_object_get failed, didn't get an object\n");
+			fprintf( stderr ,"json_object_get failed, didn't get an object\n" );
 			*success = FAIL;
-			json_decref(tempJsonHandle);
+			json_decref( tempJsonHandle );
 			return temp;
-	
 		}
-		temp[i]->spriteDimensions.x = (json_integer_value(json_object_get(tileDataJSON,"SPRITE_XPOS")) - 1) * TILE_WIDTH * 2;
-		temp[i]->spriteDimensions.y = (json_integer_value(json_object_get(tileDataJSON,"SPRITE_YPOS")) - 1 )* TILE_HEIGHT * 2;
+		temp[i]->spriteDimensions.x = ( json_integer_value( json_object_get(tileDataJSON,"SPRITE_XPOS")) - 1) * TILE_WIDTH * 2;
+		temp[i]->spriteDimensions.y = ( json_integer_value( json_object_get(tileDataJSON,"SPRITE_YPOS")) - 1 )* TILE_HEIGHT * 2;
 		temp[i]->spriteDimensions.w = TILE_WIDTH * 2;//the sprites are stored in 128x128 format, but will be displayed in 64x64
 		temp[i]->spriteDimensions.h = TILE_HEIGHT * 2;
 		temp[i]->dimensions.h = TILE_HEIGHT;
