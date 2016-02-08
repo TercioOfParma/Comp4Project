@@ -647,14 +647,14 @@ tileData **loadTileData( char *tileFile , int *success )
 		temp[i]->spriteDimensions.h = TILE_HEIGHT * 2;
 		temp[i]->dimensions.h = TILE_HEIGHT;
 		temp[i]->dimensions.w = TILE_WIDTH;
-		temp[i]->relativeX = json_integer_value(json_object_get(tileDataJSON,"RELATIVE_XPOS"));//This is useful for movement and such
-		temp[i]->relativeY = json_integer_value(json_object_get(tileDataJSON,"RELATIVE_YPOS"));
+		temp[i]->relativeX = json_integer_value(json_object_get( tileDataJSON , "RELATIVE_XPOS" ) );//This is useful for movement and such
+		temp[i]->relativeY = json_integer_value(json_object_get( tileDataJSON , "RELATIVE_YPOS" ) );
 		temp[i]->dimensions.x = temp[i]->relativeX * TILE_WIDTH + STARTX_MAP;
 		temp[i]->dimensions.y = temp[i]->relativeY * TILE_HEIGHT + STARTY_MAP;
-		temp[i]->civilianPopulation = json_integer_value(json_object_get(tileDataJSON,"CIVILIAN_POPULATION"));
-		temp[i]->terrainType = json_integer_value(json_object_get(tileDataJSON,"TERRAIN_TYPE"));
-		temp[i]->tileID = json_integer_value(json_object_get(tileDataJSON,"TILE_ID"));
-		temp[i]->angle = json_real_value(json_object_get(tileDataJSON,"ANGLE"));
+		temp[i]->civilianPopulation = json_integer_value( json_object_get( tileDataJSON , "CIVILIAN_POPULATION" ) );
+		temp[i]->terrainType = json_integer_value( json_object_get( tileDataJSON , "TERRAIN_TYPE" ) );
+		temp[i]->tileID = json_integer_value( json_object_get( tileDataJSON , "TILE_ID" ) );
+		temp[i]->angle = json_real_value( json_object_get( tileDataJSON , "ANGLE" ) );
 		temp[i]->isSelected = FALSE;
 	}
 	temp[0]->noTiles = numberOfTiles;
@@ -667,75 +667,71 @@ tileData **loadTileData( char *tileFile , int *success )
 	Used to load a unit from a unitFile based on the Unit's position in the unit file
 
 */
-unitData *loadUnit(char *unitFile, int ID, int *success)
+unitData *loadUnit( char *unitFile , int ID , int *success )
 {
-	fprintf(stderr, "Loading unit ID %d....\n", ID);
+	fprintf( stderr , "Loading unit ID %d....\n" , ID );
 	int i, loadedUnitID, found, numberOfUnits;
 	json_t *tempJsonHandle, *unitDataJSON;
 	json_error_t errorHandle;
-	unitData *temp = malloc(sizeof(unitData));
-	if(!temp)
+	unitData *temp = malloc( sizeof( unitData ) );
+	if( !temp )
 	{
-		fprintf(stderr, "Malloc has failed on loadUnit : %s \n", strerror(errno));
+		fprintf( stderr , "Malloc has failed on loadUnit : %s \n" , strerror( errno ) );
 		*success = FAIL;
 		return NULL;
 	}
 	found = FAIL;
-	tempJsonHandle = json_loads(unitFile,0, &errorHandle);
-	if(!tempJsonHandle)
+	tempJsonHandle = json_loads( unitFile , 0 , &errorHandle );
+	if( !tempJsonHandle )
 	{
-		fprintf(stderr, "json_loads has failed on %s: %s \n", unitFile, errorHandle.text);
+		fprintf( stderr , "json_loads has failed on %s: %s \n" , unitFile , errorHandle.text );
 		*success = FAIL;
 		return temp;
-	
 	}
-	unitDataJSON = json_array_get(tempJsonHandle, 0);
-	if(!json_is_object(unitDataJSON))
+	unitDataJSON = json_array_get( tempJsonHandle , 0 );
+	if( !json_is_object( unitDataJSON ) )
 	{
-		fprintf(stderr,"json_object_get failed, didn't get an object\n");
+		fprintf( stderr , "json_object_get failed, didn't get an object\n" );
 		*success = FAIL;
-		json_decref(tempJsonHandle);
+		json_decref( tempJsonHandle );
 		return temp;
-		
 	}
-	numberOfUnits = json_integer_value(json_object_get(unitDataJSON, "NO_UNITS"));
-	for(i = 0; i < numberOfUnits; i++)//linear search is used here as N (or size) will be quite low (<50) although a hard coded limit is illogical as it could limit teaching potential of military capabilities
+	numberOfUnits = json_integer_value( json_object_get( unitDataJSON , "NO_UNITS" ) );
+	for( i = 0 ; i < numberOfUnits ; i++ )//linear search is used here as N (or size) will be quite low (<50) although a hard coded limit is illogical as it could limit teaching potential of military capabilities
 	{
-		unitDataJSON = json_array_get(tempJsonHandle, ID);
-		if(!json_is_object(unitDataJSON))
+		unitDataJSON = json_array_get( tempJsonHandle , ID );
+		if( !json_is_object( unitDataJSON ) )
 		{
-			fprintf(stderr,"json_object_get failed, didn't get an object\n");
+			fprintf( stderr , "json_object_get failed, didn't get an object\n" );
 			*success = FAIL;
-			json_decref(tempJsonHandle);
+			json_decref( tempJsonHandle );
 			return temp;
-		
 		}
-		loadedUnitID = json_integer_value(json_object_get(unitDataJSON, "ID"));
-		if(loadedUnitID == ID)
+		loadedUnitID = json_integer_value( json_object_get( unitDataJSON , "ID" ) );
+		if( loadedUnitID == ID )
 		{
 			found = SUCCESS;
 			break;
-		
 		}
 	}
-	if(found == FAIL)
+	if( found == FAIL )
 	{
-		fprintf(stderr, "loadUnit has failed, ID %d doesn't exist", ID);
+		fprintf( stderr , "loadUnit has failed, ID %d doesn't exist" , ID );
 		*success = FAIL;
 		return NULL;
 	}
 	
 	temp->unitID = loadedUnitID;
-	temp->movement = json_integer_value(json_object_get(unitDataJSON, "MOVEMENT"));
-	temp->aPRange = json_integer_value(json_object_get(unitDataJSON, "ANTI_PERSONNEL_RANGE"));
-	temp->aPAttacks = json_integer_value(json_object_get(unitDataJSON, "ANTI_PERSONNEL_DICE"));
-	temp->aTRange = json_integer_value(json_object_get(unitDataJSON, "ANTI_VEHICLE_RANGE"));
-	temp->aTAttacks = json_integer_value(json_object_get(unitDataJSON, "ANTI_VEHICLE_DICE"));
-	temp->unitType = json_integer_value(json_object_get(unitDataJSON, "UNIT_TYPE"));
-	temp->wounds = json_integer_value(json_object_get(unitDataJSON, "WOUNDS"));
-	temp->save = json_integer_value(json_object_get(unitDataJSON, "SAVE"));
+	temp->movement = json_integer_value( json_object_get( unitDataJSON , "MOVEMENT" ) );
+	temp->aPRange = json_integer_value( json_object_get( unitDataJSON , "ANTI_PERSONNEL_RANGE" ) );
+	temp->aPAttacks = json_integer_value( json_object_get( unitDataJSON , "ANTI_PERSONNEL_DICE" ) );
+	temp->aTRange = json_integer_value( json_object_get( unitDataJSON , "ANTI_VEHICLE_RANGE" ) );
+	temp->aTAttacks = json_integer_value( json_object_get( unitDataJSON , "ANTI_VEHICLE_DICE" ) );
+	temp->unitType = json_integer_value( json_object_get( unitDataJSON , "UNIT_TYPE" ) );
+	temp->wounds = json_integer_value( json_object_get( unitDataJSON , "WOUNDS" ) );
+	temp->save = json_integer_value( json_object_get( unitDataJSON , "SAVE" ) );
 	temp->coverSave = DEFAULT_COVER_SAVE;
-	temp->morale = json_integer_value(json_object_get(unitDataJSON, "MORALE"));
+	temp->morale = json_integer_value( json_object_get( unitDataJSON , "MORALE"));
 	temp->spriteDimensions.x = json_integer_value(json_object_get(unitDataJSON, "SPRITE_XPOS")) * TILE_WIDTH * 2;//loads the positions of the sprite 
 	temp->spriteDimensions.y = json_integer_value(json_object_get(unitDataJSON, "SPRITE_YPOS")) * TILE_HEIGHT * 2;
 	temp->spriteDimensions.w = TILE_WIDTH * 2;
