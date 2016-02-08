@@ -1,6 +1,7 @@
 /*
 	FILE : MAIN.C
-	PURPOSE : To contain the main function
+	PURPOSE : To contain the main function. This is to initialise the runtime objects, set up the libraries and to run the 
+	simulations + activities
 	VERSION : 0.001
 	NOTES: It works!
 */
@@ -19,7 +20,7 @@
 
 */
 
-int main(int argc, char *argv[])
+int main( int argc , char *argv[] )
 {
 	
 	//------------------------------------------------- VARIABLE DECLARATIONS -----------------------------------
@@ -46,23 +47,23 @@ int main(int argc, char *argv[])
 	SDL_Rect placeHolder;
 	Mix_Music *soundtrack;
 	//------------------------------------------------ INITIALISATION -------------------------------------------
-	errorRedirection = freopen(LOG_FILE, "w", stderr);//According to the documentation I have read, it isn't an issue on windows stderr isn't a file, and so this evades the race condition issue
-	fprintf(stderr, "Main function....\n");
-	optionsFile = loadTextFile(OPTIONS_FILE, &success);
-	options = initOptions(optionsFile,&success);
-	wind = initSDL(&options, &success);
-	render = createRenderer(wind, &success);
-	font = loadFont(&options, &success);
-	soundtrack = loadMusic("audio/soundtrack.ogg", &success);
+	errorRedirection = freopen( LOG_FILE , "w" , stderr );//According to the documentation I have read, it isn't an issue on windows stderr isn't a file, and so this evades the race condition issue
+	fprintf( stderr , "Main function....\n" );
+	optionsFile = loadTextFile( OPTIONS_FILE , &success );
+	options = initOptions( optionsFile , &success );
+	wind = initSDL( &options , &success );
+	render = createRenderer( wind , &success );
+	font = loadFont( &options , &success );
+	soundtrack = loadMusic( "audio/soundtrack.ogg" , &success );
 	//use below here for testing
-	startButton = loadImage(STARTBUTTON_PATH, render, &placeHolder, &success);
-	quitButton = loadImage(QUITBUTTON_PATH, render, &placeHolder, &success);
-	nextTurnButton = loadImage(NEXTTURNBUTTON_PATH, render, &placeHolder, &success);
-	blankButton = loadImage(BLANKBUTTON_PATH, render, &placeHolder, &success);
-	test = loadLevelData(render, &success);//buttonData *loadButton(SDL_Texture *display, SDL_Rect *posAndSize, int type, int *success)
-	frontButtons = malloc(sizeof(buttonData *) * 2);
-	frontButtons[0] = loadButton(startButton, &placeHolder, START_BUTTON_TYPE, &success);
-	frontButtons[1] = loadButton(quitButton, &placeHolder, QUIT_BUTTON_TYPE, &success);
+	startButton = loadImage( STARTBUTTON_PATH , render , &placeHolder , &success );
+	quitButton = loadImage( QUITBUTTON_PATH , render , &placeHolder , &success );
+	nextTurnButton = loadImage( NEXTTURNBUTTON_PATH , render , &placeHolder , &success );
+	blankButton = loadImage( BLANKBUTTON_PATH , render , &placeHolder , &success );
+	test = loadLevelData( render , &success );//buttonData *loadButton(SDL_Texture *display, SDL_Rect *posAndSize, int type, int *success)
+	frontButtons = malloc( sizeof( buttonData * ) * 2 );
+	frontButtons[0] = loadButton( startButton , &placeHolder , START_BUTTON_TYPE , &success );
+	frontButtons[1] = loadButton( quitButton , &placeHolder , QUIT_BUTTON_TYPE , &success );
 	frontButtons[0]->dimensions.x = 100;
 	frontButtons[0]->dimensions.y = 100;
 	frontButtons[1]->dimensions.x = 100;
@@ -70,48 +71,48 @@ int main(int argc, char *argv[])
 	placeHolder.x = 10;
 	placeHolder.y = 10;
 	
-	turnButton = malloc(sizeof(buttonData *));
-	turnButton[0] = loadButton(nextTurnButton, &placeHolder, END_TURN_BUTTON, &success);
+	turnButton = malloc( sizeof( buttonData * ) );
+	turnButton[0] = loadButton( nextTurnButton , &placeHolder , END_TURN_BUTTON , &success );
 	buttonValuePrimary = 0;
 	placeHolder.x = 500;
 	placeHolder.y = 100;
-	secondaryButtons = malloc(sizeof(buttonDataText *) * test->noLevels);
+	secondaryButtons = malloc( sizeof( buttonDataText * ) * test->noLevels );
 	buttonValueSecondary = NO_BUTTON_SECONDARY;
-	Mix_PlayMusic(soundtrack, -1);
-	for(i = 0; i <  test->noLevels; i++)
+	Mix_PlayMusic( soundtrack , -1 );
+	for( i = 0 ; i <  test->noLevels ; i++ )
 	{
-		placeHolder.y += 40;
-		secondaryButtons[i] = loadButtonText(blankButton, &placeHolder, render, test->maps[i]->title, font, i, &success);
+		placeHolder.y += 40 ;
+		secondaryButtons[i] = loadButtonText( blankButton , &placeHolder , render , test->maps[i]->title , font , i , &success );
 	}
 	//------------------------------------------------ MAIN LOOP ------------------------------------------------
-	while(success != FAIL)
+	while( success != FAIL )
 	{
-		SDL_RenderClear(render);
-		if(buttonValuePrimary != START_BUTTON_TYPE)
+		SDL_RenderClear( render );
+		if( buttonValuePrimary != START_BUTTON_TYPE )
 		{
-			buttonValuePrimary = handleMouseButtonMainMenu(frontButtons, 2, render, &eventHandle);
+			buttonValuePrimary = handleMouseButtonMainMenu( frontButtons , 2 , render , &eventHandle );
 		}
-		if(buttonValuePrimary == START_BUTTON_TYPE && buttonValueSecondary == NO_BUTTON_SECONDARY )
+		if( buttonValuePrimary == START_BUTTON_TYPE && buttonValueSecondary == NO_BUTTON_SECONDARY )
 		{
-			buttonValueSecondary = handleMouseButtonSelectionMenu(secondaryButtons, test->noLevels, render, &eventHandle);
+			buttonValueSecondary = handleMouseButtonSelectionMenu( secondaryButtons , test->noLevels ,
+			render , &eventHandle );
 		}
-		else if(buttonValuePrimary == START_BUTTON_TYPE && buttonValueSecondary != NO_BUTTON_SECONDARY)
+		else if( buttonValuePrimary == START_BUTTON_TYPE && buttonValueSecondary != NO_BUTTON_SECONDARY )
 		{
-			simulationMain(test->maps[buttonValueSecondary],render, font, turnButton, &eventHandle, &success);
-			if(success != FAIL)
+			simulationMain( test->maps[ buttonValueSecondary ] , render , font , turnButton , &eventHandle , &success );
+			if( success != FAIL )
 			{
-				quizTerminated = startQuiz(test->maps[buttonValueSecondary]->activity, render, font, &eventHandle, &success);
+				quizTerminated = startQuiz( test->maps[ buttonValueSecondary ]->activity , render , font , &eventHandle , &success );
 			}
 		}
-		if(eventHandle.type == SDL_QUIT || quizTerminated == 0 || buttonValuePrimary == QUIT_BUTTON_TYPE)
+		if( eventHandle.type == SDL_QUIT || quizTerminated == 0 || buttonValuePrimary == QUIT_BUTTON_TYPE )
 		{
 				success = FAIL;
-			
 		}
-		SDL_RenderPresent(render);
+		SDL_RenderPresent( render );
 	}
 	//------------------------------------------------ DEINITIALISATION -----------------------------------------
-	endLevel(test);
-	endSDL(render, wind,font);
+	endLevel( test );
+	endSDL( render , wind , font );
 	return 0;
 }
