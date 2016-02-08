@@ -533,10 +533,10 @@ activityData *loadActivity( char *filename , int *success )
 	}
 	temp->questions = loadQuestions( questionFile , &wasSuccess );
 	temp->maximumMark = json_integer_value( json_object_get( activityDataJSON , "MAXIMUM_MARK" ) );
-	temp->title = (char *) json_string_value( json_object_get( activityDataJSON,  "TITLE" ) );
+	temp->title = (char *) json_string_value( json_object_get( activityDataJSON ,  "TITLE" ) );
 	if( wasSuccess == FAIL )
 	{
-		fprintf( stderr , "loadActivity has failed : %s" , strerror(errno) );
+		fprintf( stderr , "loadActivity has failed : %s" , strerror( errno ) );
 		*success = FAIL;
 		return NULL;
 	}
@@ -550,7 +550,7 @@ activityData *loadActivity( char *filename , int *success )
 quoteListData *loadQuoteListData( char *filename , int *success )
 {
 	fprintf( stderr , "Loading quoteList from %s....\n", filename );
-	char *quoteListDataFile, pathToLoad[MAX_TEXT_OUTPUT] , *quoteFile ;
+	char *quoteListDataFile, pathToLoad[ MAX_TEXT_OUTPUT ] , *quoteFile ;
 	int wasSuccess = SUCCESS;
 	json_t *tempJsonHandle , *quoteListDataJSON;
 	json_error_t errorHandle;
@@ -731,23 +731,22 @@ unitData *loadUnit( char *unitFile , int ID , int *success )
 	temp->wounds = json_integer_value( json_object_get( unitDataJSON , "WOUNDS" ) );
 	temp->save = json_integer_value( json_object_get( unitDataJSON , "SAVE" ) );
 	temp->coverSave = DEFAULT_COVER_SAVE;
-	temp->morale = json_integer_value( json_object_get( unitDataJSON , "MORALE"));
-	temp->spriteDimensions.x = json_integer_value(json_object_get(unitDataJSON, "SPRITE_XPOS")) * TILE_WIDTH * 2;//loads the positions of the sprite 
-	temp->spriteDimensions.y = json_integer_value(json_object_get(unitDataJSON, "SPRITE_YPOS")) * TILE_HEIGHT * 2;
+	temp->morale = json_integer_value( json_object_get( unitDataJSON , "MORALE" ) );
+	temp->spriteDimensions.x = json_integer_value( json_object_get( unitDataJSON , "SPRITE_XPOS" ) ) * TILE_WIDTH * 2;//loads the positions of the sprite 
+	temp->spriteDimensions.y = json_integer_value( json_object_get( unitDataJSON , "SPRITE_YPOS" ) ) * TILE_HEIGHT * 2;
 	temp->spriteDimensions.w = TILE_WIDTH * 2;
 	temp->spriteDimensions.h = TILE_HEIGHT * 2;
 	temp->dimensions.w = TILE_WIDTH;
 	temp->dimensions.h = TILE_HEIGHT;
 	temp->alive = TRUE;
-	temp->name = (char *) json_string_value(json_object_get(unitDataJSON, "NAME"));
-	temp->description = (char *) json_string_value(json_object_get(unitDataJSON, "DESCRIPTION"));
+	temp->name = (char *) json_string_value( json_object_get( unitDataJSON , "NAME" ) );
+	temp->description = (char *) json_string_value( json_object_get( unitDataJSON , "DESCRIPTION" ) );
 	temp->selected = FALSE;
-	fprintf(stderr, "Got a unit called %s\n", temp->name);
-	for(i = 0; i < SIZE_OF_MODIFIERS; i++)
+	fprintf( stderr , "Got a unit called %s\n" , temp->name );
+	for( i = 0 ; i < SIZE_OF_MODIFIERS ; i++ )
 	{
 		temp->modifiers[i] = FALSE;
 	}
-	
 	return temp;
 }
 /*
@@ -755,9 +754,9 @@ unitData *loadUnit( char *unitFile , int ID , int *success )
 	Used to load all the units with the assistance of the above helper function
 
 */
-unitData **loadUnitData(char *sideUnitDataFilePath, char *unitDescriptorDataFilePath, int *success)
+unitData **loadUnitData( char *sideUnitDataFilePath , char *unitDescriptorDataFilePath , int *success )
 {
-	fprintf(stderr, "Loading unit Data from %s using the descriptor file %s....\n", sideUnitDataFilePath, unitDescriptorDataFilePath);
+	fprintf( stderr , "Loading unit Data from %s using the descriptor file %s....\n" , sideUnitDataFilePath , unitDescriptorDataFilePath );
 	unitData **temp;
 	json_t *tempJsonHandle, *unitDataJSON;
 	json_error_t errorHandle;
