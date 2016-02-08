@@ -761,47 +761,45 @@ unitData **loadUnitData( char *sideUnitDataFilePath , char *unitDescriptorDataFi
 	json_t *tempJsonHandle, *unitDataJSON;
 	json_error_t errorHandle;
 	int i, numberOfUnits, unitID;
-	char *sideUnitDataFile = loadTextFile(sideUnitDataFilePath, success);
-	char *overallUnitDataFile = loadTextFile(unitDescriptorDataFilePath, success);
-	tempJsonHandle = json_loads(sideUnitDataFile,0, &errorHandle);
-	if(!tempJsonHandle)
+	char *sideUnitDataFile = loadTextFile( sideUnitDataFilePath , success );
+	char *overallUnitDataFile = loadTextFile( unitDescriptorDataFilePath , success );
+	tempJsonHandle = json_loads( sideUnitDataFile , 0 , &errorHandle );
+	if( !tempJsonHandle )
 	{
-		fprintf(stderr, "json_loads has failed on %s: %s \n", sideUnitDataFile, errorHandle.text);
+		fprintf( stderr , "json_loads has failed on %s: %s \n" , sideUnitDataFile , errorHandle.text );
 		*success = FAIL;
 		return temp;
-	
 	}
-	unitDataJSON = json_array_get(tempJsonHandle, 0);
-	if(!json_is_object(unitDataJSON))
+	unitDataJSON = json_array_get( tempJsonHandle , 0 );
+	if( !json_is_object( unitDataJSON ) ) 
 	{
-		fprintf(stderr,"json_object_get failed, didn't get an object\n");
+		fprintf( stderr , "json_object_get failed, didn't get an object\n" );
 		*success = FAIL;
-		json_decref(tempJsonHandle);
+		json_decref( tempJsonHandle );
 		return temp;//I.E. NULL	
 	}
-	numberOfUnits = json_integer_value(json_object_get(unitDataJSON, "NUMBER_UNITS")) + 1;
-	temp = malloc(sizeof(unitData *) * numberOfUnits);
-	if(!temp)
+	numberOfUnits = json_integer_value( json_object_get( unitDataJSON , "NUMBER_UNITS" ) ) + 1;
+	temp = malloc( sizeof( unitData * ) * numberOfUnits );
+	if( !temp )
 	{
-		fprintf(stderr, "malloc has failed in loadUnitData : %s \n", strerror(errno));
+		fprintf( stderr , "malloc has failed in loadUnitData : %s \n" , strerror( errno ) );
 		*success = FAIL;
 		return NULL;
 	}
-	for(i = 1; i < numberOfUnits; i++)
+	for( i = 1 ; i < numberOfUnits ; i++ )
 	{
-		unitDataJSON = json_array_get(tempJsonHandle, i);
-		if(!json_is_object(unitDataJSON))
+		unitDataJSON = json_array_get( tempJsonHandle , i );
+		if( !json_is_object( unitDataJSON ) )
 		{
-			fprintf(stderr,"json_object_get failed, didn't get an object\n");
+			fprintf( stderr , "json_object_get failed, didn't get an object\n" );
 			*success = FAIL;
-			json_decref(tempJsonHandle);
+			json_decref( tempJsonHandle );
 			return temp;
-		
 		}
-		unitID = json_integer_value(json_object_get(unitDataJSON, "UNIT_ID"));
-		temp[i] = loadUnit(overallUnitDataFile, unitID,success);
-		temp[i]->relativeX = json_integer_value(json_object_get(unitDataJSON, "RELATIVE_XPOS"));
-		temp[i]->relativeY = json_integer_value(json_object_get(unitDataJSON, "RELATIVE_YPOS"));
+		unitID = json_integer_value( json_object_get( unitDataJSON , "UNIT_ID" ) );
+		temp[i] = loadUnit( overallUnitDataFile , unitID , success );
+		temp[i]->relativeX = json_integer_value( json_object_get( unitDataJSON , "RELATIVE_XPOS" ) );
+		temp[i]->relativeY = json_integer_value( json_object_get( unitDataJSON , "RELATIVE_YPOS" ) );
 		temp[i]->dimensions.x = temp[i]->relativeX * TILE_WIDTH + STARTX_MAP;
 		temp[i]->dimensions.y = temp[i]->relativeY * TILE_HEIGHT + STARTY_MAP;
 	}
@@ -813,64 +811,57 @@ unitData **loadUnitData( char *sideUnitDataFilePath , char *unitDescriptorDataFi
 	Loads a side in the scenario
 
 */
-sideData *loadSideData(char *filename,int sideNumber, int *success)
+sideData *loadSideData( char *filename , int sideNumber , int *success )
 {
-	fprintf(stderr, "Loading a side from %s....\n", filename);
-	char *sideDataFile, *sideUnitPath, pathToLoad[MAX_TEXT_OUTPUT];
+	fprintf( stderr , "Loading a side from %s....\n" , filename );
+	char *sideDataFile, *sideUnitPath, pathToLoad[ MAX_TEXT_OUTPUT ];
 	int sideID;
 	sideData *temp;
 	json_t *tempJsonHandle, *sideDataJSON;
 	json_error_t errorHandle;
-	if(sideNumber > 1 && sideNumber < 0)
+	if( sideNumber > 1 && sideNumber < 0 )
 	{
-		fprintf(stderr, "sideNumber Not valid\n");
+		fprintf( stderr , "sideNumber Not valid\n" );
 		*success = FAIL;
 		return NULL;
 	}
-
-	temp = malloc(sizeof(sideData));
-	if(!temp)
+	temp = malloc( sizeof( sideData ) );
+	if( !temp )
 	{
-		fprintf(stderr, "malloc has failed in loadSideData, %s \n", strerror(errno));
+		fprintf( stderr , "malloc has failed in loadSideData, %s \n" , strerror( errno ) );
 		*success = FAIL;
 		return NULL;
 	}
-	snprintf(pathToLoad, MAX_TEXT_OUTPUT, "%s%s", filename, SIDE_FILES[sideNumber]);
-	sideDataFile = loadTextFile(pathToLoad, success);
-	tempJsonHandle = json_loads(sideDataFile,0, &errorHandle);
-	
-
-	if(!tempJsonHandle)
+	snprintf( pathToLoad , MAX_TEXT_OUTPUT , "%s%s" , filename , SIDE_FILES[ sideNumber ] );
+	sideDataFile = loadTextFile( pathToLoad , success );
+	tempJsonHandle = json_loads( sideDataFile , 0 , &errorHandle );
+	if( !tempJsonHandle )
 	{
-		fprintf(stderr, "json_loads has failed : %s \n", errorHandle.text);
-		*success = FAIL;
-		return NULL;
-	
-	}
-	sideDataJSON = json_array_get(tempJsonHandle, 0);
-	if(!json_is_object(sideDataJSON))
-	{
-		fprintf(stderr,"json_object_get failed, didn't get an object\n");
-		json_decref(tempJsonHandle);
-		*success = FAIL;
-		return NULL;
-	
-	}
-
-	temp->sideID = json_integer_value(json_object_get(sideDataJSON, "SIDE_UNIT_ID"));//This is so we can get 
-	sideUnitPath = miscIDToFilePath(temp->sideID, filename);
-	if(!sideUnitPath)
-	{
-		fprintf(stderr, "Side unit file doesn't exist \n");
+		fprintf( stderr , "json_loads has failed : %s \n" , errorHandle.text );
 		*success = FAIL;
 		return NULL;
 	}
-	snprintf(pathToLoad, MAX_TEXT_OUTPUT, "%s%s", filename, UNIT_FILE);
-	temp->noUnits = json_integer_value(json_object_get(sideDataJSON, "UNIT_NUMBER"));
-	temp->units = loadUnitData(sideUnitPath,pathToLoad , success);
-	temp->xObjective = json_integer_value(json_object_get(sideDataJSON, "OBJECTIVE_XPOS"));
-	temp->yObjective = json_integer_value(json_object_get(sideDataJSON, "OBJECTIVE_YPOS"));
-	
+	sideDataJSON = json_array_get( tempJsonHandle , 0 );
+	if( !json_is_object( sideDataJSON ) )
+	{
+		fprintf( stderr , "json_object_get failed, didn't get an object\n" );
+		json_decref( tempJsonHandle );
+		*success = FAIL;
+		return NULL;
+	}
+	temp->sideID = json_integer_value( json_object_get( sideDataJSON , "SIDE_UNIT_ID" ) );//This is so we can get 
+	sideUnitPath = miscIDToFilePath( temp->sideID , filename );
+	if( !sideUnitPath )
+	{
+		fprintf( stderr , "Side unit file doesn't exist \n" );
+		*success = FAIL;
+		return NULL;
+	}
+	snprintf( pathToLoad , MAX_TEXT_OUTPUT , "%s%s" , filename , UNIT_FILE );
+	temp->noUnits = json_integer_value( json_object_get( sideDataJSON , "UNIT_NUMBER" ) );
+	temp->units = loadUnitData( sideUnitPath , pathToLoad , success );
+	temp->xObjective = json_integer_value( json_object_get( sideDataJSON , "OBJECTIVE_XPOS" ) );
+	temp->yObjective = json_integer_value( json_object_get( sideDataJSON , "OBJECTIVE_YPOS" ) );
 	return temp;
 }
 /*
@@ -878,51 +869,49 @@ sideData *loadSideData(char *filename,int sideNumber, int *success)
 	Loads a map
 
 */
-mapData *loadMapData(char *levelDataFile ,int mapNo, SDL_Renderer *render,int *success)//This doesn't need an ID as all the maps are loaded in sequence
+mapData *loadMapData( char *levelDataFile , int mapNo , SDL_Renderer *render , int *success )//This doesn't need an ID as all the maps are loaded in sequence
 {
-	fprintf(stderr, "Loading map.....\n");
-	mapData *temp = malloc(sizeof(mapData));
+	fprintf( stderr , "Loading map.....\n" );
+	mapData *temp = malloc( sizeof( mapData ) );
 	json_t *tempJsonHandle, *mapDataJSON;
 	json_error_t errorHandle;
 	SDL_Rect placeholder;
-	char tilesetPath[MAX_TEXT_OUTPUT], *mapFileContent, tileFilePath[MAX_TEXT_OUTPUT];
-	if(!temp)
+	char tilesetPath[ MAX_TEXT_OUTPUT ], *mapFileContent, tileFilePath[ MAX_TEXT_OUTPUT ];
+	if( !temp )
 	{
-		fprintf(stderr, "Malloc has failed in loadMapData : %s \n", strerror(errno));
+		fprintf( stderr , "Malloc has failed in loadMapData : %s \n" , strerror( errno ) );
 		*success = FAIL;
 		return NULL;
 	}
-	mapFileContent = loadTextFile(levelDataFile, success);
-	tempJsonHandle = json_loads(mapFileContent,0, &errorHandle);
-	if(!tempJsonHandle)
+	mapFileContent = loadTextFile( levelDataFile , success );
+	tempJsonHandle = json_loads( mapFileContent , 0 , &errorHandle );
+	if( !tempJsonHandle )
 	{
-		fprintf(stderr, "json_loads has failed : %s \n", errorHandle.text);
+		fprintf( stderr , "json_loads has failed : %s \n" , errorHandle.text );
 		*success = FAIL;
 		return NULL;
-	
 	}
-	mapDataJSON = json_array_get(tempJsonHandle, mapNo);
-	if(!json_is_object(mapDataJSON))
+	mapDataJSON = json_array_get( tempJsonHandle , mapNo );
+	if(!json_is_object( mapDataJSON ) )
 	{
-		fprintf(stderr,"json_object_get failed, didn't get an object\n");
-		json_decref(tempJsonHandle);
+		fprintf( stderr , "json_object_get failed, didn't get an object\n" );
+		json_decref( tempJsonHandle );
 		*success = FAIL;
 		return NULL;
-	
 	}
-	temp->mapID = json_integer_value(json_object_get(mapDataJSON, "MAP_ID"));
-	temp->path = mapLevelIDToMapPath(temp->mapID, success);
-	temp->activity = loadActivity(temp->path, success);
-	temp->quoteList = loadQuoteListData(temp->path, success);
-	snprintf(tileFilePath, MAX_TEXT_OUTPUT, "%s%s", temp->path, TILE_FILE);
-	temp->tiles = loadTileData(tileFilePath, success);
-	temp->sides[0] = loadSideData(temp->path, 0, success);
-	temp->sides[1] = loadSideData(temp->path, 1, success);
-	temp->title = (char *) json_string_value(json_object_get(mapDataJSON, "TITLE"));
-	temp->description = (char *) json_string_value(json_object_get(mapDataJSON, "DESCRIPTION"));
-	snprintf(tilesetPath, MAX_TEXT_OUTPUT,"%s%s", temp->path, TILESET_FILE);
-	temp->tileset = loadImage(tilesetPath, render, &placeholder, success);
-	fprintf(stderr, "Map loading done!.....\n");
+	temp->mapID = json_integer_value( json_object_get( mapDataJSON , "MAP_ID" ) );
+	temp->path = mapLevelIDToMapPath( temp->mapID , success );
+	temp->activity = loadActivity( temp->path , success );
+	temp->quoteList = loadQuoteListData( temp->path , success );
+	snprintf( tileFilePath , MAX_TEXT_OUTPUT , "%s%s" , temp->path , TILE_FILE );
+	temp->tiles = loadTileData( tileFilePath , success );
+	temp->sides[0] = loadSideData( temp->path , 0 , success );
+	temp->sides[1] = loadSideData( temp->path , 1 , success );
+	temp->title = (char *) json_string_value( json_object_get( mapDataJSON , "TITLE" ) );
+	temp->description = (char *) json_string_value( json_object_get( mapDataJSON , "DESCRIPTION" ) );
+	snprintf( tilesetPath , MAX_TEXT_OUTPUT , "%s%s" , temp->path , TILESET_FILE );
+	temp->tileset = loadImage( tilesetPath , render , &placeholder , success );
+	fprintf( stderr , "Map loading done!.....\n" );
 	return temp;
 }
 
@@ -932,46 +921,40 @@ mapData *loadMapData(char *levelDataFile ,int mapNo, SDL_Renderer *render,int *s
 
 
 */
-char *mapLevelIDToMapPath(int id, int *success)
+char *mapLevelIDToMapPath( int id , int *success )
 {
-	fprintf(stderr, "Mapping ID to an actual file path in root directory, ID : %d....\n", id);
-	char filePath [MAX_TEXT_OUTPUT];
-	char *mappingFileContents,*mappedPath, stringPath[MAX_TEXT_OUTPUT];
-	json_t *tempJsonHandle, *mappingDataJSON;
+	fprintf( stderr,  "Mapping ID to an actual file path in root directory, ID : %d....\n" , id );
+	char filePath [ MAX_TEXT_OUTPUT ];
+	char *mappingFileContents ,*mappedPath , stringPath[ MAX_TEXT_OUTPUT ];
+	json_t *tempJsonHandle , *mappingDataJSON ;
 	json_error_t errorHandle;
 	int wasSuccess = SUCCESS;
 	
-	mappingFileContents = loadTextFile(MAPPING_FILE_MAPS, &wasSuccess);
+	mappingFileContents = loadTextFile( MAPPING_FILE_MAPS , &wasSuccess );
 	
-	tempJsonHandle = json_loads(mappingFileContents,0, &errorHandle);
-	if(!tempJsonHandle)
+	tempJsonHandle = json_loads( mappingFileContents , 0 , &errorHandle );
+	if( !tempJsonHandle )
 	{
-		fprintf(stderr, "%s", mappingFileContents);
-		fprintf(stderr, "json_loads has failed on %s: %s \n", filePath, errorHandle.text);
+		fprintf( stderr , "%s" , mappingFileContents );
+		fprintf( stderr , "json_loads has failed on %s: %s \n" , filePath , errorHandle.text );
 		return NULL;
-	
+	}
+	mappingDataJSON = json_array_get( tempJsonHandle , 0 );
+	if( !json_is_object( mappingDataJSON ) )
+	{
+		fprintf( stderr , "json_object_get failed, didn't get an object\n" );
+		json_decref( tempJsonHandle );
+		return NULL;
 	}
 	
-	mappingDataJSON = json_array_get(tempJsonHandle, 0);
-	if(!json_is_object(mappingDataJSON))
+	itoa( id , stringPath , 10 );
+	mappedPath = (char *)json_string_value( json_object_get( mappingDataJSON , stringPath ) );
+	if( !mappedPath )
 	{
-		fprintf(stderr,"json_object_get failed, didn't get an object\n");
-		json_decref(tempJsonHandle);
+		fprintf( stderr, "The ID you have requested doesn't exist\n" );
 		return NULL;
-	
 	}
-	
-	itoa(id, stringPath, 10);
-	mappedPath = (char *)json_string_value(json_object_get(mappingDataJSON, stringPath));
-	if(!mappedPath)
-	{
-		fprintf(stderr, "The ID you have requested doesn't exist\n");
-		return NULL;
-	
-	}
-	
 	return mappedPath;
-
 }
 /*
 	levelData *loadLevelData(char *levelFileData, int *success):
@@ -981,37 +964,36 @@ char *mapLevelIDToMapPath(int id, int *success)
 */
 levelData *loadLevelData(SDL_Renderer *render, int *success)
 {
-	fprintf(stderr, "Loading level data.....\n");
-	levelData *temp = malloc(sizeof(levelData));
+	fprintf( stderr , "Loading level data.....\n" );
+	levelData *temp = malloc( sizeof( levelData ) );
 	char *levelFileContents;
 	json_t *tempJsonHandle, *levelDataJSON;
 	json_error_t errorHandle;
 	int noLevels, i;
-	levelFileContents = loadTextFile(LEVELS_FILE, success);
+	levelFileContents = loadTextFile( LEVELS_FILE , success );
 	
-	tempJsonHandle = json_loads(levelFileContents,0, &errorHandle);
-	if(!tempJsonHandle)
+	tempJsonHandle = json_loads( levelFileContents , 0 , &errorHandle );
+	if( !tempJsonHandle )
 	{
-		fprintf(stderr, "%s", levelFileContents);
-		fprintf(stderr, "json_loads has failed on %s: %s \n", LEVELS_FILE, errorHandle.text);
+		fprintf( stderr , "%s" , levelFileContents );
+		fprintf( stderr , "json_loads has failed on %s: %s \n" , LEVELS_FILE , errorHandle.text );
 		return NULL;
 	
 	}
 	
-	levelDataJSON = json_array_get(tempJsonHandle, 0);
-	if(!json_is_object(levelDataJSON))
+	levelDataJSON = json_array_get( tempJsonHandle , 0 );
+	if( !json_is_object( levelDataJSON ) )
 	{
-		fprintf(stderr,"json_object_get failed, didn't get an object\n");
-		json_decref(tempJsonHandle);
+		fprintf( stderr , "json_object_get failed, didn't get an object\n" );
+		json_decref( tempJsonHandle );
 		return NULL;
-	
 	}
-	noLevels = json_integer_value(json_object_get(levelDataJSON, "NO_MAPS"));
+	noLevels = json_integer_value( json_object_get( levelDataJSON , "NO_MAPS" ) );
 	temp->noLevels = noLevels;
-	temp->maps = malloc(sizeof(mapData *) * noLevels);
-	for(i = 0; i < noLevels; i++)
+	temp->maps = malloc( sizeof( mapData * ) * noLevels );
+	for( i = 0 ; i < noLevels ; i++ )
 	{
-		temp->maps[i] = loadMapData((char *) MAP_FILE,i,render,success);
+		temp->maps[i] = loadMapData( ( char * ) MAP_FILE , i , render , success );
 	}
 	return temp;
 
