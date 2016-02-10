@@ -233,6 +233,27 @@ int shootUnit( sideData *shootingSideUnits , int shootingSideNo , sideData *reci
 		}
 		recievingSideUnits->units[ recievingSideNo ]->wounds -= totalHits;
 	}
+	if( aStarResult <= shootingSideUnits->units[ shootingSideNo ]->aTRange &&  recievingSideUnits->units[ recievingSideNo ]->unitType != UNITTYPE_INFANTRY)
+	{
+		shootingSideUnits->units[ shootingSideNo ]->shot = TRUE;
+		for( i = 0 ; i < shootingSideUnits->units[ shootingSideNo ]->aTAttacks ; i++ )
+		{
+			currentHit = rand() % 6 + 1;
+			if( currentHit >= TO_HIT )
+			{
+				currentHit = rand() % 6 + 1;
+				if( currentHit < recievingSideUnits->units[ recievingSideNo ]->save )
+				{
+					currentHit = rand() % 6 + 1;
+					if( currentHit < recievingSideUnits->units[ recievingSideNo ]->coverSave )
+					{
+						totalHits += 1;
+					} 
+				}
+			}
+		}
+		recievingSideUnits->units[ recievingSideNo ]->wounds -= totalHits;
+	}
 	else
 	{
 		fprintf( stdout , "Invalid Shoot!\n" );
