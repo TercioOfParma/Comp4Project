@@ -582,7 +582,7 @@
 		"ID" : 37,
 		"MOVEMENT" : 0,
 		"NAME" : "NVA HMG",
-		"DESCRIPTION" : "North Vietnamese Machinegun Implacement. What do you think it does?",
+		"DESCRIPTION" : "North Vietnamese Machinegun Emplacement. What do you think it does?",
 		"ANTI_PERSONNEL_RANGE" : 100,
 		"ANTI_PERSONNEL_DICE" : 4,
 		"ANTI_TANK_RANGE" : 500,

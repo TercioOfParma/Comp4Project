@@ -202,6 +202,7 @@ void moveUnit( sideData *applicableUnits , tileData **tiles , int xPos , int yPo
 	else
 	{
 		fprintf( stdout , "Invalid Move!\n" );
+		return;
 	}
 	applicableUnits->units[ givenUnit ]->selected = FALSE;
 }
