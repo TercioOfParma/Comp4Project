@@ -9,17 +9,17 @@
 
 
 //----------------------------------- HEADER FILES AND C PREPROCESSOR (MINUS #define)------------------------
-#include < SDL.h >
-#include < SDL_image.h >
-#include < SDL_ttf.h >
-#include < SDL_mixer.h >
-#include < jansson/jansson.h >
-#include < stdio.h >
-#include < stdlib.h >
-#include < math.h >
-#include < fcntl.h >
-#include < unistd.h >
-#include < time.h >
+#include <SDL.h>
+#include <SDL_image.h>
+#include <SDL_ttf.h>
+#include <SDL_mixer.h>
+#include <jansson/jansson.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <time.h>
 //----------------------------------- PROGRAM CONSTANTS --------------------------------------
 #define SIZE_OF_MODIFIERS 6
 #define NO_SIDES 2
@@ -119,6 +119,8 @@ const static int QUIT_BUTTON_TYPE = 2;
 const static int TILE_SELECTED = 10;
 const static int UNIT_SELECTED = 20;
 const static int UNIT_SELECTED_OTHER = 30;
+const static int NULL_INPUT = 12345678;
+const static float CLICK_RATE = 35.0;
 //----------------------------------- STRUTURE DEFINITIONS -----------------------------------
 
 /*
@@ -234,6 +236,7 @@ typedef struct
 {
 	char *quote;
 	char *analysis;
+	int noQuotes;
 	textData *display [ TEXT_DATA_QUOTE ];
 
 }quoteData;
@@ -414,7 +417,7 @@ int handleMouseButtonSelectionMenu( buttonDataText **buttonsText , int size , SD
 
 int handleKeyboardSimulation( SDL_Event *keyboardInput , unitData **units );//DONE
 
-int handleMapClicked( sideData *applicableUnits , sideData *otherSide , tileData **tiles ,  buttonData **endTurn , SDL_Event *events );//DONE
+int handleMapClicked( sideData *applicableUnits , sideData *otherSide , tileData **tiles ,  buttonData **endTurn , SDL_Event *events , int *turnButtonClicked);//DONE
 
 int checkQuestionClicked( SDL_Rect *mouseDimensions , questionData *question , int answerNo );//DONE
 

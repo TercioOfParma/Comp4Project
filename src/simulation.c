@@ -148,7 +148,14 @@ int findDistance( tileData *tileOne , tileData *tileTwo )
 void moveUnit( sideData *applicableUnits , tileData **tiles , int xPos , int yPos , int givenUnit )
 {
 	fprintf( stderr , "Moving unit %d, %s\n" , applicableUnits->units[ givenUnit ]->unitID , applicableUnits->units[ givenUnit ]->name );
-	applicableUnits->units[ givenUnit ]->moved = FALSE;
+	if(applicableUnits->units[ givenUnit ]->moved == TRUE)
+	{
+		fprintf( stdout , "%s has Already moved!\n", applicableUnits->units[ givenUnit ]->name);
+		applicableUnits->units[ givenUnit ]->selected = FALSE;
+		return;
+	
+	}
+	applicableUnits->units[ givenUnit ]->moved = TRUE;
 	int aStarResult;
 	int i, j, k, stuckMove;
 	k = 0;
@@ -174,6 +181,7 @@ void moveUnit( sideData *applicableUnits , tileData **tiles , int xPos , int yPo
 		applicableUnits->units[ givenUnit ]->dimensions.x = applicableUnits->units[ givenUnit ]->relativeX * TILE_WIDTH + STARTX_MAP;
 		applicableUnits->units[ givenUnit ]->dimensions.y = applicableUnits->units[ givenUnit ]->relativeY * TILE_HEIGHT + STARTY_MAP;
 		applicableUnits->units[ givenUnit ]->moved = TRUE;
+		
 		//Cover save stuff
 		while( i != xPos && j != yPos )
 		{
@@ -195,6 +203,7 @@ void moveUnit( sideData *applicableUnits , tileData **tiles , int xPos , int yPo
 	{
 		fprintf( stdout , "Invalid Move!\n" );
 	}
+	applicableUnits->units[ givenUnit ]->selected = FALSE;
 }
 
 
@@ -207,7 +216,14 @@ int shootUnit( sideData *shootingSideUnits , int shootingSideNo , sideData *reci
 {
 	srand( time( NULL ) );
 	fprintf( stderr , "Shooting unit %d, %s\n" , shootingSideUnits->units[ shootingSideNo ]->unitID , shootingSideUnits->units[ shootingSideNo ]->name );
-	shootingSideUnits->units[ shootingSideNo ]->shot = FALSE;
+	if(shootingSideUnits->units[ shootingSideNo ]->shot == TRUE)
+	{
+		fprintf(stdout, " %s has Already shot !\n", shootingSideUnits->units[ shootingSideNo ]->name);
+		recievingSideUnits->units[ recievingSideNo ]->selected = FALSE;
+		shootingSideUnits->units[ shootingSideNo ]->selected = FALSE;
+		return 0;
+	}
+	shootingSideUnits->units[ shootingSideNo ]->shot = TRUE;
 	fprintf( stderr , "%d\n" , tiles[0]->noTiles );
 	int aStarResult = aStarWithTerrain( shootingSideUnits , shootingSideNo , tiles , recievingSideUnits->units[ recievingSideNo ]->relativeX , recievingSideUnits->units[ recievingSideNo ]->relativeY, tiles[0]->noTiles - 1 );
 	int i, totalHits, currentHit;
@@ -227,13 +243,20 @@ int shootUnit( sideData *shootingSideUnits , int shootingSideNo , sideData *reci
 					if( currentHit < recievingSideUnits->units[ recievingSideNo ]->coverSave )
 					{
 						totalHits += 1;
+						recievingSideUnits->units[ recievingSideNo ]->wounds -= 1;
+						if( recievingSideUnits->units[ recievingSideNo ]->wounds <= 0 )
+						{
+							recievingSideUnits->units[ recievingSideNo ]->alive = FALSE;
+							recievingSideUnits->units[ recievingSideNo ]->selected = FALSE;
+							fprintf( stdout , "%s has been taken out !\n" , recievingSideUnits->units[ recievingSideNo ]->name);
+							break;
+						}	
 					} 
 				}
 			}
 		}
-		recievingSideUnits->units[ recievingSideNo ]->wounds -= totalHits;
 	}
-	if( aStarResult <= shootingSideUnits->units[ shootingSideNo ]->aTRange &&  recievingSideUnits->units[ recievingSideNo ]->unitType != UNITTYPE_INFANTRY)
+	else if( aStarResult <= shootingSideUnits->units[ shootingSideNo ]->aTRange &&  recievingSideUnits->units[ recievingSideNo ]->unitType != UNITTYPE_INFANTRY)
 	{
 		shootingSideUnits->units[ shootingSideNo ]->shot = TRUE;
 		for( i = 0 ; i < shootingSideUnits->units[ shootingSideNo ]->aTAttacks ; i++ )
@@ -248,24 +271,34 @@ int shootUnit( sideData *shootingSideUnits , int shootingSideNo , sideData *reci
 					if( currentHit < recievingSideUnits->units[ recievingSideNo ]->coverSave )
 					{
 						totalHits += 1;
+						recievingSideUnits->units[ recievingSideNo ]->wounds -= 1;
+						if( recievingSideUnits->units[ recievingSideNo ]->wounds <= 0 )
+						{
+							recievingSideUnits->units[ recievingSideNo ]->alive = FALSE;
+							recievingSideUnits->units[ recievingSideNo ]->selected = FALSE;
+							fprintf( stdout , "%s has been taken out !\n" , recievingSideUnits->units[ recievingSideNo ]->name);
+							break;
+						}						
 					} 
 				}
 			}
 		}
-		recievingSideUnits->units[ recievingSideNo ]->wounds -= totalHits;
 	}
 	else
 	{
 		fprintf( stdout , "Invalid Shoot!\n" );
+		recievingSideUnits->units[ recievingSideNo ]->selected = FALSE;
+		shootingSideUnits->units[ shootingSideNo ]->selected = FALSE;
+		fprintf(stdout, "AT Range : %d\n",  shootingSideUnits->units[ shootingSideNo ]->aTRange);
 		return 0;
 	}
-	if( recievingSideUnits->units[ recievingSideNo ]->wounds <= 0 )
-	{
-		recievingSideUnits->units[ recievingSideNo ]->alive = FALSE;
-		recievingSideUnits->units[ recievingSideNo ]->selected = FALSE;
-		fprintf( stdout , "%s has been taken out !\n" , recievingSideUnits->units[ recievingSideNo ]->name);
-	}
+	
+	
 	fprintf( stdout , "The %s delived %d damage to the %s, leaving %d wounds\n" , shootingSideUnits->units[ shootingSideNo ]->name , totalHits , recievingSideUnits->units[ recievingSideNo ]->name , recievingSideUnits->units[ recievingSideNo ]->wounds );
+	recievingSideUnits->units[ recievingSideNo ]->selected = FALSE;
+	recievingSideUnits->units[ recievingSideNo ]->shot = TRUE;
+	shootingSideUnits->units[ shootingSideNo ]->selected = FALSE;
+	shootingSideUnits->units[ shootingSideNo ]->shot = TRUE;
 	return totalHits;
 }
 /*
@@ -400,29 +433,55 @@ void simulationMain( mapData *map , SDL_Renderer *render , TTF_Font *font , butt
 {
 	fprintf( stderr , "Running the simulation....\n" );
 	int oneSideDead = FALSE;
-	int i, turnNumber, whichSide, turnButtonClicked, turnChanged,  j, oldSelected, otherSide, k, attackingSideCasualties, defendingSideCasualties;
+	int i, turnNumber, whichSide, turnButtonClicked, turnChanged,  j, oldSelected, otherSide, k, attackingSideCasualties, defendingSideCasualties, clickedState, quoteNo;
+	SDL_Rect backgroundDimensions;
+	backgroundDimensions.x = 0;
+	backgroundDimensions.y = 0;
+	SDL_Texture *background = loadImage("background.png", render, &backgroundDimensions, &i);
 	turnNumber = 0;
 	whichSide = 0;
+	otherSide = 1;
 	turnChanged = 0;
+	clickedState = 0;
+	turnButtonClicked = FALSE;
 	int time = 0;
 	Mix_Chunk *march, *shoot;
 	shoot = loadEffect( "audio/attack.wav" , &i );
 	march = loadEffect( "audio/march.wav" , &i );
 	clock_t start, end;
+	start = clock();
 	while( oneSideDead != TRUE )
 	{	
-		turnButtonClicked = 0;
-		oldSelected = 0;
-		if( turnChanged == 1 )
+		if( turnChanged == TRUE && turnButtonClicked == TRUE)
 		{
 			turnChanged = 0;
 			turnNumber = turnNumber + 1;
 			fprintf( stdout , "Turn : %d\n" , turnNumber );
-			turnButtonClicked = 0;
+			SDL_RenderClear(render);
+			SDL_RenderCopy(render, background, NULL, NULL);
+			turnButtonClicked = FALSE;
+			quoteNo = rand() % map->quoteList->quotes[0]->noQuotes;
+			if( quoteNo == 0 )
+			{
+				quoteNo = 1;
+			
+			}
+			drawQuote( map->quoteList->quotes , quoteNo , render ,  font );
+			SDL_RenderPresent( render );
+			fprintf( stdout , "Press enter here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n" );
+			getch();
 		}
 		for( i = 1 ; i <= map->sides[ whichSide ]->noUnits ; i++ )
 		{
 			map->sides[ whichSide ]->units[i]->selected = FALSE;
+			map->sides[ whichSide ]->units[i]->shot = FALSE;
+			map->sides[ whichSide ]->units[i]->moved = FALSE;
+		}
+		for( i = 1 ; i <= map->sides[ otherSide ]->noUnits ; i++ )
+		{
+			map->sides[ otherSide ]->units[i]->selected = FALSE;
+			map->sides[ otherSide ]->units[i]->shot = FALSE;
+			map->sides[ otherSide ]->units[i]->moved = FALSE;
 		}
 		for( j = 0 ; j < map->tiles[0]->noTiles ; j++ )
 		{
@@ -439,19 +498,24 @@ void simulationMain( mapData *map , SDL_Renderer *render , TTF_Font *font , butt
 			otherSide = 0;
 		
 		}
-		while( turnButtonClicked != END_TURN_BUTTON )
+		while( turnButtonClicked != TRUE )
 		{
-			if( turnButtonClicked != 0 )
+			
+			if( clickedState  != FALSE )
 			{
-				oldSelected = turnButtonClicked;
+				oldSelected = clickedState ;
 			}
-			turnButtonClicked = 0;
-			start = clock();
 			SDL_RenderClear( render );
+			SDL_RenderCopy(render, background, NULL, NULL);
 			if( time % 1 == 0 )
 			{
-				turnButtonClicked = handleMapClicked( map->sides[ whichSide ] , map->sides[ otherSide ] , map->tiles , nextTurn , events );
-				if( ( oldSelected == UNIT_SELECTED && turnButtonClicked == TILE_SELECTED) || ( oldSelected == UNIT_SELECTED && turnButtonClicked == UNIT_SELECTED_OTHER ) )
+				end = clock();
+				if( ( end - start ) / ( CLOCKS_PER_SEC/1000 ) > CLICK_RATE )
+				{
+					clickedState = handleMapClicked( map->sides[ whichSide ] , map->sides[ otherSide ] , map->tiles , nextTurn , events, &turnButtonClicked );
+					start = clock();
+				}
+				if( ( oldSelected == UNIT_SELECTED && clickedState == TILE_SELECTED) || ( oldSelected == UNIT_SELECTED && clickedState == UNIT_SELECTED_OTHER ) )
 				{
 					for( i = 1 ; i <= map->sides[ whichSide ]->noUnits ; i++ )
 					{
@@ -474,12 +538,12 @@ void simulationMain( mapData *map , SDL_Renderer *render , TTF_Font *font , butt
 							break;
 						}
 					}
-					if( i != map->sides[ whichSide ]->noUnits + 1 && !( j ==  map->tiles[0]->noTiles ) && map->sides[ whichSide ]->units[i]->selected == TRUE && map->tiles[j]->isSelected == TRUE && oldSelected == UNIT_SELECTED && turnButtonClicked == TILE_SELECTED  )
+					if( i != map->sides[ whichSide ]->noUnits + 1 && !( j ==  map->tiles[0]->noTiles ) && map->sides[ whichSide ]->units[i]->selected == TRUE && map->tiles[j]->isSelected == TRUE && oldSelected == UNIT_SELECTED && clickedState == TILE_SELECTED  )
 					{
 						Mix_PlayChannel( -1 , march , 0 );
 						moveUnit( map->sides[ whichSide ], map->tiles , map->tiles[j]->relativeX , map->tiles[j]->relativeY , i );
 					}
-					if(i != map->sides[ whichSide ]->noUnits + 1 && map->sides[ whichSide ]->units[i]->selected == TRUE && k != map->sides[ otherSide ]->noUnits + 1 && map->sides[ otherSide ]->units[k]->selected == TRUE && oldSelected == UNIT_SELECTED && turnButtonClicked == UNIT_SELECTED_OTHER )
+					if(i != map->sides[ whichSide ]->noUnits + 1 && map->sides[ whichSide ]->units[i]->selected == TRUE && k != map->sides[ otherSide ]->noUnits + 1 && map->sides[ otherSide ]->units[k]->selected == TRUE && oldSelected == UNIT_SELECTED && clickedState == UNIT_SELECTED_OTHER )
 					{
 						Mix_PlayChannel( -1 , shoot , 0 );
 						defendingSideCasualties = shootUnit( map->sides[ whichSide ] , i , map->sides[ otherSide ] , k , map->tiles );
@@ -487,7 +551,7 @@ void simulationMain( mapData *map , SDL_Renderer *render , TTF_Font *font , butt
 						resolveShooting( map->sides[ whichSide ] , i ,  map->sides[ otherSide ] , k , defendingSideCasualties , attackingSideCasualties );
 						map->sides[ whichSide ]->units[i]->selected = FALSE;
 						map->sides[ otherSide ]->units[k]->selected = FALSE;
-					} 
+					}
 				}
 			}
 			if( events->type == SDL_QUIT )
@@ -499,25 +563,30 @@ void simulationMain( mapData *map , SDL_Renderer *render , TTF_Font *font , butt
 			drawUnits( map->sides[0]->units , map->sides[0]->noUnits , render , map->tileset );
 			drawUnits( map->sides[1]->units , map->sides[1]->noUnits , render , map->tileset );
 			drawMenuElements( nextTurn , 1 , render );
-			for( i = 1 ; i < map->sides[0]->noUnits ; i++ )
+			for( i = 1 ; i <= map->sides[0]->noUnits ; i++ )
 			{
-				if( map->sides[0]->units[i]->alive == FALSE )
+				oneSideDead = TRUE;
+				if( map->sides[0]->units[i]->alive == TRUE )
 				{
-					oneSideDead = TRUE;
-				}
-			}	
-			for( i = 1 ; i < map->sides[1]->noUnits ; i++ )
-			{
-				if( map->sides[1]->units[i]->alive == FALSE )
-				{
-					oneSideDead = TRUE;
-				
+					oneSideDead = FALSE;
+					break;
 				}
 			}
-			if( turnButtonClicked == END_TURN_BUTTON )
+			if(oneSideDead != TRUE)
 			{
-				turnChanged = 1;
-				turnButtonClicked = 0;
+				for( i = 1 ; i <= map->sides[1]->noUnits ; i++ )
+				{
+				oneSideDead = TRUE;
+					if( map->sides[1]->units[i]->alive == TRUE )
+					{
+						oneSideDead = FALSE;
+						break;
+					}
+				}
+			}
+			if( turnButtonClicked == TRUE )
+			{
+				turnChanged = TRUE;
 				break;
 			}
 			end = clock();
@@ -525,5 +594,5 @@ void simulationMain( mapData *map , SDL_Renderer *render , TTF_Font *font , butt
 			SDL_RenderPresent( render );
 		}
 	}
-	displaySimulationResults( map->sides[0] , map->sides[1] , map->tiles ,  font, render );
+	displaySimulationResults( map->sides[0] , map->sides[1] , map->tiles , font , render );
 }

@@ -27,7 +27,7 @@ int checkButtonClicked( SDL_Rect *mouseDimensions , buttonData *button )
 	{
 		return FAIL;
 	}            
-	return NULL;
+	return NULL_INPUT;
 }
 /*
 	int checkButtonTextClicked(SDL_Rect *mouseDimensions, buttonDataText *button):
@@ -44,7 +44,7 @@ int checkButtonTextClicked( SDL_Rect *mouseDimensions , buttonDataText *button )
 	{
 		return FAIL;
 	}
-	return NULL;
+	return NULL_INPUT;
 }
 /*
 	int checkQuestionClicked(SDL_Rect *mouseDimensions, questionData *button):
@@ -61,7 +61,7 @@ int checkQuestionClicked( SDL_Rect *mouseDimensions , questionData *question , i
 	{
 		return FAIL;
 	}
-	return NULL;
+	return NULL_INPUT;
 }
 /*
 	int checkUnitClicked(SDL_Rect *mouseDimensions, unitData *unit):
@@ -79,7 +79,7 @@ int checkUnitClicked( SDL_Rect *mouseDimensions , unitData *unit )
 	{
 		return FAIL;
 	}
-	return NULL;
+	return NULL_INPUT;
 }
 /*
 	int checkUnitClicked(SDL_Rect *mouseDimensions, unitData *unit):
@@ -100,11 +100,13 @@ int checkTileClicked( SDL_Rect *mouseDimensions , tileData *tile )
 		fprintf( stderr , "FALSE!\n" );
 		return FAIL;
 	}
-	return NULL;
+	return NULL_INPUT;
 }
 /*
 	int handleMouseButtonMainMenu(buttonData **buttons, int size, SDL_Renderer *render):
 	Checks the mouse buttons on the main menu and draws them etc.
+
+
 */
 int handleMouseButtonMainMenu( buttonData **buttons , int size , SDL_Renderer *render , SDL_Event *events )
 {
@@ -185,6 +187,8 @@ int handleMouseButtonSelectionMenu( buttonDataText **buttonsText , int size , SD
 /*
 	int handleMouseButtonMainMenu(SDL_Rect mouseDimensions, buttonData **buttons):
 	Checks the keyboard during the simulation
+
+
 */
 int handleKeyboardSimulation( SDL_Event *keyboardInput , unitData **units )
 {
@@ -207,13 +211,17 @@ int handleKeyboardSimulation( SDL_Event *keyboardInput , unitData **units )
 
 
 */
-int handleMapClicked( sideData *applicableUnits , sideData *otherSide , tileData **tiles ,  buttonData **endTurn , SDL_Event *events )
+int handleMapClicked( sideData *applicableUnits , sideData *otherSide , tileData **tiles ,  buttonData **endTurn , SDL_Event *events , int *turnButtonClicked)
 {
 	SDL_Rect mouseCoords;
 	int i, buttonClickResultTile, buttonClickResultUnit, buttonClickResultButton;
 	mouseCoords.w = 3;
 	mouseCoords.h = 3;
 	SDL_GetMouseState( &( mouseCoords.x ) , &( mouseCoords.y ) );
+	while(	SDL_PollEvent( events ) )
+	{
+	
+	}
 	if( events->type == SDL_MOUSEBUTTONDOWN )
 	{
 		for( i = 1 ; i <= applicableUnits->noUnits ; i++ )
@@ -242,7 +250,7 @@ int handleMapClicked( sideData *applicableUnits , sideData *otherSide , tileData
 			}
 			buttonClickResultUnit = FAIL;
 		}
-		for( i = 0 ; i < tiles[0]->noTiles ; i++ )
+		for( i = 1 ; i < tiles[0]->noTiles ; i++ )
 		{	
 			fprintf( stderr , "Mouse Coordinates : x : %d , y : %d, w : %d, h : %d \n" , mouseCoords.x , mouseCoords.y , 
 			mouseCoords.w , mouseCoords.h );
@@ -256,9 +264,10 @@ int handleMapClicked( sideData *applicableUnits , sideData *otherSide , tileData
 			buttonClickResultTile = FAIL;
 		}
 		buttonClickResultButton = checkButtonClicked( &mouseCoords , endTurn[0] );
-		if( buttonClickResultButton == SUCCESS )
+		if( buttonClickResultButton == SUCCESS && *turnButtonClicked == FALSE )
 		{
 			fprintf( stderr , "End of turn button Clicked ! \n" );
+			*turnButtonClicked = TRUE;
 			return END_TURN_BUTTON;
 		}
 	}

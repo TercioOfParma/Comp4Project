@@ -397,6 +397,7 @@ quoteData **loadQuotes(char *filename, int *success)
 		temp[i]->quote = (char *) json_string_value( json_object_get( quoteDataJSON , "QUOTE" ) );
 		temp[i]->analysis = (char *) json_string_value(json_object_get( quoteDataJSON , "ANALYSIS" ) );
 	}
+	temp[0]->noQuotes = numberOfQuotes;
 	return temp;
 }
 /*
@@ -725,8 +726,8 @@ unitData *loadUnit( char *unitFile , int ID , int *success )
 	temp->movement = json_integer_value( json_object_get( unitDataJSON , "MOVEMENT" ) );
 	temp->aPRange = json_integer_value( json_object_get( unitDataJSON , "ANTI_PERSONNEL_RANGE" ) );
 	temp->aPAttacks = json_integer_value( json_object_get( unitDataJSON , "ANTI_PERSONNEL_DICE" ) );
-	temp->aTRange = json_integer_value( json_object_get( unitDataJSON , "ANTI_VEHICLE_RANGE" ) );
-	temp->aTAttacks = json_integer_value( json_object_get( unitDataJSON , "ANTI_VEHICLE_DICE" ) );
+	temp->aTRange = json_integer_value( json_object_get( unitDataJSON , "ANTI_TANK_RANGE" ) );
+	temp->aTAttacks = json_integer_value( json_object_get( unitDataJSON , "ANTI_TANK_DICE" ) );
 	temp->unitType = json_integer_value( json_object_get( unitDataJSON , "UNIT_TYPE" ) );
 	temp->wounds = json_integer_value( json_object_get( unitDataJSON , "WOUNDS" ) );
 	temp->save = json_integer_value( json_object_get( unitDataJSON , "SAVE" ) );
