@@ -1,15 +1,45 @@
 [
 	{
-		"NUMBER_UNITS" : 2
+		"NUMBER_UNITS" : 8
 	},
 	{
-		"UNIT_ID" : 1,
+		"UNIT_ID" : 9,
+		"RELATIVE_XPOS" : 6,
+		"RELATIVE_YPOS" : 4
+	},
+	{
+		"UNIT_ID" : 8,
+		"RELATIVE_XPOS" : 5,
+		"RELATIVE_YPOS" : 4
+	},
+	{
+		"UNIT_ID" : 17,
+		"RELATIVE_XPOS" : 5,
+		"RELATIVE_YPOS" : 3
+	},
+	{
+		"UNIT_ID" : 24,
 		"RELATIVE_XPOS" : 2,
 		"RELATIVE_YPOS" : 2
 	},
 	{
-		"UNIT_ID" : 2,
+		"UNIT_ID" : 24,
+		"RELATIVE_XPOS" : 3,
+		"RELATIVE_YPOS" : 2
+	},
+	{
+		"UNIT_ID" : 34,
+		"RELATIVE_XPOS" : 7,
+		"RELATIVE_YPOS" : 1
+	},
+	{
+		"UNIT_ID" : 14,
 		"RELATIVE_XPOS" : 2,
-		"RELATIVE_YPOS" : 3
+		"RELATIVE_YPOS" : 1
+	},
+	{
+		"UNIT_ID" : 21,
+		"RELATIVE_XPOS" : 1,
+		"RELATIVE_YPOS" : 1
 	}
 ]

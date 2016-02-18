@@ -1,9 +1,9 @@
 [
 	{
-		"201" : "data/Hue City 3/questions.json",
-		"301" : "data/Hue City 3/quotes.json",
-		"401" : "data/Hue City 3/unitData.json",
-		"501" : "data/Hue City 3/sideoneunits.json",
-		"502" : "data/Hue City 3/sidetwounits.json"
+		"201" : "data/Hue City/questions.json",
+		"301" : "data/Hue City/quotes.json",
+		"401" : "data/Hue City/unitData.json",
+		"501" : "data/Hue City/sideoneunits.json",
+		"502" : "data/Hue City/sidetwounits.json"
 	}
 ]
