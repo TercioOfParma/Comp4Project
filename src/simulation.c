@@ -290,7 +290,6 @@ int shootUnit( sideData *shootingSideUnits , int shootingSideNo , sideData *reci
 		fprintf( stdout , "Invalid Shoot!\n" );
 		recievingSideUnits->units[ recievingSideNo ]->selected = FALSE;
 		shootingSideUnits->units[ shootingSideNo ]->selected = FALSE;
-		fprintf(stdout, "AT Range : %d\n",  shootingSideUnits->units[ shootingSideNo ]->aTRange);
 		return 0;
 	}
 	
