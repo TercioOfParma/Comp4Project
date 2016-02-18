@@ -46,6 +46,8 @@ int main( int argc , char *argv[] )
 	SDL_Texture *startButton, *quitButton, *nextTurnButton, *blankButton;
 	SDL_Rect placeHolder;
 	Mix_Music *soundtrack;
+	SDL_Rect backgroundDimensions;
+	SDL_Texture *background; 
 	//------------------------------------------------ INITIALISATION -------------------------------------------
 	errorRedirection = freopen( LOG_FILE , "w" , stderr );//According to the documentation I have read, it isn't an issue on windows stderr isn't a file, and so this evades the race condition issue
 	fprintf( stderr , "Main function....\n" );
@@ -67,10 +69,16 @@ int main( int argc , char *argv[] )
 	frontButtons[0]->dimensions.x = 100;
 	frontButtons[0]->dimensions.y = 100;
 	frontButtons[1]->dimensions.x = 100;
+	frontButtons[1]->dimensions.w *= 2;
+	frontButtons[0]->dimensions.w *= 2;
+	frontButtons[0]->dimensions.h *= 2;
+	frontButtons[1]->dimensions.h *= 2;
 	frontButtons[1]->dimensions.y = 300;
 	placeHolder.x = 10;
 	placeHolder.y = 10;
-	
+	backgroundDimensions.x = 0;
+	backgroundDimensions.y = 0;
+	background = loadImage("background.png", render, &backgroundDimensions, &i);
 	turnButton = malloc( sizeof( buttonData * ) );
 	turnButton[0] = loadButton( nextTurnButton , &placeHolder , END_TURN_BUTTON , &success );
 	buttonValuePrimary = 0;
@@ -88,6 +96,7 @@ int main( int argc , char *argv[] )
 	while( success != FAIL )
 	{
 		SDL_RenderClear( render );
+		SDL_RenderCopy(render, background, NULL, NULL);
 		if( buttonValuePrimary != START_BUTTON_TYPE )
 		{
 			buttonValuePrimary = handleMouseButtonMainMenu( frontButtons , 2 , render , &eventHandle );
