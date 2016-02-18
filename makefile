@@ -15,6 +15,7 @@ all:
 	rm	"deinit.o"
 	rm	"init.o"
 	rm	"input.o"
+	rm	"src/main.h.gch"
 debug:
 	gcc	-c	src/main.h	-Wall	-g
 	gcc	-c	src/input.c	-Wall	-g
@@ -32,3 +33,4 @@ debug:
 	rm	"deinit.o"
 	rm	"init.o"
 	rm	"input.o"
+	rm	"src/main.h.gch"
