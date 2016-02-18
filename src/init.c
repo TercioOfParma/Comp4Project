@@ -27,7 +27,7 @@ char *loadTextFile( const char *filename , int *success )
 {
 
 	fprintf( stderr , "Loading file %s... \n" , filename );
-	int fileDescriptor, fileSize;
+	int fileDescriptor, fileSize, i;
 	char *fileContents;
 	FILE *jsonFile;
 	
@@ -55,14 +55,23 @@ char *loadTextFile( const char *filename , int *success )
 	fileContents = calloc( 1 , fileSize + 1 );
 	if( !fileContents )
 	{
-		fprintf( stderr , "malloc has failed : %s" , strerror( errno ) );
+		fprintf( stderr , "malloc has failed at %s, %s, line %d : %s\n" , __FUNCTION__ , __FILE__ , __LINE__ , strerror( errno ) );
 		*success = FAIL;
 		return NULL;
 	
 	}
 	fread( fileContents , fileSize , 1 , jsonFile );
 	fclose( jsonFile );
-	if(strstr( fileContents , "%x" ) != NULL)
+	for(i = 0; i < fileSize; i++)
+	{
+		if(fileContents[i] == ']')
+		{
+			fileContents[i + 1] = '\0';
+			break;
+		}
+	
+	}
+	if( strstr( fileContents , "%x" ) != NULL)
 	{
 		fprintf( stderr , "stack change formatter detected in file provided, nice try\n" );
 		*success = FAIL;
@@ -83,7 +92,7 @@ int getFileSize( FILE *sizeToGet , int *success )
 {
 	fprintf( stderr , "Getting File size...\n" );
 	int fileSize = 0;
-	fseek( sizeToGet ,0 , SEEK_END );
+	fseek( sizeToGet , 0 , SEEK_END );
 	fileSize = ftell( sizeToGet );
 	rewind( sizeToGet );//back to the start
 	if(errno > 0)
@@ -311,7 +320,7 @@ buttonData *loadButton( SDL_Texture *display , SDL_Rect *posAndSize , int type ,
 	buttonData *temp = malloc( sizeof( buttonData ) );
 	if( !temp )
 	{
-		fprintf( stderr , "malloc has failed on buttonData : %s" , strerror( errno ) );
+		fprintf( stderr , "malloc has failed at %s, %s, line %d : %s\n" , __FUNCTION__ , __FILE__ , __LINE__ , strerror( errno ) );
 		*success = FAIL;
 		return NULL;
 	}
@@ -332,14 +341,14 @@ buttonDataText *loadButtonText( SDL_Texture *display , SDL_Rect *posAndSize , SD
 	buttonDataText *temp = malloc( sizeof( buttonDataText ) );
 	if( !temp )
 	{
-		fprintf( stderr , "malloc has failed on buttonData : %s" , strerror( errno ) );
+		fprintf( stderr , "malloc has failed at %s, %s, line %d : %s\n" , __FUNCTION__ , __FILE__ , __LINE__ , strerror( errno ) );
 		*success = FAIL;
 		return NULL;
 	}
 	temp->details = malloc( sizeof( textData ) );//text data
 	if( !temp->details )
 	{
-		fprintf( stderr , "malloc has failed on buttonData : %s" , SDL_GetError() );
+		fprintf( stderr , "malloc has failed at %s, %s, line %d : %s\n" , __FUNCTION__ , __FILE__ , __LINE__ , strerror( errno ) );
 		*success = FAIL;
 		return NULL;
 	}
@@ -503,7 +512,7 @@ activityData *loadActivity( char *filename , int *success )
 	activityData *temp = malloc( sizeof( activityData ) );
 	if( !temp )
 	{
-		fprintf( stderr , "malloc has failed on activityData : %s" , strerror( errno ) );
+		fprintf( stderr , "malloc has failed at %s, %s, line %d : %s\n" , __FUNCTION__ , __FILE__ , __LINE__ , strerror( errno ) );
 		*success = FAIL;
 		return NULL;
 	}
@@ -559,7 +568,7 @@ quoteListData *loadQuoteListData( char *filename , int *success )
 	quoteListData *temp = malloc( sizeof( quoteListData ) );
 	if( !temp )
 	{
-		fprintf( stderr , "malloc has failed on quoteListData : %s" , strerror( errno ) );
+		fprintf( stderr , "malloc has failed at %s, %s, line %d : %s\n" , __FUNCTION__ , __FILE__ , __LINE__ , strerror( errno ) );
 		*success = FAIL;
 		return NULL;
 	}
@@ -677,7 +686,7 @@ unitData *loadUnit( char *unitFile , int ID , int *success )
 	unitData *temp = malloc( sizeof( unitData ) );
 	if( !temp )
 	{
-		fprintf( stderr , "Malloc has failed on loadUnit : %s \n" , strerror( errno ) );
+		fprintf( stderr , "malloc has failed at %s, %s, line %d : %s\n" , __FUNCTION__ , __FILE__ , __LINE__ , strerror( errno ) );
 		*success = FAIL;
 		return NULL;
 	}
@@ -685,7 +694,7 @@ unitData *loadUnit( char *unitFile , int ID , int *success )
 	tempJsonHandle = json_loads( unitFile , 0 , &errorHandle );
 	if( !tempJsonHandle )
 	{
-		fprintf( stderr , "json_loads has failed on %s: %s \n" , unitFile , errorHandle.text );
+		fprintf( stderr , "json_loads has failed on : %s \n" , errorHandle.text );
 		*success = FAIL;
 		return temp;
 	}
@@ -783,7 +792,7 @@ unitData **loadUnitData( char *sideUnitDataFilePath , char *unitDescriptorDataFi
 	temp = malloc( sizeof( unitData * ) * numberOfUnits );
 	if( !temp )
 	{
-		fprintf( stderr , "malloc has failed in loadUnitData : %s \n" , strerror( errno ) );
+		fprintf( stderr , "malloc has failed at %s, %s, line %d : %s\n" , __FUNCTION__ , __FILE__ , __LINE__ , strerror( errno ) );
 		*success = FAIL;
 		return NULL;
 	}
@@ -829,7 +838,7 @@ sideData *loadSideData( char *filename , int sideNumber , int *success )
 	temp = malloc( sizeof( sideData ) );
 	if( !temp )
 	{
-		fprintf( stderr , "malloc has failed in loadSideData, %s \n" , strerror( errno ) );
+		fprintf( stderr , "malloc has failed at %s, %s, line %d : %s\n" , __FUNCTION__ , __FILE__ , __LINE__ , strerror( errno ) );
 		*success = FAIL;
 		return NULL;
 	}

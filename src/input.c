@@ -229,7 +229,7 @@ int handleMapClicked( sideData *applicableUnits , sideData *otherSide , tileData
 			buttonClickResultUnit = checkUnitClicked( &mouseCoords , applicableUnits->units[i] );
 			if( buttonClickResultUnit == SUCCESS && applicableUnits->units[i]->alive == TRUE )
 			{	
-				fprintf( stdout , "Unit of %s selected \n" ,  applicableUnits->units[i]->name );
+				fprintf( stdout , "Unit of %s selected \nDescription : %s \n" ,  applicableUnits->units[i]->name, applicableUnits->units[i]->description );
 				applicableUnits->units[i]->selected = TRUE;
 				return UNIT_SELECTED;
 			}

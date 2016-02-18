@@ -96,7 +96,7 @@ int main( int argc , char *argv[] )
 	while( success != FAIL )
 	{
 		SDL_RenderClear( render );
-		SDL_RenderCopy(render, background, NULL, NULL);
+		SDL_RenderCopy( render , background , NULL , NULL );
 		if( buttonValuePrimary != START_BUTTON_TYPE )
 		{
 			buttonValuePrimary = handleMouseButtonMainMenu( frontButtons , 2 , render , &eventHandle );

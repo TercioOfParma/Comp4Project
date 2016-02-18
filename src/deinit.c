@@ -137,7 +137,7 @@ void endSideData( sideData *side )
 {
 	fprintf( stderr , "Deinitialising a side....\n" );
 	endUnitDataArray( side->units , side->noUnits );
-	free( side);
+	free( side );
 
 }
 /*

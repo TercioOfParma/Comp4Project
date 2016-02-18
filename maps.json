@@ -8,5 +8,15 @@
 		"MAP_ID" : 2,
 		"TITLE" : "Hue City",
 		"DESCRIPTION" : "A Nasty ass battle"
+	},
+	{
+		"MAP_ID" : 3,
+		"TITLE" : "Hue City 2",
+		"DESCRIPTION" : "A Nasty ass battle"
+	},
+	{
+		"MAP_ID" : 4,
+		"TITLE" : "Hue City 3",
+		"DESCRIPTION" : "A Nasty ass battle"
 	}
 ]
