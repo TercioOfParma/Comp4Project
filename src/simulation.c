@@ -202,7 +202,7 @@ void moveUnit( sideData *applicableUnits , tileData **tiles , int xPos , int yPo
 	else
 	{
 		fprintf( stdout , "Invalid Move!\n" );
-		return;
+		applicableUnits->units[ givenUnit ]->moved = FALSE;
 	}
 	applicableUnits->units[ givenUnit ]->selected = FALSE;
 }
@@ -288,6 +288,7 @@ int shootUnit( sideData *shootingSideUnits , int shootingSideNo , sideData *reci
 	else
 	{
 		fprintf( stdout , "Invalid Shoot!\n" );
+		shootingSideUnits->units[ shootingSideNo ]->shot = FALSE;
 		recievingSideUnits->units[ recievingSideNo ]->selected = FALSE;
 		shootingSideUnits->units[ shootingSideNo ]->selected = FALSE;
 		return 0;
@@ -295,8 +296,6 @@ int shootUnit( sideData *shootingSideUnits , int shootingSideNo , sideData *reci
 	
 	
 	fprintf( stdout , "The %s delived %d damage to the %s, leaving %d wounds\n" , shootingSideUnits->units[ shootingSideNo ]->name , totalHits , recievingSideUnits->units[ recievingSideNo ]->name , recievingSideUnits->units[ recievingSideNo ]->wounds );
-	recievingSideUnits->units[ recievingSideNo ]->selected = FALSE;
-	recievingSideUnits->units[ recievingSideNo ]->shot = TRUE;
 	shootingSideUnits->units[ shootingSideNo ]->selected = FALSE;
 	shootingSideUnits->units[ shootingSideNo ]->shot = TRUE;
 	return totalHits;

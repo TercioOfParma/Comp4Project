@@ -1,6 +1,6 @@
 [
 	{
-		"NUMBER_UNITS" : 6
+		"NUMBER_UNITS" : 11
 	},
 	{
 		"UNIT_ID" : 2,
@@ -31,5 +31,30 @@
 		"UNIT_ID" : 41,
 		"RELATIVE_XPOS" : 6,
 		"RELATIVE_YPOS" : 3
+	},
+	{
+		"UNIT_ID" : 44,
+		"RELATIVE_XPOS" : 4,
+		"RELATIVE_YPOS" : 6
+	},
+	{
+		"UNIT_ID" : 49,
+		"RELATIVE_XPOS" : 1,
+		"RELATIVE_YPOS" : 8
+	},
+	{
+		"UNIT_ID" : 44,
+		"RELATIVE_XPOS" : 3,
+		"RELATIVE_YPOS" : 6
+	},
+	{
+		"UNIT_ID" : 38,
+		"RELATIVE_XPOS" : 1,
+		"RELATIVE_YPOS" : 10
+	},
+	{
+		"UNIT_ID" : 44,
+		"RELATIVE_XPOS" : 3,
+		"RELATIVE_YPOS" : 9
 	}
 ]

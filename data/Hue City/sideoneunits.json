@@ -1,11 +1,11 @@
 [
 	{
-		"NUMBER_UNITS" : 8
+		"NUMBER_UNITS" : 10
 	},
 	{
 		"UNIT_ID" : 9,
 		"RELATIVE_XPOS" : 6,
-		"RELATIVE_YPOS" : 4
+		"RELATIVE_YPOS" : 7
 	},
 	{
 		"UNIT_ID" : 8,
@@ -41,5 +41,15 @@
 		"UNIT_ID" : 21,
 		"RELATIVE_XPOS" : 1,
 		"RELATIVE_YPOS" : 1
+	},
+	{
+		"UNIT_ID" : 19,
+		"RELATIVE_XPOS" : 10,
+		"RELATIVE_YPOS" : 1
+	},
+	{
+		"UNIT_ID" : 24,
+		"RELATIVE_XPOS" : 5,
+		"RELATIVE_YPOS" : 5
 	}
 ]
