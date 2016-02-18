@@ -1,0 +1,37 @@
+[
+	{
+		"NO_UNITS" : 2
+	},
+	{
+		"ID" : 1,
+		"MOVEMENT" : 15,
+		"NAME" : "GIs",
+		"DESCRIPTION" : "Conscripted soldiers, transported across thousands of miles of sea",
+		"ANTI_PERSONNEL_RANGE" : 30,
+		"ANTI_PERSONNEL_DICE" : 3,
+		"ANTI_TANK_RANGE" : 30,
+		"ANTI_TANK_DICE" : 1,
+		"UNIT_TYPE" : 0,
+		"WOUNDS" : 6,
+		"SAVE" : 6,
+		"MORALE" : 6,
+		"SPRITE_XPOS" : 0,
+		"SPRITE_YPOS" : 0
+	},
+	{
+		"ID" : 2,
+		"MOVEMENT" : 15,
+		"NAME" : "Vietcong",
+		"DESCRIPTION" : "Peasants fighting for their homeland and the communist creed",
+		"ANTI_PERSONNEL_RANGE" : 30,
+		"ANTI_PERSONNEL_DICE" : 2,
+		"ANTI_TANK_RANGE" : 30,
+		"ANTI_TANK_DICE" : 1,
+		"UNIT_TYPE" : 0,
+		"WOUNDS" : 4,
+		"SAVE" : 6,
+		"MORALE" : 6,
+		"SPRITE_XPOS" : 0,
+		"SPRITE_YPOS" : 1
+	}
+]
