@@ -391,6 +391,11 @@ quoteData **loadQuotes(char *filename, int *success)
 	
 	}
 	numberOfQuotes = json_integer_value( json_object_get( quoteDataJSON , "NO_QUOTES" ) );
+	if( numberOfQuotes <= 0 )
+	{
+		fprintf( stderr , " FATAL ERROR : No Quotes specified\n " );
+		return NULL;
+	}
 	temp = malloc( sizeof(quoteData *) * numberOfQuotes );
 	for( i = 0 ; i < numberOfQuotes ; i++ )
 	{
@@ -438,7 +443,12 @@ questionData **loadQuestions( char *filename , int *success )
 		json_decref( tempJsonHandle );
 		return temp;
 	}
-	numberOfQuestions = json_integer_value( json_object_get( questionDataJSON , "NO_QUESTIONS" ));
+	numberOfQuestions = json_integer_value( json_object_get( questionDataJSON , "NO_QUESTIONS" ) );
+	if( numberOfQuestions <= 0 )
+	{
+		fprintf( stderr , " FATAL ERROR : No Questions specified\n " );
+		return NULL;
+	}
 	temp = malloc( sizeof( questionData * ) * numberOfQuestions );
 	for( i = 0 ; i < numberOfQuestions ;  i++ )
 	{
@@ -638,7 +648,11 @@ tileData **loadTileData( char *tileFile , int *success )
 		return temp;
 	}
 	numberOfTiles = json_integer_value( json_object_get( tileDataJSON , "NO_TILES" ) );
-	
+	if( numberOfTiles <= 0 )
+	{
+		fprintf( stderr , " FATAL ERROR : No Tiles specified\n " );
+		return NULL;
+	}
 	temp = malloc( sizeof( tileData * ) * numberOfTiles );
 	for( i = 0 ; i < numberOfTiles ; i++ )
 	{
@@ -707,6 +721,11 @@ unitData *loadUnit( char *unitFile , int ID , int *success )
 		return temp;
 	}
 	numberOfUnits = json_integer_value( json_object_get( unitDataJSON , "NO_UNITS" ) );
+	if( numberOfUnits <= 0 )
+	{
+		fprintf( stderr , " FATAL ERROR : No Units specified\n " );
+		return NULL;
+	}
 	for( i = 0 ; i < numberOfUnits ; i++ )//linear search is used here as N (or size) will be quite low (<50) although a hard coded limit is illogical as it could limit teaching potential of military capabilities
 	{
 		unitDataJSON = json_array_get( tempJsonHandle , ID );
@@ -789,6 +808,11 @@ unitData **loadUnitData( char *sideUnitDataFilePath , char *unitDescriptorDataFi
 		return temp;//I.E. NULL	
 	}
 	numberOfUnits = json_integer_value( json_object_get( unitDataJSON , "NUMBER_UNITS" ) ) + 1;
+	if( numberOfUnits <= 0 )
+	{
+		fprintf( stderr , " FATAL ERROR : No Units specified\n " );
+		return NULL;
+	}
 	temp = malloc( sizeof( unitData * ) * numberOfUnits );
 	if( !temp )
 	{
