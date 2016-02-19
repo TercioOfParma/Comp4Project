@@ -345,12 +345,6 @@ int shootUnit( sideData *shootingSideUnits , int shootingSideNo , sideData *reci
 			}
 		}
 	}
-	if( recievingSideUnits->units[ recievingSideNo ]->wounds <= 0 )
-	{
-		recievingSideUnits->units[ recievingSideNo ]->alive = FALSE;
-		recievingSideUnits->units[ recievingSideNo ]->selected = FALSE;
-		fprintf( stdout , "%s has been taken out !\n" , recievingSideUnits->units[ recievingSideNo ]->name);
-	}	
 	else
 	{
 		fprintf( stdout , "Invalid Shoot!\n" );
@@ -359,6 +353,13 @@ int shootUnit( sideData *shootingSideUnits , int shootingSideNo , sideData *reci
 		shootingSideUnits->units[ shootingSideNo ]->selected = FALSE;
 		return 0;
 	}
+	if( recievingSideUnits->units[ recievingSideNo ]->wounds <= 0 )
+	{
+		recievingSideUnits->units[ recievingSideNo ]->alive = FALSE;
+		recievingSideUnits->units[ recievingSideNo ]->selected = FALSE;
+		fprintf( stdout , "%s has been taken out !\n" , recievingSideUnits->units[ recievingSideNo ]->name);
+	}	
+	
 	
 	
 	fprintf( stdout , "The %s delived %d damage to the %s, leaving %d wounds\n" , shootingSideUnits->units[ shootingSideNo ]->name , totalHits , recievingSideUnits->units[ recievingSideNo ]->name , recievingSideUnits->units[ recievingSideNo ]->wounds );
