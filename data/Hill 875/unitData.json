@@ -12,7 +12,7 @@
 		"ANTI_TANK_RANGE" : 30,
 		"ANTI_TANK_DICE" : 1,
 		"UNIT_TYPE" : 0,
-		"WOUNDS" : 6,
+		"WOUNDS" : 0,
 		"SAVE" : 7,
 		"MORALE" : 6,
 		"SPRITE_XPOS" : 0,

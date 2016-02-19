@@ -268,6 +268,12 @@ Mix_Chunk *loadEffect( const char *filename , int *success )
 TTF_Font *loadFont( optionsData *opt , int *success )
 {
 	fprintf( stderr , "Loading font from %s....\n" , opt->DEFAULT_FONT );
+	if(opt->FONT_SIZE <= 0)
+	{
+		fprintf(stderr, "FATAL ERROR : Font size invalid\n");
+		return NULL;
+	
+	}
 	TTF_Font *temp = TTF_OpenFont( opt->DEFAULT_FONT , opt->FONT_SIZE );
 	if( !temp )
 	{

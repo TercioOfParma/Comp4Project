@@ -90,6 +90,12 @@ int main( int argc , char *argv[] )
 	secondaryButtons = malloc( sizeof( buttonDataText * ) * test->noLevels );
 	buttonValueSecondary = NO_BUTTON_SECONDARY;
 	Mix_PlayMusic( soundtrack , -1 );
+	if(test->noLevels <= 0)
+	{
+		fprintf( stderr ,"FATAL ERROR : No Levels" );
+		return 0;
+	
+	}
 	for( i = 0 ; i <  test->noLevels ; i++ )
 	{
 		placeHolder.y += 40 ;

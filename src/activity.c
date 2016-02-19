@@ -91,7 +91,7 @@ int startQuiz( activityData *quiz , SDL_Renderer *render , TTF_Font *font , SDL_
 			if( events->type == SDL_MOUSEBUTTONDOWN )
 			{
 				clicked = FAIL;
-				for( j = 0; j < NO_ANSWERS; j++ )
+				for( j = 1; j <= NO_ANSWERS; j++ )
 				{
 					clicked = checkQuestionClicked( &mouseDimensions , quiz->questions[randomQuestion] , j );
 					if( clicked == SUCCESS )
@@ -135,10 +135,6 @@ int startQuiz( activityData *quiz , SDL_Renderer *render , TTF_Font *font , SDL_
 		SDL_RenderPresent( render );
 	
 	}
-	grade = computeGrade(quiz, gotCorrect);
-	snprintf(results, MAX_TEXT_OUTPUT, "YOU GOT %d / %d, THAT IS A GRADE %c, PLEASE PRESS ENTER INTO THE CONSOLE", gotCorrect, quiz->maximumMark, grade);
-	displayActivityResults(quiz, results, render, font);
-	getch();
 	grade = computeGrade( quiz , gotCorrect );
 	snprintf( results , MAX_TEXT_OUTPUT , "YOU GOT %d / %d, THAT IS A GRADE %c, PLEASE PRESS ENTER INTO THE CONSOLE" , 
 	gotCorrect , quiz->maximumMark , grade);
@@ -165,6 +161,7 @@ void displayActivityResults( activityData *quiz , char *resultsToDisplay , SDL_R
 	SDL_RenderClear( render );//this doesnt matter since it is an enclosed game loop in its own right
 	drawText( toDisplay , render );
 	SDL_RenderPresent( render );
+	getch();
 	SDL_DestroyTexture( toDisplay->display );
 	free( toDisplay );
 }
