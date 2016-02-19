@@ -30,6 +30,7 @@ int main( int argc , char *argv[] )
 	int quizTerminated = 1;
 	int i;
 	int buttonValuePrimary, buttonValueSecondary;
+	HWND console;
 	//C Library Structures
 	FILE *errorRedirection;
 	//CUSTOM RUNTIME STRUCTURES
@@ -49,6 +50,8 @@ int main( int argc , char *argv[] )
 	SDL_Rect backgroundDimensions;
 	SDL_Texture *background; 
 	//------------------------------------------------ INITIALISATION -------------------------------------------
+	console = GetConsoleWindow();
+	MoveWindow(console, 0 , 0 , 720 , 400 , 1); 
 	errorRedirection = freopen( LOG_FILE , "w" , stderr );//According to the documentation I have read, it isn't an issue on windows stderr isn't a file, and so this evades the race condition issue
 	fprintf( stderr , "Main function....\n" );
 	optionsFile = loadTextFile( OPTIONS_FILE , &success );

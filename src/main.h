@@ -20,6 +20,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <time.h>
+#include <windows.h>
 //----------------------------------- PROGRAM CONSTANTS --------------------------------------
 #define SIZE_OF_MODIFIERS 6
 #define NO_SIDES 2
@@ -32,8 +33,8 @@ const static int MODIFIERPOSITION_STUNNED = 2;
 const static int MODIFIERPOSITION_PINNED = 3;
 const static int MODIFIERPOSITION_STUCK = 4;
 const static int MODIFIERPOSITION_IMPETUOUS = 5;
-const static char FALSE = 0;
-const static char TRUE = 1;
+//const static char FALSE = 0;
+//const static char TRUE = 1;
 const static char FAIL = 0;
 const static char SUCCESS = 1;
 const static int SIDE_ONE = 0;
