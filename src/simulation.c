@@ -294,28 +294,25 @@ int shootUnit( sideData *shootingSideUnits , int shootingSideNo , sideData *reci
 	
 	if( aStarResult <= shootingSideUnits->units[ shootingSideNo ]->aPRange &&  recievingSideUnits->units[ recievingSideNo ]->unitType == UNITTYPE_INFANTRY)
 	{
-		fprintf( stdout , " Action cost : %d ,Shooting value : %d\n" , aStarResult ,  shootingSideUnits->units[ shootingSideNo ]->aPRange );
+		fprintf( stdout , " Action cost : %d ,Shooting range : %d , Shooting attacks : %d\n" , aStarResult ,  shootingSideUnits->units[ shootingSideNo ]->aPRange,  shootingSideUnits->units[ shootingSideNo ]->aPAttacks  );
 		shootingSideUnits->units[ shootingSideNo ]->shot = TRUE;
 		for( i = 0 ; i < shootingSideUnits->units[ shootingSideNo ]->aPAttacks ; i++ )
 		{
 			currentHit = rand() % 6 + 1;
+			fprintf(stderr, "SHOOT!\n");
 			if( currentHit >= TO_HIT )
 			{
+				fprintf(stderr, "Save!\n");
 				currentHit = rand() % 6 + 1;
 				if( currentHit < recievingSideUnits->units[ recievingSideNo ]->save )
 				{
 					currentHit = rand() % 6 + 1;
+					fprintf(stderr, "Cover save!\n");
 					if( currentHit < recievingSideUnits->units[ recievingSideNo ]->coverSave )
 					{
 						totalHits += 1;
+						fprintf(stderr, "HIT!\n");
 						recievingSideUnits->units[ recievingSideNo ]->wounds -= 1;
-						if( recievingSideUnits->units[ recievingSideNo ]->wounds <= 0 )
-						{
-							recievingSideUnits->units[ recievingSideNo ]->alive = FALSE;
-							recievingSideUnits->units[ recievingSideNo ]->selected = FALSE;
-							fprintf( stdout , "%s has been taken out !\n" , recievingSideUnits->units[ recievingSideNo ]->name);
-							break;
-						}	
 					} 
 				}
 			}
@@ -323,33 +320,37 @@ int shootUnit( sideData *shootingSideUnits , int shootingSideNo , sideData *reci
 	}
 	else if( aStarResult <= shootingSideUnits->units[ shootingSideNo ]->aTRange &&  recievingSideUnits->units[ recievingSideNo ]->unitType != UNITTYPE_INFANTRY)
 	{
-		fprintf( stdout , " Action cost : %d ,Shooting value : %d\n" , aStarResult ,  shootingSideUnits->units[ shootingSideNo ]->aTRange );
+		fprintf( stdout , " Action cost : %d ,Shooting value : %d , Shooting attacks : %d\n" , aStarResult ,  shootingSideUnits->units[ shootingSideNo ]->aTRange,  shootingSideUnits->units[ shootingSideNo ]->aTAttacks  );
 		shootingSideUnits->units[ shootingSideNo ]->shot = TRUE;
 		for( i = 0 ; i < shootingSideUnits->units[ shootingSideNo ]->aTAttacks ; i++ )
 		{
+			fprintf(stderr, "SHOOT!\n");
 			currentHit = rand() % 6 + 1;
 			if( currentHit >= TO_HIT )
 			{
 				currentHit = rand() % 6 + 1;
+				fprintf(stderr, "Save!\n");
 				if( currentHit < recievingSideUnits->units[ recievingSideNo ]->save )
 				{
 					currentHit = rand() % 6 + 1;
+					fprintf(stderr, "Cover save!\n");
 					if( currentHit < recievingSideUnits->units[ recievingSideNo ]->coverSave )
 					{
 						totalHits += 1;
+						fprintf(stderr, "HIT!\n");
 						recievingSideUnits->units[ recievingSideNo ]->wounds -= 1;
-						if( recievingSideUnits->units[ recievingSideNo ]->wounds <= 0 )
-						{
-							recievingSideUnits->units[ recievingSideNo ]->alive = FALSE;
-							recievingSideUnits->units[ recievingSideNo ]->selected = FALSE;
-							fprintf( stdout , "%s has been taken out !\n" , recievingSideUnits->units[ recievingSideNo ]->name);
-							break;
-						}						
+										
 					} 
 				}
 			}
 		}
 	}
+	if( recievingSideUnits->units[ recievingSideNo ]->wounds <= 0 )
+	{
+		recievingSideUnits->units[ recievingSideNo ]->alive = FALSE;
+		recievingSideUnits->units[ recievingSideNo ]->selected = FALSE;
+		fprintf( stdout , "%s has been taken out !\n" , recievingSideUnits->units[ recievingSideNo ]->name);
+	}	
 	else
 	{
 		fprintf( stdout , "Invalid Shoot!\n" );
@@ -385,6 +386,7 @@ void resolveShooting( sideData *shootingSideUnits , int shootingSideNo , sideDat
 	{
 		fprintf( stdout , "Shooting side won!" );
 		recievingSideUnits->units[ recievingSideNo ]->modifiers[ MODIFIERPOSITION_IMPETUOUS ] = FALSE;
+		recievingSideUnits->units[ recievingSideNo ]->morale -= 1;
 		if( recievingSideUnits->units[ recievingSideNo ]->morale < moraleTest )
 		{
 			if( combatRes > PINNED_THRESHOLD )
@@ -397,7 +399,7 @@ void resolveShooting( sideData *shootingSideUnits , int shootingSideNo , sideDat
 				fprintf( stdout , "%s gained Panicked!\n" , recievingSideUnits->units[ recievingSideNo ]->name );
 				recievingSideUnits->units[ recievingSideNo ]->modifiers[ MODIFIERPOSITION_PANICKED ] = TRUE;
 			}
-			if( combatRes > ROUT_THRESHOLD && recievingSideUnits->units[ recievingSideNo ]->morale < moraleTest )
+			if( combatRes > ROUT_THRESHOLD )
 			{
 				fprintf( stdout , "%s gained Rout!\n" , recievingSideUnits->units[ recievingSideNo ]->name );
 				recievingSideUnits->units[ recievingSideNo ]->modifiers[ MODIFIERPOSITION_PINNED ] = TRUE;
@@ -410,11 +412,13 @@ void resolveShooting( sideData *shootingSideUnits , int shootingSideNo , sideDat
 		}
 		fprintf( stdout , "%s gained Impetuous!\n" , shootingSideUnits->units[ shootingSideNo ]->name );
 		shootingSideUnits->units[ shootingSideNo ]->modifiers[ MODIFIERPOSITION_IMPETUOUS ] = TRUE;
+		shootingSideUnits->units[ shootingSideNo ]->morale += 1;
 	}
 	else
 	{
 		fprintf( stdout , "Recieving side won!" );
 		shootingSideUnits->units[ shootingSideNo ]->modifiers[ MODIFIERPOSITION_IMPETUOUS ] = FALSE;
+		shootingSideUnits->units[ shootingSideNo ]->morale -= 1;
 		if( shootingSideUnits->units[ shootingSideNo ]->morale < moraleTest )
 		{
 			if( combatRes > PINNED_THRESHOLD )
@@ -440,6 +444,7 @@ void resolveShooting( sideData *shootingSideUnits , int shootingSideNo , sideDat
 		}
 		fprintf( stdout , "%s gained Impetuous!\n" , recievingSideUnits->units[ recievingSideNo ]->name );
 		recievingSideUnits->units[ recievingSideNo ]->modifiers[ MODIFIERPOSITION_IMPETUOUS ] = TRUE;
+		recievingSideUnits->units[ recievingSideNo ]->morale += 1;
 	}
 }
 /*
