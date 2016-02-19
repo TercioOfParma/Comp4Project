@@ -118,7 +118,6 @@ int aStarWithTerrain( sideData *applicableUnits , int unitNo , tileData **tiles 
 			break;
 		}
 	}
-	fprintf( stdout , " Action cost : %d ,Movement value : %d\n" , totalLength ,  applicableUnits->units[ unitNo ]->movement );
 	return totalLength;
 }
 /*
@@ -166,15 +165,17 @@ void moveUnit( sideData *applicableUnits , tileData **tiles , int xPos , int yPo
 		stuckMove = ( applicableUnits->units[ givenUnit ]->movement / 3 );
 		applicableUnits->units[ givenUnit ]->movement -= stuckMove;
 		aStarResult = aStarWithTerrain( applicableUnits , givenUnit , tiles , xPos , yPos , tiles[0]->noTiles );
+		fprintf( stdout , " Action cost : %d ,Movement value : %d\n" , aStarResult ,  applicableUnits->units[ givenUnit ]->movement );
 		applicableUnits->units[ givenUnit ]->movement += stuckMove;
 	}
 	else
 	{
 		aStarResult = aStarWithTerrain( applicableUnits , givenUnit , tiles , xPos , yPos , tiles[0]->noTiles );
+		fprintf( stdout , " Action cost : %d ,Movement value : %d\n" , aStarResult ,  applicableUnits->units[ givenUnit ]->movement );
 	}
 	if( aStarResult <= applicableUnits->units[ givenUnit ]->movement && applicableUnits->units[ givenUnit ]->modifiers[ MODIFIERPOSITION_STUNNED ] == FALSE && applicableUnits->units[ givenUnit ]->modifiers[ MODIFIERPOSITION_PANICKED ] == FALSE && applicableUnits->units[ givenUnit ]->modifiers[ MODIFIERPOSITION_PINNED ] == FALSE )
 	{
-	
+		
 		applicableUnits->units[ givenUnit ]->relativeX = xPos;
 		applicableUnits->units[ givenUnit ]->relativeY = yPos;
 		applicableUnits->units[ givenUnit ]->selected = FALSE;
@@ -231,6 +232,7 @@ int shootUnit( sideData *shootingSideUnits , int shootingSideNo , sideData *reci
 	totalHits = 0;
 	if( aStarResult <= shootingSideUnits->units[ shootingSideNo ]->aPRange &&  recievingSideUnits->units[ recievingSideNo ]->unitType == UNITTYPE_INFANTRY)
 	{
+		fprintf( stdout , " Action cost : %d ,Shooting value : %d\n" , aStarResult ,  shootingSideUnits->units[ shootingSideNo ]->aPRange );
 		shootingSideUnits->units[ shootingSideNo ]->shot = TRUE;
 		for( i = 0 ; i < shootingSideUnits->units[ shootingSideNo ]->aPAttacks ; i++ )
 		{
@@ -259,6 +261,7 @@ int shootUnit( sideData *shootingSideUnits , int shootingSideNo , sideData *reci
 	}
 	else if( aStarResult <= shootingSideUnits->units[ shootingSideNo ]->aTRange &&  recievingSideUnits->units[ recievingSideNo ]->unitType != UNITTYPE_INFANTRY)
 	{
+		fprintf( stdout , " Action cost : %d ,Shooting value : %d\n" , aStarResult ,  shootingSideUnits->units[ shootingSideNo ]->aTRange );
 		shootingSideUnits->units[ shootingSideNo ]->shot = TRUE;
 		for( i = 0 ; i < shootingSideUnits->units[ shootingSideNo ]->aTAttacks ; i++ )
 		{
