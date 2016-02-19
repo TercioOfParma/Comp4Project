@@ -147,6 +147,12 @@ int findDistance( tileData *tileOne , tileData *tileTwo )
 void moveUnit( sideData *applicableUnits , tileData **tiles , int xPos , int yPos , int givenUnit )
 {
 	fprintf( stderr , "Moving unit %d, %s\n" , applicableUnits->units[ givenUnit ]->unitID , applicableUnits->units[ givenUnit ]->name );
+	applicableUnits->units[ givenUnit ]->moved = TRUE;
+	int aStarResult;
+	int i, j, k, stuckMove, morale;
+	k = 0;
+	i = 0;
+	j = 0;
 	if(applicableUnits->units[ givenUnit ]->moved == TRUE)
 	{
 		fprintf( stdout , "%s has Already moved!\n", applicableUnits->units[ givenUnit ]->name);
@@ -154,12 +160,46 @@ void moveUnit( sideData *applicableUnits , tileData **tiles , int xPos , int yPo
 		return;
 	
 	}
-	applicableUnits->units[ givenUnit ]->moved = TRUE;
-	int aStarResult;
-	int i, j, k, stuckMove;
-	k = 0;
-	i = 0;
-	j = 0;
+	//no sense including impetouous here because they will have lost it if they are any of these
+	if(applicableUnits->units[ givenUnit ]->modifiers[ MODIFIERPOSITION_ROUT ] == TRUE)
+	{
+		morale = rand() % 12 + 1;
+		if(morale <= applicableUnits->units[ givenUnit ]->morale)
+		{
+			applicableUnits->units[ givenUnit ]->modifiers[ MODIFIERPOSITION_ROUT ] = FALSE;
+		
+		}
+		else
+		{
+			fprintf(stdout, "ROUTING!\n");
+			xPos = applicableUnits->units[ givenUnit ]->relativeX + 1;
+			yPos = applicableUnits->units[ givenUnit ]->relativeY + 1;
+		
+		}
+	
+	}
+	if( applicableUnits->units[ givenUnit ]->modifiers[ MODIFIERPOSITION_STUNNED ] == TRUE || applicableUnits->units[ givenUnit ]->modifiers[ MODIFIERPOSITION_PANICKED ] == TRUE )
+	{
+		morale = rand() % 12 + 1;
+		if(morale <= applicableUnits->units[ givenUnit ]->morale)
+		{
+			applicableUnits->units[ givenUnit ]->modifiers[ MODIFIERPOSITION_STUNNED ] = FALSE;
+			applicableUnits->units[ givenUnit ]->modifiers[ MODIFIERPOSITION_PANICKED ] = FALSE;
+		}
+		else
+		{
+			fprintf(stdout, "Unable to move: Stunned or Panicked!\n");
+			return;
+		
+		}
+	
+	}
+	if( applicableUnits->units[ givenUnit ]->modifiers[ MODIFIERPOSITION_PINNED ] == TRUE )
+	{
+		fprintf(stderr, "Can't move: We're Pinned down!\n");
+		return;
+	
+	}
 	if( applicableUnits->units[ givenUnit ]->modifiers[ MODIFIERPOSITION_STUCK ] == TRUE )
 	{
 		stuckMove = ( applicableUnits->units[ givenUnit ]->movement / 3 );
@@ -225,11 +265,33 @@ int shootUnit( sideData *shootingSideUnits , int shootingSideNo , sideData *reci
 		shootingSideUnits->units[ shootingSideNo ]->selected = FALSE;
 		return 0;
 	}
+	if( shootingSideUnits->units[ shootingSideNo ]->modifiers[ MODIFIERPOSITION_ROUT ] == TRUE )
+	{
+		fprintf(stderr, "Can't shoot! Routing!\n" );
+		return 0;
+	}
+	shootingSideUnits->units[ shootingSideNo ]->modifiers[ MODIFIERPOSITION_PINNED ] = FALSE;
 	shootingSideUnits->units[ shootingSideNo ]->shot = TRUE;
 	fprintf( stderr , "%d\n" , tiles[0]->noTiles );
 	int aStarResult = aStarWithTerrain( shootingSideUnits , shootingSideNo , tiles , recievingSideUnits->units[ recievingSideNo ]->relativeX , recievingSideUnits->units[ recievingSideNo ]->relativeY, tiles[0]->noTiles - 1 );
-	int i, totalHits, currentHit;
+	int i, totalHits, currentHit, morale;
 	totalHits = 0;
+	if( shootingSideUnits->units[ shootingSideNo ]->modifiers[ MODIFIERPOSITION_STUNNED ] == TRUE )
+	{
+		morale = rand() % 12 + 1;
+		if(morale <= shootingSideUnits->units[ shootingSideNo ]->morale)
+		{
+			shootingSideUnits->units[ shootingSideNo ]->modifiers[ MODIFIERPOSITION_STUNNED ] = FALSE;
+		}
+		else
+		{
+			fprintf(stdout, "Unable to shoot: Stunned or Panicked!\n");
+			return;
+		
+		}
+	
+	}
+	
 	if( aStarResult <= shootingSideUnits->units[ shootingSideNo ]->aPRange &&  recievingSideUnits->units[ recievingSideNo ]->unitType == UNITTYPE_INFANTRY)
 	{
 		fprintf( stdout , " Action cost : %d ,Shooting value : %d\n" , aStarResult ,  shootingSideUnits->units[ shootingSideNo ]->aPRange );
@@ -313,7 +375,8 @@ void resolveShooting( sideData *shootingSideUnits , int shootingSideNo , sideDat
 {
 	fprintf( stderr , "Resolving shooting.......\n" );
 	int combatRes = inflictedCasualties - recievedCasualties ;
-	int moraleTest = ( rand() % 6 + 1 ) * 2;
+	int moraleTest;
+	moraleTest = rand() % 12 + 1;
 	if( combatRes == 0 )
 	{
 		return;
@@ -322,25 +385,28 @@ void resolveShooting( sideData *shootingSideUnits , int shootingSideNo , sideDat
 	{
 		fprintf( stdout , "Shooting side won!" );
 		recievingSideUnits->units[ recievingSideNo ]->modifiers[ MODIFIERPOSITION_IMPETUOUS ] = FALSE;
-		if( combatRes > PINNED_THRESHOLD )
+		if( recievingSideUnits->units[ recievingSideNo ]->morale < moraleTest )
 		{
-			fprintf( stdout , "%s gained Pinned!\n" , recievingSideUnits->units[ recievingSideNo ]->name );
-			recievingSideUnits->units[ recievingSideNo ]->modifiers[ MODIFIERPOSITION_PINNED ] = TRUE;
-		}
-		if( combatRes > PANICKED_THRESHOLD )
-		{
-			fprintf( stdout , "%s gained Panicked!\n" , recievingSideUnits->units[ recievingSideNo ]->name );
-			recievingSideUnits->units[ recievingSideNo ]->modifiers[ MODIFIERPOSITION_PANICKED ] = TRUE;
-		}
-		if( combatRes > ROUT_THRESHOLD && recievingSideUnits->units[ recievingSideNo ]->morale < moraleTest )
-		{
-			fprintf( stdout , "%s gained Rout!\n" , recievingSideUnits->units[ recievingSideNo ]->name );
-			recievingSideUnits->units[ recievingSideNo ]->modifiers[ MODIFIERPOSITION_PINNED ] = TRUE;
-		}
-		if( combatRes > STUNNED_THRESHOLD )
-		{
-			fprintf( stdout , "%s gained Stunned!\n" , recievingSideUnits->units[ recievingSideNo ]->name );
-			recievingSideUnits->units[ recievingSideNo ]->modifiers[ MODIFIERPOSITION_STUNNED ] = TRUE;
+			if( combatRes > PINNED_THRESHOLD )
+			{
+				fprintf( stdout , "%s gained Pinned!\n" , recievingSideUnits->units[ recievingSideNo ]->name );
+				recievingSideUnits->units[ recievingSideNo ]->modifiers[ MODIFIERPOSITION_PINNED ] = TRUE;
+			}
+			if( combatRes > PANICKED_THRESHOLD )
+			{
+				fprintf( stdout , "%s gained Panicked!\n" , recievingSideUnits->units[ recievingSideNo ]->name );
+				recievingSideUnits->units[ recievingSideNo ]->modifiers[ MODIFIERPOSITION_PANICKED ] = TRUE;
+			}
+			if( combatRes > ROUT_THRESHOLD && recievingSideUnits->units[ recievingSideNo ]->morale < moraleTest )
+			{
+				fprintf( stdout , "%s gained Rout!\n" , recievingSideUnits->units[ recievingSideNo ]->name );
+				recievingSideUnits->units[ recievingSideNo ]->modifiers[ MODIFIERPOSITION_PINNED ] = TRUE;
+			}
+			if( combatRes > STUNNED_THRESHOLD )
+			{
+				fprintf( stdout , "%s gained Stunned!\n" , recievingSideUnits->units[ recievingSideNo ]->name );
+				recievingSideUnits->units[ recievingSideNo ]->modifiers[ MODIFIERPOSITION_STUNNED ] = TRUE;
+			}
 		}
 		fprintf( stdout , "%s gained Impetuous!\n" , shootingSideUnits->units[ shootingSideNo ]->name );
 		shootingSideUnits->units[ shootingSideNo ]->modifiers[ MODIFIERPOSITION_IMPETUOUS ] = TRUE;
@@ -348,27 +414,29 @@ void resolveShooting( sideData *shootingSideUnits , int shootingSideNo , sideDat
 	else
 	{
 		fprintf( stdout , "Recieving side won!" );
-		moraleTest = abs( moraleTest );
 		shootingSideUnits->units[ shootingSideNo ]->modifiers[ MODIFIERPOSITION_IMPETUOUS ] = FALSE;
-		if( combatRes > PINNED_THRESHOLD )
+		if( shootingSideUnits->units[ shootingSideNo ]->morale < moraleTest )
 		{
-			fprintf( stdout , "%s gained Pinned!\n" , shootingSideUnits->units[ shootingSideNo ]->name );
-			shootingSideUnits->units[ shootingSideNo ]->modifiers[ MODIFIERPOSITION_PINNED ] = TRUE;
-		}
-		if( combatRes > PANICKED_THRESHOLD )
-		{
-			fprintf( stdout , "%s gained Panicked!\n" , shootingSideUnits->units[ shootingSideNo ]->name );
-			shootingSideUnits->units[ shootingSideNo ]->modifiers[ MODIFIERPOSITION_PANICKED ] = TRUE;
-		}
-		if( combatRes > ROUT_THRESHOLD && shootingSideUnits->units[ shootingSideNo ]->morale < moraleTest )
-		{
-			fprintf( stdout , "%s gained Rout!\n" , shootingSideUnits->units[ shootingSideNo ]->name );
-			shootingSideUnits->units[ shootingSideNo ]->modifiers[ MODIFIERPOSITION_PINNED ] = TRUE;
-		}
-		if( combatRes > STUNNED_THRESHOLD )
-		{
-			fprintf( stdout , "%s gained Stunned!\n" , shootingSideUnits->units[ shootingSideNo ]->name );
-			shootingSideUnits->units[ shootingSideNo ]->modifiers[ MODIFIERPOSITION_STUNNED ] = TRUE;
+			if( combatRes > PINNED_THRESHOLD )
+			{
+				fprintf( stdout , "%s gained Pinned!\n" , shootingSideUnits->units[ shootingSideNo ]->name );
+				shootingSideUnits->units[ shootingSideNo ]->modifiers[ MODIFIERPOSITION_PINNED ] = TRUE;
+			}
+			if( combatRes > PANICKED_THRESHOLD )
+			{
+				fprintf( stdout , "%s gained Panicked!\n" , shootingSideUnits->units[ shootingSideNo ]->name );
+				shootingSideUnits->units[ shootingSideNo ]->modifiers[ MODIFIERPOSITION_PANICKED ] = TRUE;
+			}
+			if( combatRes > ROUT_THRESHOLD && shootingSideUnits->units[ shootingSideNo ]->morale < moraleTest )
+			{
+				fprintf( stdout , "%s gained Rout!\n" , shootingSideUnits->units[ shootingSideNo ]->name );
+				shootingSideUnits->units[ shootingSideNo ]->modifiers[ MODIFIERPOSITION_PINNED ] = TRUE;
+			}
+			if( combatRes > STUNNED_THRESHOLD )
+			{
+				fprintf( stdout , "%s gained Stunned!\n" , shootingSideUnits->units[ shootingSideNo ]->name );
+				shootingSideUnits->units[ shootingSideNo ]->modifiers[ MODIFIERPOSITION_STUNNED ] = TRUE;
+			}
 		}
 		fprintf( stdout , "%s gained Impetuous!\n" , recievingSideUnits->units[ recievingSideNo ]->name );
 		recievingSideUnits->units[ recievingSideNo ]->modifiers[ MODIFIERPOSITION_IMPETUOUS ] = TRUE;
