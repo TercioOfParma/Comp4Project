@@ -147,7 +147,6 @@ int findDistance( tileData *tileOne , tileData *tileTwo )
 void moveUnit( sideData *applicableUnits , tileData **tiles , int xPos , int yPos , int givenUnit )
 {
 	fprintf( stderr , "Moving unit %d, %s\n" , applicableUnits->units[ givenUnit ]->unitID , applicableUnits->units[ givenUnit ]->name );
-	applicableUnits->units[ givenUnit ]->moved = TRUE;
 	int aStarResult;
 	int i, j, k, stuckMove, morale;
 	k = 0;
@@ -160,6 +159,7 @@ void moveUnit( sideData *applicableUnits , tileData **tiles , int xPos , int yPo
 		return;
 	
 	}
+	applicableUnits->units[ givenUnit ]->moved = TRUE;
 	//no sense including impetouous here because they will have lost it if they are any of these
 	if(applicableUnits->units[ givenUnit ]->modifiers[ MODIFIERPOSITION_ROUT ] == TRUE)
 	{
