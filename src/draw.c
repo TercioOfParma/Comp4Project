@@ -42,7 +42,7 @@ textData *renderText( TTF_Font *font , SDL_Renderer *render , const char *string
 	char renderableText [MAX_TEXT_OUTPUT];//what will be displayed
 	
 	snprintf(renderableText, MAX_TEXT_OUTPUT, "%s", stringToTexture);//no sprintf overflows here 
-	tempSurf = TTF_RenderText_Solid( font , renderableText , DEFAULT_TEXT );
+	tempSurf = TTF_RenderText_Solid( font , renderableText , DEFAULT_TEXT );//Generates a text surface
 	
 	if( !tempSurf )
 	{
@@ -50,7 +50,7 @@ textData *renderText( TTF_Font *font , SDL_Renderer *render , const char *string
 		*success = FAIL;
 		return NULL;
 	}
-	tempTex = SDL_CreateTextureFromSurface( render , tempSurf );
+	tempTex = SDL_CreateTextureFromSurface( render , tempSurf );//Converts to texture
 	if( !tempTex )
 	{
 		fprintf( stderr , "SDL_CreateTextureFromSurface has failed : %s \n", SDL_GetError() );
@@ -59,7 +59,7 @@ textData *renderText( TTF_Font *font , SDL_Renderer *render , const char *string
 	
 	}
 	temp->display = tempTex;
-	temp->dimensions.w = tempSurf->w;
+	temp->dimensions.w = tempSurf->w;//Saves the dimensions of the texture
 	temp->dimensions.h = tempSurf->h;
 	SDL_FreeSurface( tempSurf );
 	return temp; //cannot simply destroy since then the address would then be hanging
@@ -106,6 +106,7 @@ void drawQuote( quoteData **quotes , int quoteNo , SDL_Renderer *render , TTF_Fo
 		fprintf( stderr , "One of the quote components has failed, please check the file and your computer\n" );//NON CRITICAL FAILURE
 		return;
 	}
+	//Defines display positions
 	quotes[ quoteNo ]->display[ QUOTE_POS ]->dimensions.x = QUOTATION_XPOS ;
 	quotes[ quoteNo ]->display[ QUOTE_POS ]->dimensions.y = QUOTATION_YPOS ;
 	quotes[ quoteNo ]->display[ ANALYSIS_POS ]->dimensions.x = QUOTATION_XPOS ;
@@ -123,7 +124,7 @@ void drawQuestion( questionData **questions , int questionNo , SDL_Renderer *ren
 	fprintf( stderr , "Drawing question and answers....\n" );
 	int wasSuccess = SUCCESS;
 	int i;
-	
+	//Positions and texture
 	questions[ questionNo ]->display[ QUESTION_POS ] = renderText( font , render , questions[ questionNo ]->question , &wasSuccess );
 	questions[ questionNo ]->display[ QUESTION_POS ]->dimensions.x = QUESTION_XPOS ;
 	questions[ questionNo ]->display[ QUESTION_POS ]->dimensions.y = QUESTION_YPOS ;
@@ -169,3 +170,7 @@ void drawUnits( unitData **toDraw , int size , SDL_Renderer *render , SDL_Textur
 		}
 	}
 }
+/*
+	End of File
+
+*/
