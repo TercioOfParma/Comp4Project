@@ -55,7 +55,7 @@ char *loadTextFile( const char *filename , int *success )
 	fileContents = calloc( 1 , fileSize + 1 );
 	if( !fileContents )
 	{
-		fprintf( stderr , "malloc has failed at %s, %s, line %d : %s\n" , __FUNCTION__ , __FILE__ , __LINE__ , strerror( errno ) );
+		fprintf( stderr , "calloc has failed at %s, %s, line %d : %s\n" , __FUNCTION__ , __FILE__ , __LINE__ , strerror( errno ) );
 		*success = FAIL;
 		return NULL;
 	
@@ -64,7 +64,7 @@ char *loadTextFile( const char *filename , int *success )
 	fclose( jsonFile );
 	for(i = 0; i < fileSize; i++)
 	{
-		if(fileContents[i] == ']')
+		if(fileContents[i] == ']')//This makes sure that the resultant buffer doesn't read garbage from JSON files
 		{
 			fileContents[i + 1] = '\0';
 			break;
@@ -94,7 +94,7 @@ int getFileSize( FILE *sizeToGet , int *success )
 	int fileSize = 0;
 	fseek( sizeToGet , 0 , SEEK_END );
 	fileSize = ftell( sizeToGet );
-	rewind( sizeToGet );//back to the start
+	rewind( sizeToGet );//back to the start, as without this we cannot load the contents 
 	if(errno > 0)
 	{
 		fprintf( stderr , "ftell has failed : %s" , strerror( errno ) );
