@@ -87,7 +87,7 @@ int startQuiz( activityData *quiz , SDL_Renderer *render , TTF_Font *font , SDL_
 	{
 		while( SDL_PollEvent( events ) )//registers input and processes clicks on them
 		{
-			SDL_GetMouseState( &(mouseDimensions.x) , &(mouseDimensions.y) );
+			SDL_GetMouseState( &( mouseDimensions.x ) , &( mouseDimensions.y ) );
 			if( events->type == SDL_MOUSEBUTTONDOWN )
 			{
 				clicked = FAIL;
@@ -101,7 +101,7 @@ int startQuiz( activityData *quiz , SDL_Renderer *render , TTF_Font *font , SDL_
 					}
 				
 				}
-				if(clicked == SUCCESS )//Correct or Incorrect
+				if(clicked == SUCCESS )//Correct or Incorrect check
 				{
 					if(j == quiz->questions[randomQuestion]->answerNo )
 					{
