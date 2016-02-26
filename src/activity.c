@@ -2,7 +2,10 @@
 	FILE : ACTIVITY.C
 	PURPOSE : Hold all functions related to the activity section of the solution
 	VERSION : 0.001
-	NOTES: Could get far more complex in later non coursework versions
+	NOTES: This handles:
+		- The quiz
+		- Calculating Grades
+		- Displaying the results of a user quiz
 */
 //---------------------------------- C PREPROCESSOR --------------------------
 
@@ -165,3 +168,11 @@ void displayActivityResults( activityData *quiz , char *resultsToDisplay , SDL_R
 	SDL_DestroyTexture( toDisplay->display );
 	free( toDisplay );
 }
+
+
+/*
+
+	END OF FILE
+
+
+*/
