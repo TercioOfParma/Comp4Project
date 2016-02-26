@@ -22,54 +22,92 @@
 #include <time.h>
 #include <windows.h>
 //----------------------------------- PROGRAM CONSTANTS --------------------------------------
+// Used for declaring indexes and the like
 #define SIZE_OF_MODIFIERS 6
 #define NO_SIDES 2
 #define NO_ANSWERS 3
 #define TEXT_DATA_QUESTION 4
 #define TEXT_DATA_QUOTE 2
+#define LARGE 200000
+#define START_BUTTON 0
+#define QUIT_BUTTON 1
+#define NO_BUTTON_MAIN 3
+#define NO_BUTTON_SECONDARY 10000
+
+//The positions in the Modifiers array of various morale modifiers
 const static int MODIFIERPOSITION_ROUT = 0;
 const static int MODIFIERPOSITION_PANICKED = 1;
 const static int MODIFIERPOSITION_STUNNED = 2;
 const static int MODIFIERPOSITION_PINNED = 3;
 const static int MODIFIERPOSITION_STUCK = 4;
 const static int MODIFIERPOSITION_IMPETUOUS = 5;
-//const static char FALSE = 0;
-//const static char TRUE = 1;
+
+//Sides and whether or not functions succeed or fail, you need something you can return, as chars can be used and recognised as ints
 const static char FAIL = 0;
 const static char SUCCESS = 1;
 const static int SIDE_ONE = 0;
 const static int SIDE_TWO = 1;
-const static int TERRAIN_COAST = 0;
-const static int TERRAIN_URBAN = 1;
-const static int TERRAIN_JUNGLE = 2;
-const static int TERRAIN_RIVER = 3;
-const static int TERRAIN_HILL = 4;
-const static int TERRAIN_MOUNTAIN = 5;
-const static int OBJECTIVE_SEARCHANDDESTROY = 0;
-const static int OBJECTIVE_TAKEANDHOLD = 1;
-const static int UNITTYPE_INFANTRY = 0;
-const static int UNITTYPE_MECHANISED = 1;
-const static int UNITTYPE_TANK = 2;
-const static int UNITTYPE_HELICOPTER = 3;
-const static int UNITTYPE_EMPLACEMENT = 4;
-const static int UNITTYPE_RECCE = 5;
-const static int UNITTYPE_AA = 6;
-const static int UNITTYPE_ARTILLERY = 7;
+
+//Terrain type identifiers and objectives
+const static char TERRAIN_COAST = 0;
+const static char TERRAIN_URBAN = 1;
+const static char TERRAIN_JUNGLE = 2;
+const static char TERRAIN_RIVER = 3;
+const static char TERRAIN_HILL = 4;
+const static char TERRAIN_MOUNTAIN = 5;
+const static char OBJECTIVE_SEARCHANDDESTROY = 0;
+const static char OBJECTIVE_TAKEANDHOLD = 1;
+
+//Unit types, see design for why they are chars
+const static char UNITTYPE_INFANTRY = 0;
+const static char UNITTYPE_MECHANISED = 1;
+const static char UNITTYPE_TANK = 2;
+const static char UNITTYPE_HELICOPTER = 3;
+const static char UNITTYPE_EMPLACEMENT = 4;
+const static char UNITTYPE_RECCE = 5;
+const static char UNITTYPE_AA = 6;
+const static char UNITTYPE_ARTILLERY = 7;
+
+//Default positions, these are needed as there is a requirement to access these files before using ID mapping to access the others
 const static char *OPTIONS_FILE = "options.json";
 const static char *LEVELS_FILE = "levels.json";
+const static char *ACTIVITY_FILE = "activity.json";
+const static char *QUOTELIST_FILE = "quoteList.json";
+const static char *MAPPING_FILE_MISC = "FileIDMapping.json";
+const static char *SIDE_FILES[] = {"sideone.json", "sidetwo.json"};
+const static char *UNIT_FILE = "unitData.json";
+const static char *LOG_FILE = "log.txt";
+const static char *MAPPING_FILE_MAPS = "levelMapping.json";
+const static char *MAP_FILE = "maps.json";
+const static char *TILESET_FILE = "tileset.png";
+const static char *TILE_FILE = "tileData.json";
+//Text
 const static int MAX_TEXT_OUTPUT = 200;
 const static SDL_Color DEFAULT_TEXT = {255,255,255,0}; 
+
+//Positions, so that they will always be in the same placee
 const static int QUOTATION_XPOS = 400;
 const static int QUOTATION_YPOS = 300;
 const static int QUESTION_XPOS = 250;
 const static int QUESTION_YPOS = 200;
-const static char *MAPPING_FILE_MISC = "FileIDMapping.json";
 const static int QUOTE_POS = 0;
 const static int ANALYSIS_POS = 1;
 const static int QUESTION_POS = 0;
 const static int ANSWERONE_POS = 1;
 const static int ANSWERTWO_POS = 2;
 const static int ANSWERTHREE_POS = 3;
+const static int WINNING_MESSAGE_POSITIONX = 300;
+const static int WINNING_MESSAGE_POSITIONY = 100;
+const static int LOSSES_MESSAGE_POSITIONX = 400;
+const static int LOSSES_MESSAGE_POSITIONY = 200;
+const static int CONSOLESIZE_X = 720;
+const static int CONSOLESIZE_Y = 400;
+const static int BUTTONPOS = 100;
+const static int BUTTONPOS_OFFSET = 200;
+const static int START_BUTTON_TYPE = 1;
+const static int QUIT_BUTTON_TYPE = 2;
+
+//Grade percentages
 const static int A_GRADE = 80;
 const static int B_GRADE = 70;
 const static int C_GRADE = 60;
@@ -78,50 +116,46 @@ const static int E_GRADE = 40;
 const static int F_GRADE = 30;
 const static int G_GRADE = 20;
 const static int N_GRADE = 10;
-const static char *ACTIVITY_FILE = "activity.json";
-const static char *QUOTELIST_FILE = "quoteList.json";
+
+//Tile size and map position, so the solution knows how and where to draw the map to the screen
 const static int TILE_WIDTH = 64;
 const static int TILE_HEIGHT = 64;
 const static int STARTX_MAP = 0;
 const static int STARTY_MAP = 0;
-const static char *SIDE_FILES[] = {"sideone.json", "sidetwo.json"};
-const static char *UNIT_FILE = "unitData.json";
-const static char *LOG_FILE = "log.txt";
-const static char *MAPPING_FILE_MAPS = "levelMapping.json";
-const static char *MAP_FILE = "maps.json";
-const static char *TILESET_FILE = "tileset.png";
-const static char *TILE_FILE = "tileData.json";
+
+//needed to see if things hit
 const static int TO_HIT = 4;
+
+//Cover saves, 7 so it will never pass, and others are different since units are in cover
 const static int DEFAULT_COVER_SAVE = 7;
 const static int URBAN_COVER_SAVE = 5;
 const static int JUNGLE_COVER_SAVE = 6;
+
+//Thresholds used to define whether or not a combat result is such to affect how the unit fights
 const static int PINNED_THRESHOLD = 2;
 const static int PANICKED_THRESHOLD = 3;
 const static int ROUT_THRESHOLD = 3;
 const static int STUNNED_THRESHOLD = 3;
-const static int SQRT_TWO = 14;
-#define LARGE 200000
-const static int WINNING_MESSAGE_POSITIONX = 300;
-const static int WINNING_MESSAGE_POSITIONY = 100;
-const static int LOSSES_MESSAGE_POSITIONX = 400;
-const static int LOSSES_MESSAGE_POSITIONY = 200;
-#define START_BUTTON 0
-#define QUIT_BUTTON 1
-#define NO_BUTTON_MAIN 3
-#define NO_BUTTON_SECONDARY 10000
-const static int QUIT_KEY = 2;
+
+const static int SQRT_TWO = 14;//Needed for A*
+
+//Return values, so the simulation knows what is clicked
 const static int END_TURN_BUTTON = 20000;
-const static char *STARTBUTTON_PATH = "gfx/start_button.png";
-const static char *QUITBUTTON_PATH = "gfx/quit_button.png";
-const static char *NEXTTURNBUTTON_PATH = "gfx/next_turn_button.png";
-const static char *BLANKBUTTON_PATH = "gfx/blank_button.png";
-const static int START_BUTTON_TYPE = 1;
-const static int QUIT_BUTTON_TYPE = 2;
 const static int TILE_SELECTED = 10;
 const static int UNIT_SELECTED = 20;
 const static int UNIT_SELECTED_OTHER = 30;
 const static int NULL_INPUT = 12345678;
-const static float CLICK_RATE = 35.0;
+const static int QUIT_KEY = 2;
+
+//Needed to load the invariable UI buttons
+const static char *STARTBUTTON_PATH = "gfx/start_button.png";
+const static char *QUITBUTTON_PATH = "gfx/quit_button.png";
+const static char *NEXTTURNBUTTON_PATH = "gfx/next_turn_button.png";
+const static char *BLANKBUTTON_PATH = "gfx/blank_button.png";
+
+
+const static float CLICK_RATE = 35.0;//Needed to stop the program from doing multiple turns at once
+
 //----------------------------------- STRUTURE DEFINITIONS -----------------------------------
 
 /*
@@ -137,7 +171,7 @@ typedef struct
 	int aPAttacks;
 	int aTRange;
 	int aTAttacks;
-	int unitType;
+	char unitType;
 	int wounds;
 	int save;
 	int morale;
@@ -318,135 +352,142 @@ typedef struct
 
 //----------------------------------- FUNCTION PROTOTYPES ------------------------------------
 //-----------INITIALISATION-----------
-//loading libraries and the files themselves
-char *loadTextFile( const char *filename , int *success );// DONE
 
-int getFileSize( FILE *sizeToGet , int *success );// DONE
+char *loadTextFile( const char *filename , int *success );
 
-optionsData initOptions( char *fileContents , int *success );// DONE
+int getFileSize( FILE *sizeToGet , int *success );
 
-SDL_Window *initSDL( optionsData *opt , int *success );// DONE
+optionsData initOptions( char *fileContents , int *success );
 
-SDL_Renderer *createRenderer( SDL_Window *screen , int *success );// DONE
+SDL_Window *initSDL( optionsData *opt , int *success );
 
-Mix_Music *loadMusic( const char *filename , int *success );// DONE
+SDL_Renderer *createRenderer( SDL_Window *screen , int *success );
 
-Mix_Chunk *loadEffect( const char *filename , int *success );// DONE
+Mix_Music *loadMusic( const char *filename , int *success );
 
-TTF_Font *loadFont( optionsData *opt , int *success );// DONE
+Mix_Chunk *loadEffect( const char *filename , int *success );
 
-SDL_Texture *loadImage( const char *filename , SDL_Renderer *render , SDL_Rect *dimen , int *success );// DONE
+TTF_Font *loadFont( optionsData *opt , int *success );
 
-//runtime objects
-buttonData *loadButton( SDL_Texture *display , SDL_Rect *posAndSize , int type , int *success );// DONE
+SDL_Texture *loadImage( const char *filename , SDL_Renderer *render , SDL_Rect *dimen , int *success );
 
-//there was createTextData here, but i felt it unneccessary, Can always roll back changes need be
-buttonDataText *loadButtonText( SDL_Texture *display , SDL_Rect *posAndSize , SDL_Renderer *render , const char *initialData , TTF_Font *font , int type , int *success );//DONE
 
-levelData *loadLevelData( SDL_Renderer *render , int *success );//DONE
+buttonData *loadButton( SDL_Texture *display , SDL_Rect *posAndSize , int type , int *success );
 
-char *mapLevelIDToMapPath( int id , int *success );//DONE
 
-char *miscIDToFilePath( int ID , char *path );//DONE
+buttonDataText *loadButtonText( SDL_Texture *display , SDL_Rect *posAndSize , SDL_Renderer *render , const char *initialData , TTF_Font *font , int type , int *success );
 
-mapData *loadMapData( char *levelDataFile , int mapNo , SDL_Renderer *render , int *success );//DONE
+levelData *loadLevelData( SDL_Renderer *render , int *success );
 
-sideData *loadSideData( char *filename , int sideNumber , int *success );//DONE
+char *mapLevelIDToMapPath( int id , int *success );
 
-unitData **loadUnitData( char *sideUnitDataFilePath , char *unitDescriptorDataFilePath , int *success );//DONE
+char *miscIDToFilePath( int ID , char *path );
 
-tileData **loadTileData( char *tileFile , int *success );//DONE
+mapData *loadMapData( char *levelDataFile , int mapNo , SDL_Renderer *render , int *success );
 
-quoteListData *loadQuoteListData( char *filename , int *success );//DONE
+sideData *loadSideData( char *filename , int sideNumber , int *success );
 
-quoteData **loadQuotes( char *filename , int *success );//DONE
+unitData **loadUnitData( char *sideUnitDataFilePath , char *unitDescriptorDataFilePath , int *success );
 
-activityData *loadActivity( char *filename , int *success );//DONE
+tileData **loadTileData( char *tileFile , int *success );
 
-questionData **loadQuestions( char *filename , int *success );//DONE
+quoteListData *loadQuoteListData( char *filename , int *success );
 
-unitData *loadUnit( char *unitFile , int ID , int *success );//DONE
+quoteData **loadQuotes( char *filename , int *success );
+
+activityData *loadActivity( char *filename , int *success );
+
+questionData **loadQuestions( char *filename , int *success );
+
+unitData *loadUnit( char *unitFile , int ID , int *success );
 
 //----------DEINITIALISATION-----------
-void endSDL( SDL_Renderer *render , SDL_Window *screen , TTF_Font *font );//DONE
+void endSDL( SDL_Renderer *render , SDL_Window *screen , TTF_Font *font );
 
-void endUnitDataArray( unitData **units , int size );//DONE
+void endUnitDataArray( unitData **units , int size );
 
-void endSideData( sideData *side );//DONE
+void endSideData( sideData *side );
 
-void endTileData( tileData **tiles , int size );//DONE
+void endTileData( tileData **tiles , int size );
 
-void endQuoteListData( quoteListData *quotes );//DONE
+void endQuoteListData( quoteListData *quotes );
 
-void endQuotes( quoteData **quotes , int size );//DONE
+void endQuotes( quoteData **quotes , int size );
 
-void endActivity( activityData *activity );//DONE
+void endActivity( activityData *activity );
 
-void endQuestions( questionData **questions , int size );//DONE
+void endQuestions( questionData **questions , int size );
 
-void endLevel( levelData *level );//DONE
+void endLevel( levelData *level );
 
 
 //----------DRAWING AND GRAPHICAL-----
-void drawTerrain( tileData **toDraw , int size , SDL_Renderer *render , SDL_Texture *tileMap );//DONE
+void drawTerrain( tileData **toDraw , int size , SDL_Renderer *render , SDL_Texture *tileMap );
 
-void drawUnits( unitData **toDraw , int size ,  SDL_Renderer *render , SDL_Texture *tileMap );//DONE
+void drawUnits( unitData **toDraw , int size ,  SDL_Renderer *render , SDL_Texture *tileMap );
 
-void drawMenuElements( buttonData **buttons , int size , SDL_Renderer *render );// DONE
+void drawMenuElements( buttonData **buttons , int size , SDL_Renderer *render );
 
-void drawMenuElementsText( buttonDataText **buttons , int size , SDL_Renderer *render );//DONE
+void drawMenuElementsText( buttonDataText **buttons , int size , SDL_Renderer *render );
 
-textData *renderText( TTF_Font *font , SDL_Renderer *render , const char *stringToTexture , int *success );// DONE
+textData *renderText( TTF_Font *font , SDL_Renderer *render , const char *stringToTexture , int *success );
 
-void drawText( textData *toDraw , SDL_Renderer *render );// DONE
+void drawText( textData *toDraw , SDL_Renderer *render );
 
-void drawQuote( quoteData **quotes , int quoteNo , SDL_Renderer *render , TTF_Font *font );//DONE
+void drawQuote( quoteData **quotes , int quoteNo , SDL_Renderer *render , TTF_Font *font );
 
-void drawQuestion( questionData **questions , int questionNo , SDL_Renderer *render , TTF_Font *font );//DONE
+void drawQuestion( questionData **questions , int questionNo , SDL_Renderer *render , TTF_Font *font );
 
 
 
 //----------INPUT---------------------
 
-int checkButtonClicked( SDL_Rect *mouseDimensions , buttonData *button );//DONE
+int checkButtonClicked( SDL_Rect *mouseDimensions , buttonData *button );
 
-int checkButtonTextClicked( SDL_Rect *mouseDimensions , buttonDataText *button );//DONE
+int checkButtonTextClicked( SDL_Rect *mouseDimensions , buttonDataText *button );
 
-int handleMouseButtonMainMenu( buttonData **buttons , int size , SDL_Renderer *render , SDL_Event *events );//DONE
+int handleMouseButtonMainMenu( buttonData **buttons , int size , SDL_Renderer *render , SDL_Event *events );
 
-int handleMouseButtonSelectionMenu( buttonDataText **buttonsText , int size , SDL_Renderer *render , SDL_Event *events );//DONE
+int handleMouseButtonSelectionMenu( buttonDataText **buttonsText , int size , SDL_Renderer *render , SDL_Event *events );
 
-int handleKeyboardSimulation( SDL_Event *keyboardInput , unitData **units );//DONE
+int handleKeyboardSimulation( SDL_Event *keyboardInput , unitData **units );
 
-int handleMapClicked( sideData *applicableUnits , sideData *otherSide , tileData **tiles ,  buttonData **endTurn , SDL_Event *events , int *turnButtonClicked);//DONE
+int handleMapClicked( sideData *applicableUnits , sideData *otherSide , tileData **tiles ,  buttonData **endTurn , SDL_Event *events , int *turnButtonClicked);
 
-int checkQuestionClicked( SDL_Rect *mouseDimensions , questionData *question , int answerNo );//DONE
+int checkQuestionClicked( SDL_Rect *mouseDimensions , questionData *question , int answerNo );
 
-int checkUnitClicked( SDL_Rect *mouseDimensions , unitData *unit );//DONE
+int checkUnitClicked( SDL_Rect *mouseDimensions , unitData *unit );
 
-int checkTileClicked( SDL_Rect *mouseDimensions , tileData *tile );//DONE
+int checkTileClicked( SDL_Rect *mouseDimensions , tileData *tile );
 
 //---------SIMULATION----------------
 
-int aStarWithTerrain( sideData *applicableUnits , int unitNo , tileData **tiles , int xPos , int yPos , int size );//DONE
+int aStarWithTerrain( sideData *applicableUnits , int unitNo , tileData **tiles , int xPos , int yPos , int size );
 
-void moveUnit( sideData *applicableUnits , tileData **tiles , int xPos , int yPos , int givenUnit );//DONE
+void moveUnit( sideData *applicableUnits , tileData **tiles , int xPos , int yPos , int givenUnit );
 
 int shootUnit( sideData *shootingSideUnits , int shootingSideNo , sideData *recievingSideUnits , int recievingSideNo , 
-tileData **tiles );//DONE
+tileData **tiles );
 
-void resolveShooting( sideData *shootingSideUnits , int shootingSideNo , sideData *recievingSideUnits , int recievingSideNo , int inflictedCasualties , int recievedCasualties );//DONE
+void resolveShooting( sideData *shootingSideUnits , int shootingSideNo , sideData *recievingSideUnits , int recievingSideNo , int inflictedCasualties , int recievedCasualties );
 
-void displaySimulationResults( sideData *sideOne , sideData *sideTwo , tileData **map , TTF_Font *font , SDL_Renderer *render );//DONE
+void displaySimulationResults( sideData *sideOne , sideData *sideTwo , tileData **map , TTF_Font *font , SDL_Renderer *render );
 
-int findDistance( tileData *tileOne , tileData *tileTwo );//DONE
+int findDistance( tileData *tileOne , tileData *tileTwo );
 
 void simulationMain( mapData *map , SDL_Renderer *render , TTF_Font *font , buttonData **nextTurn , SDL_Event *events , int *success );
 
 //---------ACTIVITY------------------
-int startQuiz( activityData *quiz , SDL_Renderer *render , TTF_Font *font , SDL_Event *events ,  int *success );//DONE
+int startQuiz( activityData *quiz , SDL_Renderer *render , TTF_Font *font , SDL_Event *events ,  int *success );
 
-//there was askQuestion here but it seemed unneccessary, so Its been folded into startQuiz
-char computeGrade( activityData *quiz , int noCorrect );//DONE
 
-void displayActivityResults( activityData *quiz , char *resultsToDisplay , SDL_Renderer *render , TTF_Font *font );//DONE
+char computeGrade( activityData *quiz , int noCorrect );
+
+void displayActivityResults( activityData *quiz , char *resultsToDisplay , SDL_Renderer *render , TTF_Font *font );
+
+
+/*
+	END OF FILE
+
+
+*/
