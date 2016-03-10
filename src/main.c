@@ -97,7 +97,7 @@ int main( int argc , char *argv[] )
 	turnButton[0] = loadButton( nextTurnButton , &placeHolder , END_TURN_BUTTON , &success );
 	buttonValuePrimary = 0;
 	placeHolder.x = BUTTONPOS_OFFSET * 2;
-	placeHolder.y = BUTTON_POS;
+	placeHolder.y = BUTTONPOS;
 	secondaryButtons = malloc( sizeof( buttonDataText * ) * test->noLevels );
 	buttonValueSecondary = NO_BUTTON_SECONDARY;
 	Mix_PlayMusic( soundtrack , -1 );
