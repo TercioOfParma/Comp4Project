@@ -119,7 +119,7 @@ int getFileSize( FILE *sizeToGet , int *success )
 	loads the options file in JSON to a optionsData structure
 
 	On success, it will return the options
-	Otherwise, it will return NULL
+	Otherwise, it will return an empty tempOpt
 	=====================================================================
 */
 
@@ -135,7 +135,7 @@ optionsData initOptions( char *fileContents , int *success )
 	{
 		fprintf( stderr , "json_loads has failed : %s \n" , errorHandle.text );
 		*success = FAIL;
-		return NULL;
+		return tempOpt;
 	}
 	
 	optionsData = json_array_get( tempJsonHandle , 0 );
@@ -144,7 +144,7 @@ optionsData initOptions( char *fileContents , int *success )
 		fprintf( stderr , "json_object_get failed, didn't get an object\n" );
 		*success = FAIL;
 		json_decref( tempJsonHandle );
-		return NULL;
+		return tempOpt;
 	
 	}
 	//gets the program options
