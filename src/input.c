@@ -11,9 +11,14 @@
 #include "main.h"
 #endif
 //------------------------------ FUNCTIONS -----------------------------------
-/*
+/*	===================================================================================
 	int checkButtonClicked(SDL_Rect *mouseDimensions, buttonData *button):
-	Checks if a mouse clicked a button
+	Checks if a mouse clicked a button. 
+	
+	Returns success if it has
+	Returns fail if it doesn't
+	Otherwise its NULL_INPUT
+	===================================================================================	
 */
 
 int checkButtonClicked( SDL_Rect *mouseDimensions , buttonData *button )
@@ -29,9 +34,14 @@ int checkButtonClicked( SDL_Rect *mouseDimensions , buttonData *button )
 	}            
 	return NULL_INPUT;
 }
-/*
+/*	===================================================================================
 	int checkButtonTextClicked(SDL_Rect *mouseDimensions, buttonDataText *button):
 	Checks if a mouse clicked a button
+	
+	Returns success if it has
+	Returns fail if it doesn't
+	Otherwise its NULL_INPUT
+	===================================================================================
 */
 int checkButtonTextClicked( SDL_Rect *mouseDimensions , buttonDataText *button )
 {
@@ -46,9 +56,14 @@ int checkButtonTextClicked( SDL_Rect *mouseDimensions , buttonDataText *button )
 	}
 	return NULL_INPUT;
 }
-/*
+/*	===================================================================================
 	int checkQuestionClicked(SDL_Rect *mouseDimensions, questionData *button):
 	Checks if a mouse clicked a question
+	
+	Returns success if it has
+	Returns fail if it doesn't
+	Otherwise its NULL_INPUT
+	===================================================================================
 */
 int checkQuestionClicked( SDL_Rect *mouseDimensions , questionData *question , int answerNo )
 {
@@ -64,8 +79,14 @@ int checkQuestionClicked( SDL_Rect *mouseDimensions , questionData *question , i
 	return NULL_INPUT;
 }
 /*
+	===================================================================================
 	int checkUnitClicked(SDL_Rect *mouseDimensions, unitData *unit):
 	Checks if a mouse clicked a unit
+	
+	Returns success if it has
+	Returns fail if it doesn't
+	Otherwise its NULL_INPUT
+	===================================================================================
 */
 int checkUnitClicked( SDL_Rect *mouseDimensions , unitData *unit )
 {
@@ -81,9 +102,14 @@ int checkUnitClicked( SDL_Rect *mouseDimensions , unitData *unit )
 	}
 	return NULL_INPUT;
 }
-/*
-	int checkUnitClicked(SDL_Rect *mouseDimensions, unitData *unit):
+/*	====================================================================================
+	int checkTileClicked( SDL_Rect *mouseDimensions , tileData *tile ):
 	Checks if a mouse clicked a unit
+	
+	Returns success if it has
+	Returns fail if it doesn't
+	Otherwise its NULL_INPUT
+	====================================================================================
 */
 int checkTileClicked( SDL_Rect *mouseDimensions , tileData *tile )
 {
@@ -102,22 +128,25 @@ int checkTileClicked( SDL_Rect *mouseDimensions , tileData *tile )
 	}
 	return NULL_INPUT;
 }
-/*
+/*	====================================================================================
 	int handleMouseButtonMainMenu(buttonData **buttons, int size, SDL_Renderer *render):
 	Checks the mouse buttons on the main menu and draws them etc.
 
-
+	Will return the button's type on success
+	Otherwise, it will return a NULL_INPUT
+	====================================================================================
 */
 int handleMouseButtonMainMenu( buttonData **buttons , int size , SDL_Renderer *render , SDL_Event *events )
 {
 	fprintf( stderr , "Checking main menu....\n" );
 	SDL_Rect mouseCoords;
 	int i, buttonClickResult;
-	mouseCoords.w = 3;
-	mouseCoords.h = 3;
-	buttonClickResult = 0;
+	//This is big enough to click, but small enough that the user doesn't click anything by accident
+	mouseCoords.w = MOUSE_X;
+	mouseCoords.h = MOUSE_Y;
+	buttonClickResult = FAIL;
 	drawMenuElements( buttons , size , render );
-	while( SDL_PollEvent( events ) )
+	while( SDL_PollEvent( events ) )//For each event, check the mouse coordinates, and see if a button has been clicked
 	{
 		SDL_GetMouseState( &( mouseCoords.x ) , &( mouseCoords.y ) );
 		if( events->type == SDL_MOUSEBUTTONDOWN )
@@ -140,31 +169,31 @@ int handleMouseButtonMainMenu( buttonData **buttons , int size , SDL_Renderer *r
 	{
 		return buttons[i]->type;//this'll be either START_BUTTON or QUIT_BUTTON
 	}
-	return NO_BUTTON_MAIN;
+	return NULL_INPUT;
 }
-/*
-	int handleMouseButtonSelectionMenu(SDL_Rect mouseDimensions,buttonDataText **buttonsText, int size, SDL_Renderer *render):
+/*	=========================================================================================
+	int handleMouseButtonSelectionMenu(SDL_Rect mouseDimensions,buttonDataText **buttonsText,
+	int size, SDL_Renderer *render):
 	Checks the mouse buttons on the secondary menu and draws them etc.
 
-
+	=========================================================================================
 */
 int handleMouseButtonSelectionMenu( buttonDataText **buttonsText , int size , SDL_Renderer *render , SDL_Event *events )
 {
 	fprintf( stderr , "Checking secondary menu....\n" );
 	SDL_Rect mouseCoords;
 	int i, buttonClickResult;
-	mouseCoords.w = 3;
-	mouseCoords.h = 3;
+	mouseCoords.w = MOUSE_X;
+	mouseCoords.h = MOUSE_Y;
 	drawMenuElementsText( buttonsText , size , render );
 	buttonClickResult = FAIL;
-	while( SDL_PollEvent( events ) )
+	while( SDL_PollEvent( events ) )//For each event, check the mouse coordinates, and see if a button has been clicked
 	{
 		SDL_GetMouseState( &( mouseCoords.x ), &( mouseCoords.y ) );
 		if( events->type == SDL_MOUSEBUTTONDOWN )
 		{
 			for( i = 0 ; i < size ; i++ )
 			{
-				buttonClickResult = checkButtonTextClicked( &mouseCoords , buttonsText[i] );
 				buttonClickResult = checkButtonTextClicked( &mouseCoords , buttonsText[i] );
 				if( buttonClickResult == SUCCESS )
 				{
@@ -182,49 +211,36 @@ int handleMouseButtonSelectionMenu( buttonDataText **buttonsText , int size , SD
 		fprintf( stderr , "Result : %d\n" , buttonClickResult );
 		return buttonsText[i]->type;//this'll be either START_BUTTON or QUIT_BUTTON
 	}
-	return NO_BUTTON_SECONDARY;
+	return NULL_INPUT;
 }
 /*
-	int handleMouseButtonMainMenu(SDL_Rect mouseDimensions, buttonData **buttons):
-	Checks the keyboard during the simulation
-
-
-*/
-int handleKeyboardSimulation( SDL_Event *keyboardInput , unitData **units )
-{
-	if( keyboardInput->type == SDL_KEYDOWN )//checks to make sure the key has been pressed during the given event queue
-	{
-		switch( keyboardInput->key.keysym.sym )//This accesses the key state from inside SDL_Event
-		{
-			case SDLK_q:
-				return QUIT_KEY;
-				break;
-			default:
-				break;
-		}
-	}
-
-}
-/*
-	int handleMapClicked(sideData *applicableUnits, sideData *otherSide, tileData **tiles,  buttonData **endTurn, SDL_Event *events):
+	========================================================================================
+	int handleMapClicked(sideData *applicableUnits, sideData *otherSide, tileData **tiles,  
+	buttonData **endTurn, SDL_Event *events):
 	handles the units and the map being clicked
 
-
+	UNIT_SELECTED will be returned if a friendly unit has been selected
+	UNIT_SELECTED_OTHER will be returned if an enemy unit has been selected
+	TILE_SELECTED will be returned if a map tile is selected
+	END_TURN_BUTTON will be returned if the end turn button is selected
+	Otherwise, NULL_INPUT will be returned
+	========================================================================================
 */
 int handleMapClicked( sideData *applicableUnits , sideData *otherSide , tileData **tiles ,  buttonData **endTurn , SDL_Event *events , int *turnButtonClicked)
 {
 	SDL_Rect mouseCoords;
 	int i, buttonClickResultTile, buttonClickResultUnit, buttonClickResultButton;
-	mouseCoords.w = 3;
-	mouseCoords.h = 3;
+	//This is big enough to click, but small enough that the user doesn't click anything by accident
+	mouseCoords.w = MOUSE_X;
+	mouseCoords.h = MOUSE_Y;
 	SDL_GetMouseState( &( mouseCoords.x ) , &( mouseCoords.y ) );
-	while(	SDL_PollEvent( events ) )
+	while(	SDL_PollEvent( events ) )//checks all the input. since this is only run once every 35 miliseconds, it is neccessary to check everything that may have happened in the last 35 miliseconds and do that
 	{
 	
 	}
 	if( events->type == SDL_MOUSEBUTTONDOWN )
 	{
-		for( i = 1 ; i <= applicableUnits->noUnits ; i++ )
+		for( i = 1 ; i <= applicableUnits->noUnits ; i++ )//checks friendly units
 		{	
 			buttonClickResultUnit = checkUnitClicked( &mouseCoords , applicableUnits->units[i] );
 			if( buttonClickResultUnit == SUCCESS && applicableUnits->units[i]->alive == TRUE )
@@ -239,7 +255,7 @@ int handleMapClicked( sideData *applicableUnits , sideData *otherSide , tileData
 			}
 			buttonClickResultUnit = FAIL;
 		}
-		for( i = 1 ; i <= otherSide->noUnits ; i++ )
+		for( i = 1 ; i <= otherSide->noUnits ; i++ )//checks enemy units
 		{	
 			buttonClickResultUnit = checkUnitClicked( &mouseCoords , otherSide->units[i] );
 			if( buttonClickResultUnit == SUCCESS && otherSide->units[i]->alive == TRUE )
@@ -250,7 +266,7 @@ int handleMapClicked( sideData *applicableUnits , sideData *otherSide , tileData
 			}
 			buttonClickResultUnit = FAIL;
 		}
-		for( i = 1 ; i < tiles[0]->noTiles ; i++ )
+		for( i = 1 ; i < tiles[0]->noTiles ; i++ )//checks map
 		{	
 			fprintf( stderr , "Mouse Coordinates : x : %d , y : %d, w : %d, h : %d \n" , mouseCoords.x , mouseCoords.y , 
 			mouseCoords.w , mouseCoords.h );
@@ -263,7 +279,7 @@ int handleMapClicked( sideData *applicableUnits , sideData *otherSide , tileData
 			}
 			buttonClickResultTile = FAIL;
 		}
-		buttonClickResultButton = checkButtonClicked( &mouseCoords , endTurn[0] );
+		buttonClickResultButton = checkButtonClicked( &mouseCoords , endTurn[0] );//checks the next turn button
 		if( buttonClickResultButton == SUCCESS && *turnButtonClicked == FALSE )
 		{
 			fprintf( stderr , "End of turn button Clicked ! \n" );
@@ -271,5 +287,12 @@ int handleMapClicked( sideData *applicableUnits , sideData *otherSide , tileData
 			return END_TURN_BUTTON;
 		}
 	}
-	return 0;
+	return NULL_INPUT;
 }
+
+/*
+
+	END OF FILE
+
+
+*/

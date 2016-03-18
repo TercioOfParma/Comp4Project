@@ -18,9 +18,14 @@
 
 //------------------------------ FUNCTIONS -----------------------------------
 /*
+	==============================================================
 	char *loadTextFile(const char *filename, int *success):
 	Loads a file in a safe way and creates a string from it
 
+	
+	On success, it will return the contents of the file
+	Otherwise, it will return NULL
+	==============================================================
 */
 
 char *loadTextFile( const char *filename , int *success )
@@ -39,7 +44,7 @@ char *loadTextFile( const char *filename , int *success )
 		return NULL;
 	}
 	
-	jsonFile = fdopen( fileDescriptor , "rb" );
+	jsonFile = fdopen( fileDescriptor , "rb" );//opens file descriptor
 	if( !jsonFile )
 	{
 		fprintf( stderr , "fopen has failed : %s \n" , strerror( errno ) );
@@ -47,13 +52,13 @@ char *loadTextFile( const char *filename , int *success )
 		return NULL;
 	}
 	fileSize = getFileSize( jsonFile , success );
-	if( !fileSize )
+	if( fileSize == FAIL )
 	{
 		return NULL;
 	
 	}
-	fileContents = calloc( 1 , fileSize + 1 );
-	if( !fileContents )
+	fileContents = calloc( 1 , fileSize + 1 );//initialises memory for the file + null terminator
+	if( !fileContents  )
 	{
 		fprintf( stderr , "calloc has failed at %s, %s, line %d : %s\n" , __FUNCTION__ , __FILE__ , __LINE__ , strerror( errno ) );
 		*success = FAIL;
@@ -71,7 +76,7 @@ char *loadTextFile( const char *filename , int *success )
 		}
 	
 	}
-	if( strstr( fileContents , "%x" ) != NULL)
+	if( strstr( fileContents , "%x" ) != NULL)//checks for any stack change operators
 	{
 		fprintf( stderr , "stack change formatter detected in file provided, nice try\n" );
 		*success = FAIL;
@@ -83,9 +88,13 @@ char *loadTextFile( const char *filename , int *success )
 
 }
 /*
+	==================================================
 	int getFileSize(FILE *sizeToGet, int *success):
 	Gets the size of a file
 
+	On success, it will return success
+	Otherwise, it will return fail
+	==================================================
 */
 
 int getFileSize( FILE *sizeToGet , int *success )
@@ -99,15 +108,19 @@ int getFileSize( FILE *sizeToGet , int *success )
 	{
 		fprintf( stderr , "ftell has failed : %s" , strerror( errno ) );
 		*success = FAIL;
-		return 0;
+		return FAIL;
 	}
 	return fileSize;
 
 }
 /*
+	=====================================================================
 	optionsData *initOptions(char *fileContents, int *success):
 	loads the options file in JSON to a optionsData structure
 
+	On success, it will return the options
+	Otherwise, it will return NULL
+	=====================================================================
 */
 
 optionsData initOptions( char *fileContents , int *success )
@@ -122,7 +135,7 @@ optionsData initOptions( char *fileContents , int *success )
 	{
 		fprintf( stderr , "json_loads has failed : %s \n" , errorHandle.text );
 		*success = FAIL;
-		return tempOpt;
+		return NULL;
 	}
 	
 	optionsData = json_array_get( tempJsonHandle , 0 );
@@ -131,7 +144,7 @@ optionsData initOptions( char *fileContents , int *success )
 		fprintf( stderr , "json_object_get failed, didn't get an object\n" );
 		*success = FAIL;
 		json_decref( tempJsonHandle );
-		return tempOpt;
+		return NULL;
 	
 	}
 	//gets the program options
@@ -146,10 +159,13 @@ optionsData initOptions( char *fileContents , int *success )
 	return tempOpt;
 }
 
-/*
+/*	=============================================================
 	SDL_Window *initSDL(optionsData *opt, int *success):
 	initialise SDL2 and associated library
-
+	
+	On success, will return an SDL_Window for the main solution
+	Otherwise, it will return NULL
+	=============================================================
 */
 
 SDL_Window *initSDL( optionsData *opt , int *success )
@@ -202,6 +218,7 @@ SDL_Window *initSDL( optionsData *opt , int *success )
 	return temp;
 }
 /*
+	==========================================================================
 	SDL_Renderer *createRenderer(SDL_Window *screen, int *success):
 	initialise hardware renderer
 

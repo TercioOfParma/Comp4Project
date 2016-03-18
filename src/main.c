@@ -1,19 +1,20 @@
 /*
 	FILE : MAIN.C
-	PURPOSE : To contain the main function. This is to initialise the runtime objects, set up the libraries and to run the 
+	PURPOSE : To contain the main function. This is to initialise the runtime objects, 
+	set up the libraries and to run the solution
 	simulations + activities
 	VERSION : 0.001
-	NOTES: Remove magic numbers + add comments
+	NOTES: Done and dusted
 */
 
-//---------------------------------- C PREPROCESSOR --------------------------
+//==== C PREPROCESSOR ====
 
 #ifndef INCLUDE_LOCK
 #define INCLUDE_LOCK
 #include "main.h"
 #endif
 
-//------------------------------ FUNCTIONS -----------------------------------
+//==== FUNCTIONS ======
 /*
 	int main(int argc, char *argv[]):
 	The big main function that ties it all together
@@ -28,23 +29,23 @@
 int main( int argc , char *argv[] )
 {
 	
-	//------------------------------------------------- VARIABLE DECLARATIONS -----------------------------------
+	//==== Variable Declarations ====
 	//PRIMITIVE DATA TYPES
 	char *optionsFile;
 	int success = SUCCESS;
-	int quizTerminated = 1;
+	int quizTerminated = FAIL;
 	int i;
-	int buttonValuePrimary, buttonValueSecondary;
+	int primaryButtonValue, secondaryButtonValue;
 	HWND console;
-	//C Library Structures
+	//==== C Standard Library Data Structures ======
 	FILE *errorRedirection;
-	//CUSTOM RUNTIME STRUCTURES
+	//==== Custom Data Structures =====
 	optionsData options;
-	levelData *test;
+	levelData *levels;
 	buttonData **frontButtons;
 	buttonData **turnButton;
 	buttonDataText **secondaryButtons;
-	//SDL2 + EXTENSION LIBRARIES AND JANSSON STRUCTURES
+	//==== SDL2 Data Structures =====
 	SDL_Window *wind;
 	SDL_Renderer *render;
 	TTF_Font *font;
@@ -54,7 +55,9 @@ int main( int argc , char *argv[] )
 	Mix_Music *soundtrack;
 	SDL_Rect backgroundDimensions;
 	SDL_Texture *background; 
-	//------------------------------------------------ INITIALISATION -------------------------------------------
+	
+	
+	//=== Start up ====
 	//moving status window, this is done to make the status windows visible for the user
 	console = GetConsoleWindow();
 	MoveWindow(console, 0 , 0 , CONSOLESIZE_X , CONSOLESIZE_Y , 1); 
@@ -64,6 +67,10 @@ int main( int argc , char *argv[] )
 	fprintf( stderr , "Main function....\n" );
 	
 	//loading options and libraries and initialising them
+	/*
+	It is important to note here that it would look like that success can be overwritten. However, 
+	since, the value is deliberately never set to success outside of main, this is a non issue
+	*/
 	optionsFile = loadTextFile( OPTIONS_FILE , &success );
 	options = initOptions( optionsFile , &success );
 	wind = initSDL( &options , &success );
@@ -76,44 +83,48 @@ int main( int argc , char *argv[] )
 	quitButton = loadImage( QUITBUTTON_PATH , render , &placeHolder , &success );
 	nextTurnButton = loadImage( NEXTTURNBUTTON_PATH , render , &placeHolder , &success );
 	blankButton = loadImage( BLANKBUTTON_PATH , render , &placeHolder , &success );
-	test = loadLevelData( render , &success );
+	levels = loadLevelData( render , &success );
 	frontButtons = malloc( sizeof( buttonData * ) * 2 );
-	frontButtons[0] = loadButton( startButton , &placeHolder , START_BUTTON_TYPE , &success );
-	frontButtons[1] = loadButton( quitButton , &placeHolder , QUIT_BUTTON_TYPE , &success );
-	frontButtons[0]->dimensions.x = BUTTONPOS;
-	frontButtons[0]->dimensions.y = BUTTONPOS;
-	frontButtons[1]->dimensions.x = BUTTONPOS;
-	frontButtons[1]->dimensions.w *= 2;
-	frontButtons[0]->dimensions.w *= 2;
-	frontButtons[0]->dimensions.h *= 2;
-	frontButtons[1]->dimensions.h *= 2;
-	frontButtons[1]->dimensions.y = BUTTONPOS_OFFSET;
-	placeHolder.x = 10;
+	frontButtons[START_BUTTON] = loadButton( startButton , &placeHolder , START_BUTTON , &success );
+	frontButtons[QUIT_BUTTON] = loadButton( quitButton , &placeHolder , QUIT_BUTTON , &success );
+	
+	
+	frontButtons[START_BUTTON]->dimensions.x = BUTTONPOS;
+	frontButtons[START_BUTTON]->dimensions.y = BUTTONPOS;
+	frontButtons[QUIT_BUTTON]->dimensions.x = BUTTONPOS;
+	frontButtons[QUIT_BUTTON]->dimensions.w = frontButtons[QUIT_BUTTON]->dimensions.w * 2;
+	frontButtons[START_BUTTON]->dimensions.w = frontButtons[START_BUTTON]->dimensions.w * 2;
+	frontButtons[START_BUTTON]->dimensions.h = frontButtons[START_BUTTON]->dimensions.h  * 2;
+	frontButtons[QUIT_BUTTON]->dimensions.h = frontButtons[QUIT_BUTTON]->dimensions.h * 2;
+	frontButtons[QUIT_BUTTON]->dimensions.y = BUTTONPOS_OFFSET;
+	
+	placeHolder.x = 10;//Nice position for the next turn button
 	placeHolder.y = 10;
-	backgroundDimensions.x = 0;
+	backgroundDimensions.x = 0;//Only good position for a background
 	backgroundDimensions.y = 0;
+	
 	background = loadImage("background.png", render, &backgroundDimensions, &i);
 	turnButton = malloc( sizeof( buttonData * ) );
 	turnButton[0] = loadButton( nextTurnButton , &placeHolder , END_TURN_BUTTON , &success );
-	buttonValuePrimary = 0;
+	primaryButtonValue = NULL_INPUT;
 	placeHolder.x = BUTTONPOS_OFFSET * 2;
 	placeHolder.y = BUTTONPOS;
-	secondaryButtons = malloc( sizeof( buttonDataText * ) * test->noLevels );
-	buttonValueSecondary = NO_BUTTON_SECONDARY;
+	secondaryButtons = malloc( sizeof( buttonDataText * ) * levels->noLevels );
+	secondaryButtonValue = NULL_INPUT;
 	Mix_PlayMusic( soundtrack , -1 );
 	
 	//Level loading
-	if(test->noLevels <= 0)
+	if(levels->noLevels <= 0)
 	{
 		fprintf( stderr ,"FATAL ERROR : No Levels" );
 		return 0;
 	
 	}
 	//level button generation
-	for( i = 0 ; i <  test->noLevels ; i++ )
+	for( i = 0 ; i <  levels->noLevels ; i++ )
 	{
-		placeHolder.y += 40 ;
-		secondaryButtons[i] = loadButtonText( blankButton , &placeHolder , render , test->maps[i]->title , font , i , &success );
+		placeHolder.y = placeHolder.y + 40 ;//Makes it nicely spaced out
+		secondaryButtons[i] = loadButtonText( blankButton , &placeHolder , render , levels->maps[i]->title , font , i , &success );
 	}
 	//------------------------------------------------ MAIN LOOP ------------------------------------------------
 	while( success != FAIL )
@@ -122,35 +133,37 @@ int main( int argc , char *argv[] )
 		SDL_RenderClear( render );
 		SDL_RenderCopy( render , background , NULL , NULL );
 		//Runs main menu
-		if( buttonValuePrimary != START_BUTTON_TYPE )
+		if( primaryButtonValue != START_BUTTON)
 		{
-			buttonValuePrimary = handleMouseButtonMainMenu( frontButtons , 2 , render , &eventHandle );
+			primaryButtonValue = handleMouseButtonMainMenu( frontButtons , 2 , render , &eventHandle );
 		}
 		//Runs secondary selection menu
-		if( buttonValuePrimary == START_BUTTON_TYPE && buttonValueSecondary == NO_BUTTON_SECONDARY )
+		if( primaryButtonValue == START_BUTTON && secondaryButtonValue == NULL_INPUT)
 		{
-			buttonValueSecondary = handleMouseButtonSelectionMenu( secondaryButtons , test->noLevels ,
+			secondaryButtonValue = handleMouseButtonSelectionMenu( secondaryButtons , levels->noLevels ,
 			render , &eventHandle );
 		}
 		//Run a simulation and quiz
-		else if( buttonValuePrimary == START_BUTTON_TYPE && buttonValueSecondary != NO_BUTTON_SECONDARY )
+		else if( primaryButtonValue == START_BUTTON && secondaryButtonValue != NULL_INPUT )
 		{
-			simulationMain( test->maps[ buttonValueSecondary ] , render , font , turnButton , &eventHandle , &success );
+			simulationMain( levels->maps[ secondaryButtonValue ] , render , font , turnButton , &eventHandle , &success );
 			if( success != FAIL )
 			{
-				quizTerminated = startQuiz( test->maps[ buttonValueSecondary ]->activity , render , font , &eventHandle , &success );
+				quizTerminated = startQuiz( levels->maps[ secondaryButtonValue ]->activity , render , font , &eventHandle , &success );
 			}
 		}
-		if( eventHandle.type == SDL_QUIT || quizTerminated == 0 || buttonValuePrimary == QUIT_BUTTON_TYPE )
+		if( eventHandle.type == SDL_QUIT || quizTerminated == SUCCESS || primaryButtonValue == QUIT_BUTTON )
 		{
 				success = FAIL;
 		}
 		SDL_RenderPresent( render );
 	}
-	//------------------------------------------------ DEINITIALISATION -----------------------------------------
-	endLevel( test );
+	//=== End ====
+	endLevel( levels );
+	free( frontButtons );
+	free( turnButton );
 	endSDL( render , wind , font );
-	return 0;
+	return SUCCESS;
 }
 /*
 
