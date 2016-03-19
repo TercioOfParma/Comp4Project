@@ -3,6 +3,11 @@
 	PURPOSE : Hold initialisation functions for libraries, multimedia and runtime structures
 	VERSION : 0.001
 	NOTES: Big File, may have some unnoticed minor bugs
+	Most, if not all of these deal with malloc and allocating memory 
+	not all of these free the memory, which is intended. 
+	The functions assume that the success argument is true without checking, although
+	it having failed will have little effect beyond perhaps reading memory which doesn't exist. Since
+	any event of the success being fail will likely be a crash anyway, it hardly matters.
 */
 
 
@@ -118,7 +123,7 @@ int getFileSize( FILE *sizeToGet , int *success )
 	optionsData *initOptions(char *fileContents, int *success):
 	loads the options file in JSON to a optionsData structure
 
-	On success, it will return the options
+	On success, it will return the options as a copy, rather than a pointer
 	Otherwise, it will return an empty tempOpt
 	=====================================================================
 */
@@ -163,7 +168,7 @@ optionsData initOptions( char *fileContents , int *success )
 	SDL_Window *initSDL(optionsData *opt, int *success):
 	initialise SDL2 and associated library
 	
-	On success, will return an SDL_Window for the main solution
+	On success, will return a pointer to a SDL_Window structure for the main solution
 	Otherwise, it will return NULL
 	=============================================================
 */
@@ -221,7 +226,10 @@ SDL_Window *initSDL( optionsData *opt , int *success )
 	==========================================================================
 	SDL_Renderer *createRenderer(SDL_Window *screen, int *success):
 	initialise hardware renderer
-
+	
+	Returns a pointer to a SDL hardware render on success
+	Otherwise it will return NULL
+	==========================================================================
 */
 
 SDL_Renderer *createRenderer( SDL_Window *screen , int *success )
@@ -229,7 +237,7 @@ SDL_Renderer *createRenderer( SDL_Window *screen , int *success )
 	fprintf( stderr , "Creating SDL2 Renderer....\n" );
 	SDL_Renderer *temp;
 	int Render_Flags = SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC;//Hardware acceleration and a frame rate capped by the refresh rate of the monitor
-	temp = SDL_CreateRenderer( screen , -1 , Render_Flags );
+	temp = SDL_CreateRenderer( screen , -1 , Render_Flags );//this creates a render for the window with the appropriate graphics driver
 	if( !temp )
 	{
 		fprintf( stderr , "SDL_CreateRenderer has failed : %s \n" , SDL_GetError() );
@@ -241,8 +249,13 @@ SDL_Renderer *createRenderer( SDL_Window *screen , int *success )
 
 }
 /*
+	==========================================================================
 	Mix_Music *loadMusic(const char *filename, int *success):
 	load music 
+	
+	Will return a pointer to a  music structure on success
+	Otherwise it will return a NULL
+	==========================================================================
 
 */
 
@@ -260,9 +273,13 @@ Mix_Music *loadMusic( const char *filename , int *success )
 	return temp;
 
 }
-/*
+/*	============================================================================
 	Mix_Chunk *loadEffect(const char *filename, int *success):
 	load sound effects
+	
+	Will return a pointer to a sound effect structure on success
+	On failure it will return NULL
+	============================================================================
 
 */
 Mix_Chunk *loadEffect( const char *filename , int *success )
@@ -278,20 +295,27 @@ Mix_Chunk *loadEffect( const char *filename , int *success )
 	return temp;
 }
 /*
+	============================================================================
 	TTF_Font *loadFont(options *opt, int *success):
 	load a font structure
+	
+	On success, it will return a pointer to a  TTF font structure that can be used for graphical display
+	of text
+	Otherwise, it will return NULL
+	
+	=============================================================================
 
 */
 TTF_Font *loadFont( optionsData *opt , int *success )
 {
 	fprintf( stderr , "Loading font from %s....\n" , opt->DEFAULT_FONT );
-	if(opt->FONT_SIZE <= 0)
+	if(opt->FONT_SIZE <= 0)//Makes sure that the font size will be visible
 	{
 		fprintf(stderr, "FATAL ERROR : Font size invalid\n");
 		return NULL;
 	
 	}
-	TTF_Font *temp = TTF_OpenFont( opt->DEFAULT_FONT , opt->FONT_SIZE );
+	TTF_Font *temp = TTF_OpenFont( opt->DEFAULT_FONT , opt->FONT_SIZE );//loads the font
 	if( !temp )
 	{
 		fprintf( stderr , "TTF_OpenFont has failed : %s \n" , TTF_GetError() );
@@ -301,8 +325,13 @@ TTF_Font *loadFont( optionsData *opt , int *success )
 	return temp;
 }
 /*
+	========================================================================
 	SDL_Texture *loadImage(const char *filename, SDL_Renderer *render, SDL_Rect *dimen, int *success):
 	load an image, translates it to a hardware renderable texture and returns the original image's dimensions
+	
+	On success, It will return a hardware renderable texture pointer, and will give a width and height
+	Otherwise it will return NULL
+	=======================================================================
 
 */
 SDL_Texture *loadImage( const char *filename , SDL_Renderer *render , SDL_Rect *dimen , int *success )
@@ -327,15 +356,19 @@ SDL_Texture *loadImage( const char *filename , SDL_Renderer *render , SDL_Rect *
 		*success = FAIL;
 		return NULL;
 	}
+	//Dimensions of the surface for the texture, as the texture has no such member variables
 	dimen->w = temp->w;
 	dimen->h = temp->h;
-	SDL_FreeSurface( temp );
+	SDL_FreeSurface( temp );//frees the surface
 	return tempTex;
 }
-/*
+/*	======================================================================
 	buttonData *loadButton(SDL_Texture *display, SDL_Rect *posAndSize, int type, int *success):
 	Loads a regular button
 
+	On success, it will return a pointer to a buttonData structure
+	Otherwise, it will return NULL
+	====================================================================
 */
 buttonData *loadButton( SDL_Texture *display , SDL_Rect *posAndSize , int type , int *success )
 {
@@ -347,18 +380,23 @@ buttonData *loadButton( SDL_Texture *display , SDL_Rect *posAndSize , int type ,
 		*success = FAIL;
 		return NULL;
 	}
-	temp->display = display; //will copy the address of the button texture to the object
+	temp->display = display; //will copy the address of the button texture to the object, saves kbs of memory
 	temp->dimensions = *posAndSize;
 	temp->type = type;
 
 	return temp;
 }
-/*
-	buttonData *loadButton(SDL_Texture *display, SDL_Rect *posAndSize, int type, int *success):
+/*	===================================================================
+	buttonDataText *loadButtonText( SDL_Texture *display , SDL_Rect *posAndSize , SDL_Renderer *render , const char *initialData
+	, TTF_Font *font , int type , int *success ):
 	Loads a button with text
 
+	On success, it will return a pointer to a buttonData with text element
+	Otherwise it will return NULL
+	=================================================================
 */
-buttonDataText *loadButtonText( SDL_Texture *display , SDL_Rect *posAndSize , SDL_Renderer *render , const char *initialData , TTF_Font *font , int type , int *success )
+buttonDataText *loadButtonText( SDL_Texture *display , SDL_Rect *posAndSize , SDL_Renderer *render , const char *initialData ,
+ TTF_Font *font , int type , int *success )
 {
 	fprintf( stderr , "Loading a button with text....\n" );
 	buttonDataText *temp = malloc( sizeof( buttonDataText ) );
@@ -375,7 +413,7 @@ buttonDataText *loadButtonText( SDL_Texture *display , SDL_Rect *posAndSize , SD
 		*success = FAIL;
 		return NULL;
 	}
-	temp->display = display;
+	temp->display = display;//will copy the address of the button texture to the object, saves kbs of memory
 	temp->dimensions = *posAndSize;
 	temp->type = type;
 	temp->details = renderText( font , render , initialData , success );
@@ -383,10 +421,14 @@ buttonDataText *loadButtonText( SDL_Texture *display , SDL_Rect *posAndSize , SD
 	temp->details->dimensions.y = posAndSize->y + (posAndSize->h / 5);
 	return temp;
 }
-/*
+/*	=============================================================
 	quoteData **loadQuotes(char *filename, int *success):
 	Loads the quotes from a specified data file
-
+	
+	
+	On success, it will return a pointer to an array of quotes
+	Otherwise, it will return NULL
+	=============================================================
 */
 quoteData **loadQuotes(char *filename, int *success)
 {
@@ -396,21 +438,21 @@ quoteData **loadQuotes(char *filename, int *success)
 	json_t *tempJsonHandle, *quoteDataJSON;
 	json_error_t errorHandle;
 	int numberOfQuotes, i;
-	
-	tempJsonHandle = json_loads( quoteDataFILE , 0 , &errorHandle );
+	//====================== Opening and first interpretations =================
+	tempJsonHandle = json_loads( quoteDataFILE , 0 , &errorHandle );//loads the text into a way json can interpret
 	if( !tempJsonHandle )
 	{
 		fprintf( stderr , "json_loads has failed on %s: %s \n", filename , errorHandle.text );
 		*success = FAIL;
-		return temp;
+		return NULL;
 	}
-	quoteDataJSON = json_array_get( tempJsonHandle , 0 );
+	quoteDataJSON = json_array_get( tempJsonHandle , 0 );//gets the first element in the file
 	if( !json_is_object( quoteDataJSON ) )
 	{
 		fprintf( stderr , "json_object_get failed, didn't get an object\n" );
 		*success = FAIL;
 		json_decref( tempJsonHandle );
-		return temp;
+		return NULL;
 	
 	}
 	numberOfQuotes = json_integer_value( json_object_get( quoteDataJSON , "NO_QUOTES" ) );
@@ -420,6 +462,7 @@ quoteData **loadQuotes(char *filename, int *success)
 		return NULL;
 	}
 	temp = malloc( sizeof(quoteData *) * numberOfQuotes );
+	//=====================  Getting the quotes =========================
 	for( i = 0 ; i < numberOfQuotes ; i++ )
 	{
 		temp[i] = malloc( sizeof( quoteData ) );
@@ -434,13 +477,17 @@ quoteData **loadQuotes(char *filename, int *success)
 		temp[i]->quote = (char *) json_string_value( json_object_get( quoteDataJSON , "QUOTE" ) );
 		temp[i]->analysis = (char *) json_string_value(json_object_get( quoteDataJSON , "ANALYSIS" ) );
 	}
+	//==================================================================
 	temp[0]->noQuotes = numberOfQuotes;
 	return temp;
 }
-/*
-	quoteData **loadQuotes(char *filename, int *success):
+/*	==================================================================
+	questionData **loadQuestions( char *filename , int *success ):
 	Loads the questions from a specified data file
 
+	On success, it will return a pointer to an array of questions
+	Otherwise, it will return NULL
+	==================================================================
 */
 questionData **loadQuestions( char *filename , int *success )
 {
@@ -450,13 +497,13 @@ questionData **loadQuestions( char *filename , int *success )
 	json_t *tempJsonHandle, *questionDataJSON;
 	json_error_t errorHandle;
 	int numberOfQuestions, i;
-	
+	//====================== Opening and first interpretations =================
 	tempJsonHandle = json_loads( questionDataFILE , 0 , &errorHandle );
 	if( !tempJsonHandle )
 	{
 		fprintf( stderr , "json_loads has failed on %s: %s \n" , filename , errorHandle.text );
 		*success = FAIL;
-		return temp;
+		return NULL;
 	}
 	questionDataJSON = json_array_get( tempJsonHandle , 0 );
 	if( !json_is_object( questionDataJSON ) )
@@ -464,7 +511,7 @@ questionData **loadQuestions( char *filename , int *success )
 		fprintf( stderr , "json_object_get failed, didn't get an object\n" );
 		*success = FAIL;
 		json_decref( tempJsonHandle );
-		return temp;
+		return NULL;
 	}
 	numberOfQuestions = json_integer_value( json_object_get( questionDataJSON , "NO_QUESTIONS" ) );
 	if( numberOfQuestions <= 0 )
@@ -473,6 +520,7 @@ questionData **loadQuestions( char *filename , int *success )
 		return NULL;
 	}
 	temp = malloc( sizeof( questionData * ) * numberOfQuestions );
+	//=====================  Getting the questions =========================
 	for( i = 0 ; i < numberOfQuestions ;  i++ )
 	{
 		temp[i] = malloc( sizeof( questionData ) );
@@ -493,8 +541,14 @@ questionData **loadQuestions( char *filename , int *success )
 	return temp;
 }
 /*
+	====================================================================
 	char *miscIDToFilePath(int ID, char *path):
 	Used to map the IDs in non Level Data files to correct file paths
+	
+	
+	On success, it will return the path found in the file
+	Otherwise, it will return NULL
+	====================================================================
 */
 char *miscIDToFilePath( int ID , char *path )
 {
@@ -507,7 +561,7 @@ char *miscIDToFilePath( int ID , char *path )
 	
 	snprintf( filePath , MAX_TEXT_OUTPUT ,  "%s%s", path , MAPPING_FILE_MISC );
 	mappingFileContents = loadTextFile( filePath , &wasSuccess );
-	
+	//Opening up the file
 	tempJsonHandle = json_loads( mappingFileContents , 0 , &errorHandle );
 	if( !tempJsonHandle )
 	{
@@ -522,7 +576,7 @@ char *miscIDToFilePath( int ID , char *path )
 		json_decref( tempJsonHandle );
 		return NULL;
 	}
-	itoa( ID , stringPath , 10 );
+	itoa( ID , stringPath , 10 );//Converts to string so that a field can be found
 	mappedPath = (char *) json_string_value( json_object_get( mappingDataJSON , stringPath ) );
 	if( !mappedPath )
 	{
@@ -532,8 +586,13 @@ char *miscIDToFilePath( int ID , char *path )
 	return mappedPath;
 }
 /*
+	=====================================================================
 	activityData *loadActivity(char *filename, int *success):
 	Used to load ActivityData structures
+	
+	On success, it will return a pointer to a activity structure
+	Otherwise, it will return NULL
+	=====================================================================
 */
 activityData *loadActivity( char *filename , int *success )
 {
@@ -549,7 +608,7 @@ activityData *loadActivity( char *filename , int *success )
 		*success = FAIL;
 		return NULL;
 	}
-	snprintf( pathToLoad , MAX_TEXT_OUTPUT , "%s%s" , filename , ACTIVITY_FILE );
+	snprintf( pathToLoad , MAX_TEXT_OUTPUT , "%s%s" , filename , ACTIVITY_FILE );//Loading of the file as in other functions
 	activityDataFile = loadTextFile( pathToLoad , &wasSuccess );
 	tempJsonHandle = json_loads( activityDataFile , 0 , &errorHandle );
 	
@@ -586,8 +645,13 @@ activityData *loadActivity( char *filename , int *success )
 	return temp;
 }
 /*
-	activityData *loadActivity(char *filename, int *success):
+	==============================================================
+	quoteListData *loadQuoteListData( char *filename , int *success ):
 	Used to load a quoteListData structures
+	
+	On success, it will return a pointer to a quoteListData structure
+	Otherwise, it will return NULL
+	==============================================================
 
 */
 quoteListData *loadQuoteListData( char *filename , int *success )
@@ -641,8 +705,14 @@ quoteListData *loadQuoteListData( char *filename , int *success )
 	return temp;
 }
 /*
+	=============================================================
 	tileData **loadTileData(char *tileFile, int *success):
 	Used to load tiles for maps
+	
+	
+	On success, it will return a pointer to an array of tiles
+	Otherwise, it will return NULL
+	=============================================================
 
 */
 tileData **loadTileData( char *tileFile , int *success )
@@ -653,13 +723,13 @@ tileData **loadTileData( char *tileFile , int *success )
 	json_t *tempJsonHandle, *tileDataJSON;
 	json_error_t errorHandle;
 	int numberOfTiles, i;
-	
+	//================================Standard JSON loading procedure =====================
 	tempJsonHandle = json_loads( tileDataFile , 0 , &errorHandle );
 	if( !tempJsonHandle )
 	{
 		fprintf( stderr , "json_loads has failed on %s: %s \n" , tileFile , errorHandle.text );
 		*success = FAIL;
-		return temp;
+		return NULL;
 	}
 	
 	tileDataJSON = json_array_get( tempJsonHandle , 0 );
@@ -668,7 +738,7 @@ tileData **loadTileData( char *tileFile , int *success )
 		fprintf( stderr , "json_object_get failed, didn't get an object\n" );
 		*success = FAIL;
 		json_decref( tempJsonHandle );
-		return temp;
+		return NULL;
 	}
 	numberOfTiles = json_integer_value( json_object_get( tileDataJSON , "NO_TILES" ) );
 	if( numberOfTiles <= 0 )
@@ -677,6 +747,8 @@ tileData **loadTileData( char *tileFile , int *success )
 		return NULL;
 	}
 	temp = malloc( sizeof( tileData * ) * numberOfTiles );
+	
+	//==============================Getting the tiles =====================================
 	for( i = 0 ; i < numberOfTiles ; i++ )
 	{
 		temp[i] = malloc( sizeof( tileData ) );
@@ -688,15 +760,18 @@ tileData **loadTileData( char *tileFile , int *success )
 			json_decref( tempJsonHandle );
 			return temp;
 		}
+		//Computes the Unit position on the tileset
 		temp[i]->spriteDimensions.x = ( json_integer_value( json_object_get(tileDataJSON,"SPRITE_XPOS")) - 1) * TILE_WIDTH * 2;
 		temp[i]->spriteDimensions.y = ( json_integer_value( json_object_get(tileDataJSON,"SPRITE_YPOS")) - 1 )* TILE_HEIGHT * 2;
 		temp[i]->spriteDimensions.w = TILE_WIDTH * 2;//the sprites are stored in 128x128 format, but will be displayed in 64x64
 		temp[i]->spriteDimensions.h = TILE_HEIGHT * 2;
+		
 		temp[i]->dimensions.h = TILE_HEIGHT;
 		temp[i]->dimensions.w = TILE_WIDTH;
 		temp[i]->relativeX = json_integer_value(json_object_get( tileDataJSON , "RELATIVE_XPOS" ) );//This is useful for movement and such
 		temp[i]->relativeY = json_integer_value(json_object_get( tileDataJSON , "RELATIVE_YPOS" ) );
-		temp[i]->dimensions.x = temp[i]->relativeX * TILE_WIDTH + STARTX_MAP;
+		
+		temp[i]->dimensions.x = temp[i]->relativeX * TILE_WIDTH + STARTX_MAP;//This needs to be computed everytime the unit moves
 		temp[i]->dimensions.y = temp[i]->relativeY * TILE_HEIGHT + STARTY_MAP;
 		temp[i]->civilianPopulation = json_integer_value( json_object_get( tileDataJSON , "CIVILIAN_POPULATION" ) );
 		temp[i]->terrainType = json_integer_value( json_object_get( tileDataJSON , "TERRAIN_TYPE" ) );
@@ -710,8 +785,13 @@ tileData **loadTileData( char *tileFile , int *success )
 
 }
 /*
-	tileData **loadTileData(char *tileFile, int *success):
+	=================================================================================
+	unitData *loadUnit( char *unitFile , int ID , int *success ):
 	Used to load a unit from a unitFile based on the Unit's position in the unit file
+	
+	On success, this will return a pointer to a unit data structure
+	Otherwise, it will return NULL
+	=================================================================================
 
 */
 unitData *loadUnit( char *unitFile , int ID , int *success )
@@ -733,7 +813,7 @@ unitData *loadUnit( char *unitFile , int ID , int *success )
 	{
 		fprintf( stderr , "json_loads has failed on : %s \n" , errorHandle.text );
 		*success = FAIL;
-		return temp;
+		return NULL;
 	}
 	unitDataJSON = json_array_get( tempJsonHandle , 0 );
 	if( !json_is_object( unitDataJSON ) )
@@ -741,7 +821,7 @@ unitData *loadUnit( char *unitFile , int ID , int *success )
 		fprintf( stderr , "json_object_get failed, didn't get an object\n" );
 		*success = FAIL;
 		json_decref( tempJsonHandle );
-		return temp;
+		return NULL;
 	}
 	numberOfUnits = json_integer_value( json_object_get( unitDataJSON , "NO_UNITS" ) );
 	if( numberOfUnits <= 0 )
@@ -757,7 +837,7 @@ unitData *loadUnit( char *unitFile , int ID , int *success )
 			fprintf( stderr , "json_object_get failed, didn't get an object\n" );
 			*success = FAIL;
 			json_decref( tempJsonHandle );
-			return temp;
+			return NULL;
 		}
 		loadedUnitID = json_integer_value( json_object_get( unitDataJSON , "ID" ) );
 		if( loadedUnitID == ID )
@@ -774,6 +854,7 @@ unitData *loadUnit( char *unitFile , int ID , int *success )
 	}
 	
 	temp->unitID = loadedUnitID;
+	//==================Unit stats===============================
 	temp->movement = json_integer_value( json_object_get( unitDataJSON , "MOVEMENT" ) );
 	temp->aPRange = json_integer_value( json_object_get( unitDataJSON , "ANTI_PERSONNEL_RANGE" ) );
 	temp->aPAttacks = json_integer_value( json_object_get( unitDataJSON , "ANTI_PERSONNEL_DICE" ) );
@@ -784,6 +865,7 @@ unitData *loadUnit( char *unitFile , int ID , int *success )
 	temp->save = json_integer_value( json_object_get( unitDataJSON , "SAVE" ) );
 	temp->coverSave = DEFAULT_COVER_SAVE;
 	temp->morale = json_integer_value( json_object_get( unitDataJSON , "MORALE" ) );
+	//==========================Stuff relevant to the simulation =============================
 	temp->spriteDimensions.x = json_integer_value( json_object_get( unitDataJSON , "SPRITE_XPOS" ) ) * TILE_WIDTH * 2;//loads the positions of the sprite 
 	temp->spriteDimensions.y = json_integer_value( json_object_get( unitDataJSON , "SPRITE_YPOS" ) ) * TILE_HEIGHT * 2;
 	temp->spriteDimensions.w = TILE_WIDTH * 2;
@@ -802,8 +884,13 @@ unitData *loadUnit( char *unitFile , int ID , int *success )
 	return temp;
 }
 /*
+	=======================================================================================================
 	unitData **loadUnitData(char *sideUnitDataFilePath, char *unitDescriptorDataFilePath, int *success):
 	Used to load all the units with the assistance of the above helper function
+	
+	On success, it returns a pointer to an array of units
+	Otherwise, it will return NULL
+	=======================================================================================================
 
 */
 unitData **loadUnitData( char *sideUnitDataFilePath , char *unitDescriptorDataFilePath , int *success )
@@ -815,12 +902,14 @@ unitData **loadUnitData( char *sideUnitDataFilePath , char *unitDescriptorDataFi
 	int i, numberOfUnits, unitID;
 	char *sideUnitDataFile = loadTextFile( sideUnitDataFilePath , success );
 	char *overallUnitDataFile = loadTextFile( unitDescriptorDataFilePath , success );
+	
+	//==================== General JSON handling procedure and mallocing ======================
 	tempJsonHandle = json_loads( sideUnitDataFile , 0 , &errorHandle );
 	if( !tempJsonHandle )
 	{
 		fprintf( stderr , "json_loads has failed on %s: %s \n" , sideUnitDataFile , errorHandle.text );
 		*success = FAIL;
-		return temp;
+		return NULL;
 	}
 	unitDataJSON = json_array_get( tempJsonHandle , 0 );
 	if( !json_is_object( unitDataJSON ) ) 
@@ -828,7 +917,7 @@ unitData **loadUnitData( char *sideUnitDataFilePath , char *unitDescriptorDataFi
 		fprintf( stderr , "json_object_get failed, didn't get an object\n" );
 		*success = FAIL;
 		json_decref( tempJsonHandle );
-		return temp;//I.E. NULL	
+		return NULL;	
 	}
 	numberOfUnits = json_integer_value( json_object_get( unitDataJSON , "NUMBER_UNITS" ) ) + 1;
 	if( numberOfUnits <= 0 )
@@ -846,7 +935,8 @@ unitData **loadUnitData( char *sideUnitDataFilePath , char *unitDescriptorDataFi
 	for( i = 1 ; i < numberOfUnits ; i++ )
 	{
 		unitDataJSON = json_array_get( tempJsonHandle , i );
-		if( !json_is_object( unitDataJSON ) )
+		if( !json_is_object( unitDataJSON ) )//Loop to load the unit's data and their positions from the unit data
+		//File and the descriptor file
 		{
 			fprintf( stderr , "json_object_get failed, didn't get an object\n" );
 			*success = FAIL;
@@ -864,9 +954,13 @@ unitData **loadUnitData( char *sideUnitDataFilePath , char *unitDescriptorDataFi
 	return temp;
 }
 /*
+	===========================================================================
 	sideData *loadSideData(char *filename,int sideNumber, int *success):
-	Loads a side in the scenario
-
+	Loads a side in the scenario and its units
+	
+	On success, it returns a pointer to a side structure
+	Otherwise, it will return a NULL
+	============================================================================
 */
 sideData *loadSideData( char *filename , int sideNumber , int *success )
 {
@@ -876,7 +970,7 @@ sideData *loadSideData( char *filename , int sideNumber , int *success )
 	sideData *temp;
 	json_t *tempJsonHandle, *sideDataJSON;
 	json_error_t errorHandle;
-	if( sideNumber > 1 && sideNumber < 0 )
+	if( sideNumber > 1 && sideNumber < 0 )//makes sure the side is valid
 	{
 		fprintf( stderr , "sideNumber Not valid\n" );
 		*success = FAIL;
@@ -922,8 +1016,13 @@ sideData *loadSideData( char *filename , int sideNumber , int *success )
 	return temp;
 }
 /*
+	===================================================================================
 	mapData *loadMapData(char *levelDataFile ,int mapNo, int *success):
-	Loads a map
+	Loads the simulation at the start
+	
+	On success, it will return a pointer to a map structure
+	Otherwise, it will return NULL
+	===================================================================================
 
 */
 mapData *loadMapData( char *levelDataFile , int mapNo , SDL_Renderer *render , int *success )//This doesn't need an ID as all the maps are loaded in sequence

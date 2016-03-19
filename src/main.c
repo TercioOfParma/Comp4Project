@@ -16,14 +16,15 @@
 
 //==== FUNCTIONS ======
 /*
+	========================================================
 	int main(int argc, char *argv[]):
 	The big main function that ties it all together
 	It Does the following :
 		- Declares and initialises variables and structures
 		- Handles initialising libraries and windows
 		- Main program loop
-		- Deinitialisation
-
+		- exiting
+	========================================================
 */
 
 int main( int argc , char *argv[] )
