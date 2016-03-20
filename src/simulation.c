@@ -4,16 +4,22 @@
 	VERSION : 0.001
 	NOTES: Could get far more complex in later non coursework versions
 */
-//---------------------------------- C PREPROCESSOR --------------------------
+//============ Preprocessor ======================
 
 #ifndef INCLUDE_LOCK
 #define INCLUDE_LOCK
 #include "main.h"
 #endif
-//------------------------------ FUNCTIONS -----------------------------------
+//=========== Functions ==========================
 /*
+	============================================================================
 	int aStarWithTerrain(sideData *applicableUnits, int unitNo, tileData **tiles, int xPos, int yPos):
 	used to see if a unit can move or shoot a tile
+	
+	When the program works normally, it will return the minimum length
+	The other will return a zero, as this is when somehow the unit attempts to use the
+	algorithm to get to their own tile
+	============================================================================
 
 */
 int aStarWithTerrain( sideData *applicableUnits , int unitNo , tileData **tiles , int xPos , int yPos , int size )
@@ -77,7 +83,7 @@ int aStarWithTerrain( sideData *applicableUnits , int unitNo , tileData **tiles 
 					{
 						tiles[i]->hScore += 5;//rough terrain movement and shooting modifier for non infantry in jungle and cities
 					}
-					if( favouredPositionLength > tiles[i]->hScore )
+					if( favouredPositionLength > tiles[i]->hScore )//checks to see if the new h score is lower
 					{
 						favouredPositionLength = tiles[i]->hScore;
 						tiles[i]->explored = TRUE;
@@ -121,8 +127,12 @@ int aStarWithTerrain( sideData *applicableUnits , int unitNo , tileData **tiles 
 	return totalLength;
 }
 /*
-	int aStarWithTerrain(sideData *applicableUnits, int unitNo, tileData **tiles, int xPos, int yPos):
-	used to see if a unit can move or shoot a tile
+	====================================================================
+	int findDistance( tileData *tileOne , tileData *tileTwo ):
+	Finds the distance, factoring diagonals where applicable
+	
+	returns the total distance
+	====================================================================
 
 */
 int findDistance( tileData *tileOne , tileData *tileTwo )
@@ -141,8 +151,12 @@ int findDistance( tileData *tileOne , tileData *tileTwo )
 	return totalDistance;
 }
 /*
-	void moveUnit(sideData *applicableUnits, int givenUnit):
+	===============================================================================
+	void moveUnit( sideData *applicableUnits , tileData **tiles , int xPos , 
+	int yPos , int givenUnit ):
 	moves a unit
+	
+	===============================================================================
 */
 void moveUnit( sideData *applicableUnits , tileData **tiles , int xPos , int yPos , int givenUnit )
 {
@@ -152,7 +166,7 @@ void moveUnit( sideData *applicableUnits , tileData **tiles , int xPos , int yPo
 	k = 0;
 	i = 0;
 	j = 0;
-	if(applicableUnits->units[ givenUnit ]->moved == TRUE)
+	if(applicableUnits->units[ givenUnit ]->moved == TRUE)//checks to see if the unit has moved
 	{
 		fprintf( stdout , "%s has Already moved!\n", applicableUnits->units[ givenUnit ]->name);
 		applicableUnits->units[ givenUnit ]->selected = FALSE;
@@ -160,6 +174,7 @@ void moveUnit( sideData *applicableUnits , tileData **tiles , int xPos , int yPo
 	
 	}
 	applicableUnits->units[ givenUnit ]->moved = TRUE;
+	//============================= Morale Checks =============================================
 	//no sense including impetouous here because they will have lost it if they are any of these
 	if(applicableUnits->units[ givenUnit ]->modifiers[ MODIFIERPOSITION_ROUT ] == TRUE)
 	{
@@ -178,7 +193,9 @@ void moveUnit( sideData *applicableUnits , tileData **tiles , int xPos , int yPo
 		}
 	
 	}
-	if( applicableUnits->units[ givenUnit ]->modifiers[ MODIFIERPOSITION_STUNNED ] == TRUE || applicableUnits->units[ givenUnit ]->modifiers[ MODIFIERPOSITION_PANICKED ] == TRUE )
+	if( applicableUnits->units[ givenUnit ]->modifiers[ MODIFIERPOSITION_STUNNED ] == TRUE || 
+	applicableUnits->units[ givenUnit ]->modifiers[ MODIFIERPOSITION_PANICKED ] == TRUE )
+	
 	{
 		morale = rand() % 12 + 1;
 		if(morale <= applicableUnits->units[ givenUnit ]->morale)
@@ -200,6 +217,7 @@ void moveUnit( sideData *applicableUnits , tileData **tiles , int xPos , int yPo
 		return;
 	
 	}
+	//====================== Movement ======================================
 	if( applicableUnits->units[ givenUnit ]->modifiers[ MODIFIERPOSITION_STUCK ] == TRUE )
 	{
 		stuckMove = ( applicableUnits->units[ givenUnit ]->movement / 3 );
@@ -213,7 +231,10 @@ void moveUnit( sideData *applicableUnits , tileData **tiles , int xPos , int yPo
 		aStarResult = aStarWithTerrain( applicableUnits , givenUnit , tiles , xPos , yPos , tiles[0]->noTiles );
 		fprintf( stdout , " Action cost : %d ,Movement value : %d\n" , aStarResult ,  applicableUnits->units[ givenUnit ]->movement );
 	}
-	if( aStarResult <= applicableUnits->units[ givenUnit ]->movement && applicableUnits->units[ givenUnit ]->modifiers[ MODIFIERPOSITION_STUNNED ] == FALSE && applicableUnits->units[ givenUnit ]->modifiers[ MODIFIERPOSITION_PANICKED ] == FALSE && applicableUnits->units[ givenUnit ]->modifiers[ MODIFIERPOSITION_PINNED ] == FALSE )
+	if( aStarResult <= applicableUnits->units[ givenUnit ]->movement && 
+	applicableUnits->units[ givenUnit ]->modifiers[ MODIFIERPOSITION_STUNNED ] == FALSE &&//Where the unit actually moves
+	applicableUnits->units[ givenUnit ]->modifiers[ MODIFIERPOSITION_PANICKED ] == FALSE &&
+	applicableUnits->units[ givenUnit ]->modifiers[ MODIFIERPOSITION_PINNED ] == FALSE )
 	{
 		
 		applicableUnits->units[ givenUnit ]->relativeX = xPos;
@@ -250,9 +271,13 @@ void moveUnit( sideData *applicableUnits , tileData **tiles , int xPos , int yPo
 
 
 /*
-	void shootUnit(sideData *shootingSideUnits, int shootingSideNo, sideData *recievingSideUnits, int recievingSideNo):
+	===============================================================================================================
+	int shootUnit( sideData *shootingSideUnits , int shootingSideNo , sideData *recievingSideUnits , 
+	int recievingSideNo , tileData **tiles ):
 	shoots a unit
-
+	
+	Returns the number of wounds inflicted
+	===============================================================================================================
 */
 int shootUnit( sideData *shootingSideUnits , int shootingSideNo , sideData *recievingSideUnits , int recievingSideNo , tileData **tiles )
 {
@@ -265,6 +290,7 @@ int shootUnit( sideData *shootingSideUnits , int shootingSideNo , sideData *reci
 		shootingSideUnits->units[ shootingSideNo ]->selected = FALSE;
 		return 0;
 	}
+	//================================== Morale =====================================================
 	if( shootingSideUnits->units[ shootingSideNo ]->modifiers[ MODIFIERPOSITION_ROUT ] == TRUE )
 	{
 		fprintf(stderr, "Can't shoot! Routing!\n" );
@@ -273,7 +299,9 @@ int shootUnit( sideData *shootingSideUnits , int shootingSideNo , sideData *reci
 	shootingSideUnits->units[ shootingSideNo ]->modifiers[ MODIFIERPOSITION_PINNED ] = FALSE;
 	shootingSideUnits->units[ shootingSideNo ]->shot = TRUE;
 	fprintf( stderr , "%d\n" , tiles[0]->noTiles );
-	int aStarResult = aStarWithTerrain( shootingSideUnits , shootingSideNo , tiles , recievingSideUnits->units[ recievingSideNo ]->relativeX , recievingSideUnits->units[ recievingSideNo ]->relativeY, tiles[0]->noTiles - 1 );
+	//====================== Path finding and more morale ==========================================
+	int aStarResult = aStarWithTerrain( shootingSideUnits , shootingSideNo , tiles , recievingSideUnits->units[ recievingSideNo ]->relativeX ,
+	recievingSideUnits->units[ recievingSideNo ]->relativeY, tiles[0]->noTiles - 1 );
 	int i, totalHits, currentHit, morale;
 	totalHits = 0;
 	if( shootingSideUnits->units[ shootingSideNo ]->modifiers[ MODIFIERPOSITION_STUNNED ] == TRUE )
@@ -291,10 +319,14 @@ int shootUnit( sideData *shootingSideUnits , int shootingSideNo , sideData *reci
 		}
 	
 	}
+	//============================= Shooting =======================================
+	if( aStarResult <= shootingSideUnits->units[ shootingSideNo ]->aPRange && 
+	recievingSideUnits->units[ recievingSideNo ]->unitType == UNITTYPE_INFANTRY)
 	
-	if( aStarResult <= shootingSideUnits->units[ shootingSideNo ]->aPRange &&  recievingSideUnits->units[ recievingSideNo ]->unitType == UNITTYPE_INFANTRY)
 	{
-		fprintf( stdout , " Action cost : %d ,Shooting range : %d , Shooting attacks : %d\n" , aStarResult ,  shootingSideUnits->units[ shootingSideNo ]->aPRange,  shootingSideUnits->units[ shootingSideNo ]->aPAttacks  );
+		fprintf( stdout , " Action cost : %d ,Shooting range : %d , Shooting attacks : %d\n" , aStarResult ,  
+		shootingSideUnits->units[ shootingSideNo ]->aPRange,  shootingSideUnits->units[ shootingSideNo ]->aPAttacks  );
+		
 		shootingSideUnits->units[ shootingSideNo ]->shot = TRUE;
 		for( i = 0 ; i < shootingSideUnits->units[ shootingSideNo ]->aPAttacks ; i++ )
 		{
@@ -318,7 +350,9 @@ int shootUnit( sideData *shootingSideUnits , int shootingSideNo , sideData *reci
 			}
 		}
 	}
-	else if( aStarResult <= shootingSideUnits->units[ shootingSideNo ]->aTRange &&  recievingSideUnits->units[ recievingSideNo ]->unitType != UNITTYPE_INFANTRY)
+	else if( aStarResult <= shootingSideUnits->units[ shootingSideNo ]->aTRange &&
+	recievingSideUnits->units[ recievingSideNo ]->unitType != UNITTYPE_INFANTRY)
+	
 	{
 		fprintf( stdout , " Action cost : %d ,Shooting value : %d , Shooting attacks : %d\n" , aStarResult ,  shootingSideUnits->units[ shootingSideNo ]->aTRange,  shootingSideUnits->units[ shootingSideNo ]->aTAttacks  );
 		shootingSideUnits->units[ shootingSideNo ]->shot = TRUE;
@@ -362,15 +396,20 @@ int shootUnit( sideData *shootingSideUnits , int shootingSideNo , sideData *reci
 	
 	
 	
-	fprintf( stdout , "The %s delived %d damage to the %s, leaving %d wounds\n" , shootingSideUnits->units[ shootingSideNo ]->name , totalHits , recievingSideUnits->units[ recievingSideNo ]->name , recievingSideUnits->units[ recievingSideNo ]->wounds );
+	fprintf( stdout , "The %s delived %d damage to the %s, leaving %d wounds\n" , shootingSideUnits->units[ shootingSideNo ]->name , totalHits ,
+	recievingSideUnits->units[ recievingSideNo ]->name , recievingSideUnits->units[ recievingSideNo ]->wounds );
+
 	shootingSideUnits->units[ shootingSideNo ]->selected = FALSE;
 	shootingSideUnits->units[ shootingSideNo ]->shot = TRUE;
 	return totalHits;
 }
 /*
-	void resolveShooting(sideData *shootingSideUnits, int shootingSideNo, sideData *recievingSideUnits, int recievingSideNo,int inflictedCasualties, int recievedCasualties):
+	==================================================================================================
+	void resolveShooting(sideData *shootingSideUnits, int shootingSideNo, sideData *recievingSideUnits, 
+	int recievingSideNo,int inflictedCasualties, int recievedCasualties):
 	shoots a unit
 
+	==================================================================================================
 */
 
 void resolveShooting( sideData *shootingSideUnits , int shootingSideNo , sideData *recievingSideUnits , int recievingSideNo , int inflictedCasualties , int recievedCasualties )
@@ -383,6 +422,7 @@ void resolveShooting( sideData *shootingSideUnits , int shootingSideNo , sideDat
 	{
 		return;
 	}
+	//============================ Actual resolving ============================================
 	else if( combatRes > 0 )
 	{
 		fprintf( stdout , "Shooting side won!" );
@@ -432,7 +472,7 @@ void resolveShooting( sideData *shootingSideUnits , int shootingSideNo , sideDat
 				fprintf( stdout , "%s gained Panicked!\n" , shootingSideUnits->units[ shootingSideNo ]->name );
 				shootingSideUnits->units[ shootingSideNo ]->modifiers[ MODIFIERPOSITION_PANICKED ] = TRUE;
 			}
-			if( combatRes > ROUT_THRESHOLD && shootingSideUnits->units[ shootingSideNo ]->morale < moraleTest )
+			if( combatRes > ROUT_THRESHOLD )
 			{
 				fprintf( stdout , "%s gained Rout!\n" , shootingSideUnits->units[ shootingSideNo ]->name );
 				shootingSideUnits->units[ shootingSideNo ]->modifiers[ MODIFIERPOSITION_PINNED ] = TRUE;
@@ -449,8 +489,12 @@ void resolveShooting( sideData *shootingSideUnits , int shootingSideNo , sideDat
 	}
 }
 /*
-	void displaySimulationResults(sideData *sideOne, sideData *sideTwo, tileData **map, TTF_Font *font, SDL_Renderer *render):
+	============================================================================================
+	void displaySimulationResults(sideData *sideOne, sideData *sideTwo, tileData **map, 
+	TTF_Font *font, SDL_Renderer *render):
+	
 	displays the result of a simulation
+	============================================================================================
 */
 
 void displaySimulationResults( sideData *sideOne , sideData *sideTwo , tileData **map , TTF_Font *font , SDL_Renderer *render )
@@ -502,33 +546,40 @@ void displaySimulationResults( sideData *sideOne , sideData *sideTwo , tileData 
 	getch();
 }
 /*
-	void simulationMain(mapData *map, SDL_Renderer *render, TTF_Font *font, buttonData *nextTurn, SDL_Event *events, int *success):
-	Handles a simulation 
+	=========================================================================================
+	void simulationMain(mapData *map, SDL_Renderer *render, TTF_Font *font, buttonData *nextTurn,
+	SDL_Event *events, int *success):
+	Handles a simulation like a subordinate main function
+	=========================================================================================
 */
 void simulationMain( mapData *map , SDL_Renderer *render , TTF_Font *font , buttonData **nextTurn , SDL_Event *events , int *success )
 {
 	fprintf( stderr , "Running the simulation....\n" );
 	int oneSideDead = FALSE;
-	int i, turnNumber, whichSide, turnButtonClicked, turnChanged,  j, oldSelected, otherSide, k, attackingSideCasualties, defendingSideCasualties, clickedState, quoteNo;
+	int i, turnNumber, whichSide, turnButtonClicked, turnChanged,  j, oldSelected, otherSide, k, attackingSideCasualties, 
+	defendingSideCasualties, clickedState, quoteNo, time;
 	SDL_Rect backgroundDimensions;
+	clock_t start, end;
+	SDL_Texture *background;
+	Mix_Chunk *march, *shoot;
+	//========================== INIT ==================================
 	backgroundDimensions.x = 0;
 	backgroundDimensions.y = 0;
-	SDL_Texture *background = loadImage("background.png", render, &backgroundDimensions, &i);
-	turnNumber = 0;
-	whichSide = 0;
-	otherSide = 1;
+	background = loadImage("background.png", render, &backgroundDimensions, &i);
+	turnNumber = 0;//turn value
+	whichSide = SIDE_ONE;//starting side
+	otherSide = SIDE_TWO;
 	turnChanged = 0;
-	clickedState = 0;
+	clickedState = FALSE;
 	turnButtonClicked = FALSE;
-	int time = 0;
-	Mix_Chunk *march, *shoot;
+	time = 0;
 	shoot = loadEffect( "audio/attack.wav" , &i );
 	march = loadEffect( "audio/march.wav" , &i );
-	clock_t start, end;
 	start = clock();
+	//================================= Main functionality ===============
 	while( oneSideDead != TRUE )
 	{	
-		if( turnChanged == TRUE && turnButtonClicked == TRUE)
+		if( turnChanged == TRUE && turnButtonClicked == TRUE)//Changing turn
 		{
 			turnChanged = 0;
 			turnNumber = turnNumber + 1;
@@ -547,7 +598,7 @@ void simulationMain( mapData *map , SDL_Renderer *render , TTF_Font *font , butt
 			fprintf( stdout , "Press enter here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n" );
 			getch();
 		}
-		for( i = 1 ; i <= map->sides[ whichSide ]->noUnits ; i++ )
+		for( i = 1 ; i <= map->sides[ whichSide ]->noUnits ; i++ )//removes selection
 		{
 			map->sides[ whichSide ]->units[i]->selected = FALSE;
 			map->sides[ whichSide ]->units[i]->shot = FALSE;
@@ -565,76 +616,102 @@ void simulationMain( mapData *map , SDL_Renderer *render , TTF_Font *font , butt
 		}
 		if( turnNumber % 2 == 1 )
 		{
-			whichSide = 0;
-			otherSide = 1;
+			whichSide = SIDE_ONE;
+			otherSide = SIDE_TWO;
 		}
 		else
 		{
-			whichSide = 1;
-			otherSide = 0;
+			whichSide = SIDE_TWO;
+			otherSide = SIDE_ONE;
 		
 		}
 		while( turnButtonClicked != TRUE )
 		{
-			
 			if( clickedState  != FALSE )
 			{
 				oldSelected = clickedState ;
 			}
 			SDL_RenderClear( render );
 			SDL_RenderCopy(render, background, NULL, NULL);
-			if( time % 1 == 0 )
+			end = clock();
+			if( ( end - start ) / ( CLOCKS_PER_SEC/1000 ) > CLICK_RATE )
 			{
-				end = clock();
-				if( ( end - start ) / ( CLOCKS_PER_SEC/1000 ) > CLICK_RATE )
+				clickedState = handleMapClicked( map->sides[ whichSide ] , map->sides[ otherSide ] , map->tiles , nextTurn , events, &turnButtonClicked );
+				start = clock();
+				if( clickedState == NULL_INPUT )
 				{
-					clickedState = handleMapClicked( map->sides[ whichSide ] , map->sides[ otherSide ] , map->tiles , nextTurn , events, &turnButtonClicked );
-					start = clock();
-				}
-				if( ( oldSelected == UNIT_SELECTED && clickedState == TILE_SELECTED) || ( oldSelected == UNIT_SELECTED && clickedState == UNIT_SELECTED_OTHER ) )
-				{
-					for( i = 1 ; i <= map->sides[ whichSide ]->noUnits ; i++ )
-					{
-						if( map->sides[ whichSide ]->units[i]->selected == TRUE )
-						{
-							break;
-						}
-					}
-					for( k = 1 ; k <= map->sides[ otherSide ]->noUnits ; k++ )
-					{
-						if( map->sides[ otherSide ]->units[k]->selected == TRUE )
-						{
-							break;
-						}
-					}
-					for( j = 0 ; j < map->tiles[0]->noTiles ; j++ )
-					{
-						if( map->tiles[j]->isSelected == TRUE )
-						{
-							break;
-						}
-					}
-					if( i != map->sides[ whichSide ]->noUnits + 1 && !( j ==  map->tiles[0]->noTiles ) && map->sides[ whichSide ]->units[i]->selected == TRUE && map->tiles[j]->isSelected == TRUE && oldSelected == UNIT_SELECTED && clickedState == TILE_SELECTED  )
-					{
-						Mix_PlayChannel( -1 , march , 0 );
-						moveUnit( map->sides[ whichSide ], map->tiles , map->tiles[j]->relativeX , map->tiles[j]->relativeY , i );
-					}
-					if(i != map->sides[ whichSide ]->noUnits + 1 && map->sides[ whichSide ]->units[i]->selected == TRUE && k != map->sides[ otherSide ]->noUnits + 1 && map->sides[ otherSide ]->units[k]->selected == TRUE && oldSelected == UNIT_SELECTED && clickedState == UNIT_SELECTED_OTHER )
-					{
-						Mix_PlayChannel( -1 , shoot , 0 );
-						defendingSideCasualties = shootUnit( map->sides[ whichSide ] , i , map->sides[ otherSide ] , k , map->tiles );
-						attackingSideCasualties = shootUnit( map->sides[ otherSide ] , k , map->sides[ whichSide ] , i , map->tiles );
-						resolveShooting( map->sides[ whichSide ] , i ,  map->sides[ otherSide ] , k , defendingSideCasualties , attackingSideCasualties );
-						map->sides[ whichSide ]->units[i]->selected = FALSE;
-						map->sides[ otherSide ]->units[k]->selected = FALSE;
-					}
+					clickedState = oldSelected;
+				
 				}
 			}
-			if( events->type == SDL_QUIT )
+			if( ( oldSelected == UNIT_SELECTED &&
+			clickedState == TILE_SELECTED ) ||
+			( oldSelected == UNIT_SELECTED &&
+			clickedState == UNIT_SELECTED_OTHER ) )
+			{
+				for( i = 1 ; i <= map->sides[ whichSide ]->noUnits ; i++ )
+				{
+					if( map->sides[ whichSide ]->units[i]->selected == TRUE )
+					{
+						break;
+					}
+				}
+				for( k = 1 ; k <= map->sides[ otherSide ]->noUnits ; k++ )
+				{
+					if( map->sides[ otherSide ]->units[k]->selected == TRUE )
+					{
+						break;
+					}
+				}
+				for( j = 0 ; j < map->tiles[0]->noTiles ; j++ )
+				{
+					if( map->tiles[j]->isSelected == TRUE )
+					{
+						break;
+					}
+				}
+				fprintf(stdout, "Old Selected : %d\n New Selected : %d\n", oldSelected, clickedState);
+				
+				if( i != map->sides[ whichSide ]->noUnits + 1 &&
+				!( j ==  map->tiles[0]->noTiles ) && 
+				map->sides[ whichSide ]->units[i]->selected == TRUE &&
+				map->tiles[j]->isSelected == TRUE &&
+				oldSelected == UNIT_SELECTED &&
+				clickedState == TILE_SELECTED  )//Movement
+				
+				{
+					Mix_PlayChannel( -1 , march , 0 );
+					moveUnit( map->sides[ whichSide ], map->tiles , map->tiles[j]->relativeX , map->tiles[j]->relativeY , i );
+				}
+				
+				if(i != map->sides[ whichSide ]->noUnits + 1 &&
+				map->sides[ whichSide ]->units[i]->selected == TRUE &&
+				k != map->sides[ otherSide ]->noUnits + 1 &&
+				map->sides[ otherSide ]->units[k]->selected == TRUE &&
+				oldSelected == UNIT_SELECTED &&
+				clickedState == UNIT_SELECTED_OTHER )//Shooting
+				
+				{
+					Mix_PlayChannel( -1 , shoot , 0 );
+					
+					defendingSideCasualties = shootUnit( map->sides[ whichSide ] , i , map->sides[ otherSide ] , k , map->tiles );
+					
+					attackingSideCasualties = shootUnit( map->sides[ otherSide ] , k , map->sides[ whichSide ] , i , map->tiles );
+					
+					resolveShooting( map->sides[ whichSide ] , i ,  map->sides[ otherSide ] , k , defendingSideCasualties , attackingSideCasualties );
+					
+					map->sides[ whichSide ]->units[i]->selected = FALSE;
+					
+					map->sides[ otherSide ]->units[k]->selected = FALSE;
+				}
+			}
+			
+			if( events->type == SDL_QUIT )//Clicking the red cross in the top right
 			{
 				*success = FAIL;
 				return;
 			}
+			//Drawing
 			drawTerrain( map->tiles , map->tiles[0]->noTiles , render , map->tileset );
 			drawUnits( map->sides[0]->units , map->sides[0]->noUnits , render , map->tileset );
 			drawUnits( map->sides[1]->units , map->sides[1]->noUnits , render , map->tileset );
@@ -652,7 +729,7 @@ void simulationMain( mapData *map , SDL_Renderer *render , TTF_Font *font , butt
 			{
 				for( i = 1 ; i <= map->sides[1]->noUnits ; i++ )
 				{
-				oneSideDead = TRUE;
+					oneSideDead = TRUE;
 					if( map->sides[1]->units[i]->alive == TRUE )
 					{
 						oneSideDead = FALSE;

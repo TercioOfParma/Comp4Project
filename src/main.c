@@ -37,9 +37,9 @@ int main( int argc , char *argv[] )
 	int quizTerminated = FAIL;
 	int i;
 	int primaryButtonValue, secondaryButtonValue;
-	HWND console;
-	//==== C Standard Library Data Structures ======
+	//==== C or Windows Standard Library Data Structures ======
 	FILE *errorRedirection;
+	HWND console;
 	//==== Custom Data Structures =====
 	optionsData options;
 	levelData *levels;
@@ -64,7 +64,8 @@ int main( int argc , char *argv[] )
 	MoveWindow(console, 0 , 0 , CONSOLESIZE_X , CONSOLESIZE_Y , 1); 
 	
 	//Handling and testing the error output
-	errorRedirection = freopen( LOG_FILE , "w" , stderr );//According to the documentation I have read, it isn't an issue on windows stderr isn't a file, and so this evades the race condition issue
+	errorRedirection = freopen( LOG_FILE , "w" , stderr );//According to the documentation I have read, it isn't an issue on windows stderr isn't a file,
+	//and so this evades the race condition issue
 	fprintf( stderr , "Main function....\n" );
 	
 	//loading options and libraries and initialising them

@@ -4,13 +4,13 @@
 	VERSION : 0.001
 	NOTES: It will be interesting to see how this code turns out
 */
-//---------------------------------- C PREPROCESSOR --------------------------
+//==== Preprocessor ========
 
 #ifndef INCLUDE_LOCK
 #define INCLUDE_LOCK
 #include "main.h"
 #endif
-//------------------------------ FUNCTIONS -----------------------------------
+//==== Functions =======
 /*	===================================================================================
 	int checkButtonClicked(SDL_Rect *mouseDimensions, buttonData *button):
 	Checks if a mouse clicked a button. 
@@ -176,6 +176,8 @@ int handleMouseButtonMainMenu( buttonData **buttons , int size , SDL_Renderer *r
 	int size, SDL_Renderer *render):
 	Checks the mouse buttons on the secondary menu and draws them etc.
 
+	On succrss, it will return the type of the selection button
+	Otherwise, it will return NULL_INPUT
 	=========================================================================================
 */
 int handleMouseButtonSelectionMenu( buttonDataText **buttonsText , int size , SDL_Renderer *render , SDL_Event *events )
@@ -234,13 +236,16 @@ int handleMapClicked( sideData *applicableUnits , sideData *otherSide , tileData
 	mouseCoords.w = MOUSE_X;
 	mouseCoords.h = MOUSE_Y;
 	SDL_GetMouseState( &( mouseCoords.x ) , &( mouseCoords.y ) );
-	while(	SDL_PollEvent( events ) )//checks all the input. since this is only run once every 35 miliseconds, it is neccessary to check everything that may have happened in the last 35 miliseconds and do that
+	while(	SDL_PollEvent( events ) )//checks all the input. since this is only run once every 35 miliseconds, 
+	//it is neccessary to check everything that may have happened in the last 35 miliseconds and do that rather than processing
+	//each time as other functions do
 	{
 	
 	}
 	if( events->type == SDL_MOUSEBUTTONDOWN )
 	{
-		for( i = 1 ; i <= applicableUnits->noUnits ; i++ )//checks friendly units
+		//====================== checks friendly units======================================================
+		for( i = 1 ; i <= applicableUnits->noUnits ; i++ )
 		{	
 			buttonClickResultUnit = checkUnitClicked( &mouseCoords , applicableUnits->units[i] );
 			if( buttonClickResultUnit == SUCCESS && applicableUnits->units[i]->alive == TRUE )
@@ -255,7 +260,8 @@ int handleMapClicked( sideData *applicableUnits , sideData *otherSide , tileData
 			}
 			buttonClickResultUnit = FAIL;
 		}
-		for( i = 1 ; i <= otherSide->noUnits ; i++ )//checks enemy units
+		//======================================checks enemy units=============================
+		for( i = 1 ; i <= otherSide->noUnits ; i++ )
 		{	
 			buttonClickResultUnit = checkUnitClicked( &mouseCoords , otherSide->units[i] );
 			if( buttonClickResultUnit == SUCCESS && otherSide->units[i]->alive == TRUE )
@@ -266,7 +272,8 @@ int handleMapClicked( sideData *applicableUnits , sideData *otherSide , tileData
 			}
 			buttonClickResultUnit = FAIL;
 		}
-		for( i = 1 ; i < tiles[0]->noTiles ; i++ )//checks map
+		//==========================checks map===========================
+		for( i = 1 ; i < tiles[0]->noTiles ; i++ )
 		{	
 			fprintf( stderr , "Mouse Coordinates : x : %d , y : %d, w : %d, h : %d \n" , mouseCoords.x , mouseCoords.y , 
 			mouseCoords.w , mouseCoords.h );

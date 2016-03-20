@@ -4,18 +4,20 @@
 	VERSION : 0.001
 	NOTES: Some functions here are simplistic. However, they take up a long amount of time on systems with an integrated chipset (luckily our spec doesn't have such limitations). These
 	will also not work on a software rendering system if you still have one of those
+	All of these save 1 have void, so no return
 */
-//---------------------------------- C PREPROCESSOR --------------------------
+//========== Preprocessor ===============
 
 #ifndef INCLUDE_LOCK
 #define INCLUDE_LOCK
 #include "main.h"
 #endif
-//------------------------------ FUNCTIONS -----------------------------------
+//============ Functions =================
 /*
+	============================================================================
 	void drawMenuElements(buttonData **buttons,int size, SDL_Renderer *render):
 	Draws an array of regular buttons
-
+	============================================================================
 */
 
 void drawMenuElements( buttonData **buttons , int size , SDL_Renderer *render )
@@ -24,14 +26,19 @@ void drawMenuElements( buttonData **buttons , int size , SDL_Renderer *render )
 	int i;
 	for( i = 0 ; i < size ; i++ )
 	{
-		SDL_RenderCopy( render , buttons[i]->display , NULL ,  &(buttons[i]->dimensions) );
+		SDL_RenderCopy( render , buttons[i]->display , NULL ,  &(buttons[i]->dimensions) );//write to renderer
 	}
 
 }
 /*
+	============================================================================================
 	textData *renderText(TTF_Font *font, SDL_Renderer *render, const char *stringToTexture):
 	Creates a textData structure, and gives it a texture from the instructed text
 	Mallocs some stuff, also deals with some memory allocation to GPU by library
+	
+	On success, it will return the textData structure
+	Otherwise, NULL
+	============================================================================================
 */
 textData *renderText( TTF_Font *font , SDL_Renderer *render , const char *stringToTexture , int *success )
 {
@@ -65,9 +72,10 @@ textData *renderText( TTF_Font *font , SDL_Renderer *render , const char *string
 	return temp; //cannot simply destroy since then the address would then be hanging
 }
 /*
+	===========================================================================
 	void drawText(textData *toDraw, SDL_Renderer *render):
 	draws a textData structure, (effectively a glorified wrapper function at this point
-
+	===========================================================================
 */
 void drawText( textData *toDraw , SDL_Renderer *render )
 {
@@ -75,8 +83,10 @@ void drawText( textData *toDraw , SDL_Renderer *render )
 	SDL_RenderCopy( render , toDraw->display , NULL , &(toDraw->dimensions) );
 }
 /*
+	====================================================================================
 	void drawMenuElementsText(buttonDataText **buttons, int size, SDL_Renderer *render):
 	draws a buttonData structure and associated textData
+	====================================================================================
 
 */
 void drawMenuElementsText( buttonDataText **buttons , int size , SDL_Renderer *render )
@@ -91,9 +101,10 @@ void drawMenuElementsText( buttonDataText **buttons , int size , SDL_Renderer *r
 	}
 }
 /*
+	=====================================================================================
 	void drawQuote(quoteData **quotes, int quoteNo, SDL_Renderer *render, TTF_Font *font):
 	Draws a quote an its analysis in a set place, will be done at the end of a turn
-	Deals with memory!
+	=====================================================================================
 */
 void drawQuote( quoteData **quotes , int quoteNo , SDL_Renderer *render , TTF_Font *font )
 {
@@ -115,8 +126,10 @@ void drawQuote( quoteData **quotes , int quoteNo , SDL_Renderer *render , TTF_Fo
 	drawText(quotes[ quoteNo ]->display[ ANALYSIS_POS ], render );
 }
 /*
+	=================================================================================
 	void drawQuestion(questionData **questions, int quoteNo, SDL_Renderer *render):
 	Draws a quote an its analysis in a set place, will be done at the end of a turn
+	=================================================================================
 
 */
 void drawQuestion( questionData **questions , int questionNo , SDL_Renderer *render , TTF_Font *font )
@@ -139,9 +152,10 @@ void drawQuestion( questionData **questions , int questionNo , SDL_Renderer *ren
 
 }
 /*
+	=========================================================================================
 	void drawTerrain(tileData **toDraw, int size, SDL_Renderer *render, SDL_Texture *tileMap):
 	Draws a map tile from the base texture that has all the textures
-
+	=========================================================================================
 */
 void drawTerrain( tileData **toDraw , int size , SDL_Renderer *render , SDL_Texture *tileMap )
 {
@@ -150,13 +164,15 @@ void drawTerrain( tileData **toDraw , int size , SDL_Renderer *render , SDL_Text
 	for( i = 0 ; i < size ; i++)
 	{
 		SDL_RenderCopyEx( render , tileMap , &(toDraw[i]->spriteDimensions) , &(toDraw[i]->dimensions) ,
-		toDraw[i]->angle , NULL, SDL_FLIP_NONE );
+		toDraw[i]->angle , NULL, SDL_FLIP_NONE );//allows the tiles to be spinned if people want to make the map
+		//look differently
 	}
 }
 /*
+	=======================================================================================
 	void drawUnits(unitData *toDraw, int size,  SDL_Renderer *render):
 	Draws a unit tile from the base texture that has all the textures
-
+	=======================================================================================
 */
 void drawUnits( unitData **toDraw , int size , SDL_Renderer *render , SDL_Texture *tileMap )
 {

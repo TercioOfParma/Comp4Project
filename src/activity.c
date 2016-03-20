@@ -7,18 +7,21 @@
 		- Calculating Grades
 		- Displaying the results of a user quiz
 */
-//---------------------------------- C PREPROCESSOR --------------------------
+//======= Preprocessor =============
 
 #ifndef INCLUDE_LOCK
 #define INCLUDE_LOCK
 #include "main.h"
 #endif
-//------------------------------ FUNCTIONS -----------------------------------
+//====== Functions =================
 
 /*
+	===============================================================
 	char computeGrade(activityData *quiz, int noCorrect):
 	Generates a grade from answers
-
+	
+	Will return the grade given, or U by default
+	===============================================================
 */
 char computeGrade(activityData *quiz, int noCorrect)
 {
@@ -63,11 +66,15 @@ char computeGrade(activityData *quiz, int noCorrect)
 
 }
 /*
+	===================================================================================================
 	void startQuiz(activityData *quiz, SDL_Renderer *render, TTF_Font *font):
 	Starts and runs a quiz and acts as a loop.
-	Nothing is malloc'd here, the data is already iniitalised prior to this being run
+	Nothing is malloc'd here, the data is already initialised prior to this being run
 	If the memory isn't allocated, then it will never run this in the first place due to error
 	code written in the init functions
+	
+	On termination, it will always return SUCCESS
+	===================================================================================================
 */
 int startQuiz( activityData *quiz , SDL_Renderer *render , TTF_Font *font , SDL_Event *events ,  int *success)
 {
@@ -75,8 +82,8 @@ int startQuiz( activityData *quiz , SDL_Renderer *render , TTF_Font *font , SDL_
 	int gotCorrect, i, randomQuestion, j, clicked;
 	char results[ MAX_TEXT_OUTPUT ], grade;
 	SDL_Rect mouseDimensions;
-	mouseDimensions.w = 5;//so that the person can actually click something
-	mouseDimensions.h = 5;
+	mouseDimensions.w = MOUSE_X;//so that the person can actually click something
+	mouseDimensions.h = MOUSE_Y;
 	srand( time(NULL) );
 	randomQuestion = rand() % quiz->maximumMark ;
 	gotCorrect = 0;
@@ -91,7 +98,7 @@ int startQuiz( activityData *quiz , SDL_Renderer *render , TTF_Font *font , SDL_
 		while( SDL_PollEvent( events ) )//registers input and processes clicks on them
 		{
 			SDL_GetMouseState( &( mouseDimensions.x ) , &( mouseDimensions.y ) );
-			if( events->type == SDL_MOUSEBUTTONDOWN )
+			if( events->type == SDL_MOUSEBUTTONDOWN )//checks for click
 			{
 				clicked = FAIL;
 				for( j = 1; j <= NO_ANSWERS; j++ )
@@ -129,7 +136,7 @@ int startQuiz( activityData *quiz , SDL_Renderer *render , TTF_Font *font , SDL_
 			if( events->type == SDL_QUIT )
 			{
 				*success = FAIL;
-				return 0;
+				return SUCCESS;
 			
 			}
 		}
@@ -142,12 +149,17 @@ int startQuiz( activityData *quiz , SDL_Renderer *render , TTF_Font *font , SDL_
 	snprintf( results , MAX_TEXT_OUTPUT , "YOU GOT %d / %d, THAT IS A GRADE %c, PLEASE PRESS ENTER INTO THE CONSOLE" , 
 	gotCorrect , quiz->maximumMark , grade);
 	displayActivityResults( quiz , results , render , font );
-	return 0;
+	return SUCCESS;
 }
 /*
-	void displayActivityResults(activityData *quiz, char *resultsToDisplay, SDL_Renderer *render, TTF_Font *font):
-	Renders, displays and destroys the results
+	==============================================================================
+	void displayActivityResults(activityData *quiz, char *resultsToDisplay, 
+	SDL_Renderer *render, TTF_Font *font):
+	Renders, displays and destroys the results information for the quiz
 	Deals with GPU Memory. Allocation is handled by renderText
+	
+	As a void method, it returns nothing
+	=============================================================================
 
 */
 void displayActivityResults( activityData *quiz , char *resultsToDisplay , SDL_Renderer *render , TTF_Font *font )

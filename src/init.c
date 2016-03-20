@@ -11,7 +11,7 @@
 */
 
 
-//---------------------------------- C PREPROCESSOR --------------------------
+//===== Preprocessor ========
 
 
 #ifndef INCLUDE_LOCK
@@ -21,7 +21,7 @@
 
 
 
-//------------------------------ FUNCTIONS -----------------------------------
+//======== Functions =============
 /*
 	==============================================================
 	char *loadTextFile(const char *filename, int *success):
@@ -829,7 +829,8 @@ unitData *loadUnit( char *unitFile , int ID , int *success )
 		fprintf( stderr , " FATAL ERROR : No Units specified\n " );
 		return NULL;
 	}
-	for( i = 0 ; i < numberOfUnits ; i++ )//linear search is used here as N (or size) will be quite low (<50) although a hard coded limit is illogical as it could limit teaching potential of military capabilities
+	for( i = 0 ; i < numberOfUnits ; i++ )//linear search is used here as N (or size) will be quite low (<50) although a hard coded limit is 
+	//illogical as it could limit teaching potential of military capabilities
 	{
 		unitDataJSON = json_array_get( tempJsonHandle , ID );
 		if( !json_is_object( unitDataJSON ) )
@@ -1033,6 +1034,7 @@ mapData *loadMapData( char *levelDataFile , int mapNo , SDL_Renderer *render , i
 	json_error_t errorHandle;
 	SDL_Rect placeholder;
 	char tilesetPath[ MAX_TEXT_OUTPUT ], *mapFileContent, tileFilePath[ MAX_TEXT_OUTPUT ];
+	//==================JSON STUFF=============================
 	if( !temp )
 	{
 		fprintf( stderr , "Malloc has failed in loadMapData : %s \n" , strerror( errno ) );
@@ -1055,14 +1057,20 @@ mapData *loadMapData( char *levelDataFile , int mapNo , SDL_Renderer *render , i
 		*success = FAIL;
 		return NULL;
 	}
+	//========Map Loading ======================
 	temp->mapID = json_integer_value( json_object_get( mapDataJSON , "MAP_ID" ) );
 	temp->path = mapLevelIDToMapPath( temp->mapID , success );
+	//activity
 	temp->activity = loadActivity( temp->path , success );
+	//quotes
 	temp->quoteList = loadQuoteListData( temp->path , success );
 	snprintf( tileFilePath , MAX_TEXT_OUTPUT , "%s%s" , temp->path , TILE_FILE );
+	//map Tiles
 	temp->tiles = loadTileData( tileFilePath , success );
+	//units and side data
 	temp->sides[0] = loadSideData( temp->path , 0 , success );
 	temp->sides[1] = loadSideData( temp->path , 1 , success );
+	//misc  things for displaying information, and buttons
 	temp->title = (char *) json_string_value( json_object_get( mapDataJSON , "TITLE" ) );
 	temp->description = (char *) json_string_value( json_object_get( mapDataJSON , "DESCRIPTION" ) );
 	snprintf( tilesetPath , MAX_TEXT_OUTPUT , "%s%s" , temp->path , TILESET_FILE );
@@ -1072,10 +1080,14 @@ mapData *loadMapData( char *levelDataFile , int mapNo , SDL_Renderer *render , i
 }
 
 /*
+	=======================================================
 	char *mapLevelIDToMapPath(int id, int *success):
-	Loads map ID to find the data
+	Loads map ID to find the data for a module, as opposed to the
+	other function which finds data at a sub module level
 
-
+	On success, it returns the string showing the path to the module
+	Otherwise, it will return NULL
+	=======================================================
 */
 char *mapLevelIDToMapPath( int id , int *success )
 {
@@ -1087,7 +1099,7 @@ char *mapLevelIDToMapPath( int id , int *success )
 	int wasSuccess = SUCCESS;
 	
 	mappingFileContents = loadTextFile( MAPPING_FILE_MAPS , &wasSuccess );
-	
+	//================JSON stuff =========================
 	tempJsonHandle = json_loads( mappingFileContents , 0 , &errorHandle );
 	if( !tempJsonHandle )
 	{
@@ -1112,11 +1124,14 @@ char *mapLevelIDToMapPath( int id , int *success )
 	}
 	return mappedPath;
 }
-/*
+/*	==============================================================
 	levelData *loadLevelData(char *levelFileData, int *success):
 	Loads the levels
 
-
+	On success, it will return a pointer to a levels structure containing
+	all the modules
+	Otherwise, it will return NULL
+	==============================================================
 */
 levelData *loadLevelData(SDL_Renderer *render, int *success)
 {
@@ -1127,7 +1142,7 @@ levelData *loadLevelData(SDL_Renderer *render, int *success)
 	json_error_t errorHandle;
 	int noLevels, i;
 	levelFileContents = loadTextFile( LEVELS_FILE , success );
-	
+	//============ JSON Stuff ========================
 	tempJsonHandle = json_loads( levelFileContents , 0 , &errorHandle );
 	if( !tempJsonHandle )
 	{
@@ -1147,6 +1162,7 @@ levelData *loadLevelData(SDL_Renderer *render, int *success)
 	noLevels = json_integer_value( json_object_get( levelDataJSON , "NO_MAPS" ) );
 	temp->noLevels = noLevels;
 	temp->maps = malloc( sizeof( mapData * ) * noLevels );
+	//================= Map loading section ====================================
 	for( i = 0 ; i < noLevels ; i++ )
 	{
 		temp->maps[i] = loadMapData( ( char * ) MAP_FILE , i , render , success );
@@ -1154,3 +1170,10 @@ levelData *loadLevelData(SDL_Renderer *render, int *success)
 	return temp;
 
 }
+/*
+
+
+	END OF FILE
+
+
+*/
